@@ -2,7 +2,6 @@
 import { computed, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import {
-  Diamond,
   Search,
   House,
   LayoutGrid,
@@ -69,7 +68,7 @@ async function addCollection() {
 <template>
   <aside class="sidebar" :class="{ collapsed }">
     <div class="sidebar-logo">
-      <Diamond class="logo-glyph" :size="18" :stroke-width="1.8" />
+      <img src="../../assets/logo.png" alt="Project Hub" />
       <span class="logo-text">Project Hub</span>
     </div>
 

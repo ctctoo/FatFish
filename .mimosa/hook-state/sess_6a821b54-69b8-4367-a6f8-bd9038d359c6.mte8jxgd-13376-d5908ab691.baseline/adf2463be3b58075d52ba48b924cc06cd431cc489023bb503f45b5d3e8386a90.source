@@ -71,6 +71,17 @@ pub fn init_connection(db_path: &std::path::Path) -> Result<Connection, rusqlite
             link_type TEXT,
             FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE CASCADE
         );
+
+        CREATE TABLE IF NOT EXISTS todos (
+            id TEXT PRIMARY KEY,
+            title TEXT NOT NULL,
+            done INTEGER NOT NULL DEFAULT 0,
+            project_id TEXT,
+            due_date TEXT,
+            sort_order INTEGER NOT NULL DEFAULT 0,
+            created_at TEXT NOT NULL,
+            FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE SET NULL
+        );
         "#,
     )?;
 

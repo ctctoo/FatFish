@@ -55,6 +55,13 @@
   white-space: nowrap;
 }
 
+.sidebar-logo img {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
 .sidebar-logo .logo-glyph {
   color: var(--text-primary);
   font-size: 18px;
@@ -98,8 +105,8 @@
 }
 
 .sidebar-item.active {
-  background: var(--selected);
-  color: var(--text-primary);
+  background: var(--accent-soft);
+  color: var(--accent);
   font-weight: 600;
 }
 
@@ -334,7 +341,7 @@
   gap: 16px;
 }
 
-/* ---------- Project card ---------- */
+/* ---------- Project card (horizontal: icon tile + content + footer) ---------- */
 .project-card {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -344,7 +351,6 @@
   transition: border-color 0.15s, background 0.15s;
   display: flex;
   flex-direction: column;
-  min-height: 230px;
 }
 
 .project-card:hover {
@@ -352,49 +358,28 @@
   background: var(--surface-muted);
 }
 
-.card-cover {
-  height: 100px;
+.card-main {
+  display: flex;
+  gap: 14px;
+  padding: 16px 16px 12px;
+}
+
+.card-tile {
+  width: 64px;
+  height: 64px;
+  border-radius: 14px;
+  flex-shrink: 0;
   display: grid;
   place-items: center;
-  font-size: 34px;
-  flex-shrink: 0;
-  position: relative;
   user-select: none;
 }
 
-.card-cover .cover-letter {
-  font-size: 36px;
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.92);
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
-}
-
-.card-fav {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  color: var(--text-secondary);
-  background: none;
-  border: none;
-  padding: 3px;
-  border-radius: 6px;
-  display: inline-flex;
-}
-
-.card-fav:hover {
-  background: rgba(0, 0, 0, 0.08);
-}
-
-.card-fav.on {
-  color: #d9a92f;
-}
-
-.card-body {
-  padding: 13px 16px 14px;
+.card-content {
+  min-width: 0;
+  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  flex: 1;
+  gap: 6px;
 }
 
 .card-title-row {
@@ -404,32 +389,31 @@
 }
 
 .card-title {
-  font-size: 16px;
+  font-size: 15.5px;
   font-weight: 600;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.card-more {
+.card-star {
   margin-left: auto;
+  background: none;
   border: none;
-  background: transparent;
   color: var(--text-tertiary);
-  padding: 2px 6px;
+  padding: 2px;
   border-radius: 6px;
   display: inline-flex;
-  opacity: 0;
-  transition: opacity 0.15s;
+  flex-shrink: 0;
 }
 
-.project-card:hover .card-more {
-  opacity: 1;
-}
-
-.card-more:hover {
+.card-star:hover {
   background: var(--hover);
-  color: var(--text-primary);
+  color: var(--text-secondary);
+}
+
+.card-star.on {
+  color: #d9a92f;
 }
 
 .card-desc {
@@ -447,37 +431,54 @@
   display: flex;
   gap: 6px;
   flex-wrap: wrap;
-  margin-top: auto;
+  margin-top: 2px;
 }
 
 .card-footer {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin-top: 4px;
+  gap: 10px;
+  padding: 9px 16px;
+  border-top: 1px solid var(--border);
+}
+
+.card-divider {
+  width: 1px;
+  height: 14px;
+  background: var(--border);
+}
+
+.card-local {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12.5px;
+  color: var(--text-secondary);
+}
+
+.card-updated {
+  font-size: 12.5px;
+  color: var(--text-tertiary);
+}
+
+.card-more {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: var(--text-tertiary);
+  padding: 3px 6px;
+  border-radius: 6px;
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+.card-more:hover {
+  background: var(--hover);
+  color: var(--text-primary);
 }
 
 .card-open {
-  position: absolute;
-  right: 12px;
-  bottom: 12px;
-  border: none;
-  background: var(--surface);
-  border: 1px solid var(--border-strong);
-  color: var(--text-primary);
-  font-size: 12px;
-  padding: 4px 12px;
-  border-radius: 7px;
-  opacity: 0;
-  transition: opacity 0.15s;
-}
-
-.project-card:hover .card-open {
-  opacity: 1;
-}
-
-.card-open:hover {
-  background: var(--hover);
+  display: none;
 }
 
 /* ---------- Status ---------- */
@@ -496,17 +497,15 @@
   background: var(--status-color, var(--text-tertiary));
 }
 
-/* ---------- Tag badge ---------- */
+/* ---------- Tag badge（彩色圆片，背景/文字由组件内联指定） ---------- */
 .tag-badge {
   display: inline-flex;
   align-items: center;
   gap: 4px;
   font-size: 12px;
-  padding: 2px 9px;
+  padding: 2px 10px;
   border-radius: 20px;
-  background: var(--surface-muted);
-  border: 1px solid var(--border);
-  color: var(--text-secondary);
+  border: none;
   white-space: nowrap;
 }
 
@@ -1206,15 +1205,15 @@
   border-radius: var(--radius-lg);
   overflow: hidden;
   background: var(--surface);
-  min-height: 230px;
+  min-height: 150px;
 }
 
 .skeleton-card .sk-cover {
-  height: 100px;
+  display: none;
 }
 
 .skeleton-card .sk-body {
-  padding: 14px 16px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
   gap: 10px;

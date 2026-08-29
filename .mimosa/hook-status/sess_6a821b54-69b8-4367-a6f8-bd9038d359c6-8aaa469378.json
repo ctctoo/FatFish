@@ -1,14 +1,14 @@
 {
   "schemaVersion": "mimosa-hook-status/v1",
-  "recordedAt": "2026-08-29T09:50:51.257Z",
+  "recordedAt": "2026-08-29T10:36:02.327Z",
   "sessionId": "sess_6a821b54-69b8-4367-a6f8-bd9038d359c6",
   "event": "PostToolUse",
   "toolName": "Edit",
-  "file": "C:/Users/chan/.zcode/cli/memories/projects/project-hub-15c3a7ae265d344b/memory/project-hub-setup.md",
+  "file": "src/main.ts",
   "outcome": "clear",
   "coverage": "complete",
   "findingCount": 0,
-  "durationMs": 4,
+  "durationMs": 15,
   "hostState": "hook_complete",
   "reportHint": ".mimosa/reports/"
 }

@@ -1,3 +1,20 @@
+export interface Todo {
+  id: string;
+  title: string;
+  done: boolean;
+  projectId: string | null;
+  projectName: string | null;
+  projectStatus: string | null;
+  /** 截止日期 YYYY-MM-DD */
+  dueDate: string | null;
+}
+
+export interface TodoInput {
+  title: string;
+  projectId: string | null;
+  dueDate: string | null;
+}
+
 export interface Tag {
   id: string;
   name: string;
@@ -142,4 +159,25 @@ export function coverColorFor(name: string, explicit: string | null): string {
   let hash = 0;
   for (const ch of name) hash = (hash * 31 + ch.charCodeAt(0)) >>> 0;
   return COVER_PALETTE[hash % COVER_PALETTE.length];
+}
+
+/** 标签彩色圆片配色（背景 / 文字成对），按名称稳定取色 */
+export const TAG_CHIP_PALETTE: { bg: string; text: string }[] = [
+  { bg: "#E8EEFB", text: "#3B6FD4" },
+  { bg: "#E5F3EA", text: "#3D8B5F" },
+  { bg: "#FBF0DC", text: "#B07A1A" },
+  { bg: "#F6E9F7", text: "#9A4FA8" },
+  { bg: "#FBE9E4", text: "#C05B3C" },
+  { bg: "#E4F3F1", text: "#2F8A7E" },
+  { bg: "#EDEcFa", text: "#6B5BD2" },
+  { bg: "#F3EEE2", text: "#8A7A2F" },
+];
+
+export function tagChipFor(name: string, explicit: string | null): { bg: string; text: string } {
+  if (explicit) {
+    return { bg: `color-mix(in srgb, ${explicit} 14%, transparent)`, text: explicit };
+  }
+  let hash = 0;
+  for (const ch of name) hash = (hash * 31 + ch.charCodeAt(0)) >>> 0;
+  return TAG_CHIP_PALETTE[hash % TAG_CHIP_PALETTE.length];
 }

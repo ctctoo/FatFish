@@ -10,6 +10,8 @@ import type {
   ScannedProject,
   Tag,
   TagInput,
+  Todo,
+  TodoInput,
 } from "../types";
 
 export const tauriApi = {
@@ -79,6 +81,23 @@ export const tauriApi = {
   },
   deleteLink(id: string): Promise<void> {
     return invoke("delete_link", { id });
+  },
+
+  // ---- todos ----
+  listTodos(): Promise<Todo[]> {
+    return invoke("list_todos");
+  },
+  createTodo(input: TodoInput): Promise<Todo> {
+    return invoke("create_todo", { input });
+  },
+  updateTodo(id: string, input: TodoInput): Promise<void> {
+    return invoke("update_todo", { id, input });
+  },
+  toggleTodo(id: string, done: boolean): Promise<void> {
+    return invoke("toggle_todo", { id, done });
+  },
+  deleteTodo(id: string): Promise<void> {
+    return invoke("delete_todo", { id });
   },
 
   // ---- scanner ----
