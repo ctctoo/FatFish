@@ -3,41 +3,66 @@
 [![Deploy promo page to GitHub Pages](https://github.com/ctctoo/FatFish/actions/workflows/pages.yml/badge.svg)](https://github.com/ctctoo/FatFish/actions/workflows/pages.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/ctctoo/FatFish#license)
 
-**Local-First 的桌面项目管理工具** —— 把散落在磁盘各处的项目收进一个清爽的首页：扫描、索引、组织、记录，随时一键回到工作现场。
+**Local-First 的桌面项目空间管理器。**
+把散落在磁盘各处的项目、论文、旅行计划、设计稿、课程作业——所有你在本机做的事情，收进一个清爽的首页。扫描、索引、组织、记录，随时一键回到工作现场。
 
 > 数据全部存在本机，不依赖任何云端服务。你的项目文件夹永远不会被改动——FatFish 只做记录者。
 
 🌐 **[产品介绍页](https://ctctoo.github.io/FatFish/)**
 
+![FatFish 主界面](assets/screenshot.png)
+
+---
+
+## 为什么做 FatFish
+
+本地磁盘上的项目总是越来越多：
+
+- `~/Dev`、`~/Projects`、`~/Documents` 里有几十个仓库或资料夹
+- 每个项目的状态、TODO、关联链接、Git 分支都散落在各自目录里
+- 找项目靠翻文件夹，切上下文靠记忆力
+
+FatFish 不管理你的代码，只管理**项目的入口与上下文**。它读取你的目录结构建立索引，让你用 `Ctrl+K` 秒级抵达任何一个项目。
+
+---
+
 ## 功能
 
 ### 项目库
 
-- **本地扫描导入**：自动识别一级子目录中的项目（`pom.xml` / `package.json` / `Cargo.toml` / `go.mod` / `build.gradle` / `requirements.txt`…），并判断 Java / Kotlin / JS / TS / Python / Rust / Go / Android 等技术栈
-- **项目状态**：`● 计划中 / ● 进行中 / ● 已暂停 / ● 已完成 / ● 已归档`，卡片右键或 ⋯ 菜单即可一键切换，状态一目了然
-- **封面系统**：Emoji + 主题色封面，项目卡片不再千篇一律
-- **收藏与最近打开**：常用项目置顶显示
+- **本地扫描导入**：指向父目录，自动识别一级子目录中的项目。通过特征文件判断技术栈：
+  - `pom.xml` → Java
+  - `build.gradle(.kts)` → Java / Android（检测 `AndroidManifest.xml`）
+  - `package.json` + `tsconfig.json` → TypeScript，否则 JavaScript
+  - `Cargo.toml` → Rust
+  - `go.mod` → Go
+  - `requirements.txt` / `pyproject.toml` / `setup.py` → Python
+- **项目状态**：`计划中 / 进行中 / 已暂停 / 已完成 / 已归档`，一键切换，状态变更自动记录
+- **封面系统**：首字母 + 主题色封面，项目卡片不再千篇一律
+- **收藏与最近打开**：常用项目置顶，最近活跃的自动上浮
 
 ### 组织方式
 
-- **集合（Collections）**：按用途自由分组，支持从扫描结果批量导入、多选现有项目加入集合
-- **标签（Tags）**：彩色标签系统，按标签筛选
-- **多维度筛选**：状态 / 集合 / 标签 / 收藏 / 最近，配合排序（更新时间 / 名称 / 打开时间）快速定位
+- **集合（Collections）**：按用途自由分组，扫描结果可批量导入到指定集合
+- **标签（Tags）**：彩色标签系统，支持按标签筛选
+- **多维度筛选**：状态 / 集合 / 标签 / 收藏 / 最近，配合排序快速定位
 
 ### 记录与追踪
 
-- **Todo 待办**：首页 Todo 面板，任务可关联项目、设置截止日期、勾选完成
-- **项目链接**：GitHub / 官网 / 文档 / 设计稿 / 在线 Demo / 论文 / 网盘——一个项目的所有入口
-- **备注**：自由文本记录项目上下文
-- **活动时间线（Timeline）**：自动记录项目创建、描述更新、链接添加、Todo 创建、状态变更，回看项目脉络
-- **Git 只读信息**：remote、分支、最后 commit、dirty 状态（Git 不可用时自动降级，不影响使用）
+- **跨项目 Todo**：首页待办面板，任务可关联项目、设置截止日期
+- **项目链接**：GitHub / 官网 / 文档 / 设计稿 / Demo / 论文 / 云盘 / 其他
+- **备注**：自由文本 Markdown 记录项目上下文
+- **活动时间线**：自动记录创建、描述更新、链接添加、Todo 创建、状态变更
+- **Git 只读信息**：remote、分支、最后 commit、dirty 状态，Git 不可用时自动降级，绝不报错
 
 ### 桌面体验
 
-- **命令面板**：`Ctrl+K` 全局搜索项目，键盘党友好
-- **双主题**：浅色 / 深色 / 跟随系统，基于 Design Token 的完整主题体系
-- **中英双语**：设置内一键切换，界面即时生效
-- **网格 / 列表**两种视图，可折叠侧栏，原生桌面窗口
+- **命令面板**：`Ctrl+K` 全局搜索项目、标签、路径
+- **网格 / 列表双视图**：可折叠侧栏，原生桌面窗口
+- **明暗主题**：浅色 / 深色 / 跟随系统
+- **中英双语**：设置内一键切换
+
+---
 
 ## 技术栈
 
@@ -46,8 +71,10 @@
 | 桌面框架 | Tauri 2（Rust + 系统 WebView） |
 | 前端 | Vue 3 + TypeScript + Vite + Pinia + Vue Router |
 | 后端 | Rust，Command → Service → Repository → SQLite 分层 |
-| 存储 | SQLite（rusqlite bundled，幂等迁移） |
+| 存储 | SQLite（rusqlite bundled，随应用分发） |
 | 国际化 | 自研轻量 i18n（字典 + `useI18n()`，locale 持久化） |
+
+---
 
 ## 快速开始
 
@@ -55,9 +82,11 @@
 
 ```bash
 npm install          # 安装依赖
-npm run tauri dev    # 开发模式
-npm run tauri build  # 构建发行版（exe + 安装包，位于 src-tauri/target/release/bundle/）
+npm run tauri dev    # 开发模式启动
+npm run tauri build  # 构建发行版（位于 src-tauri/target/release/bundle/）
 ```
+
+---
 
 ## 数据与隐私
 
@@ -65,12 +94,15 @@ npm run tauri build  # 构建发行版（exe + 安装包，位于 src-tauri/targ
 - 从索引中移除项目**不会**删除磁盘上的项目文件夹
 - 不联网、不上报、不同步，卸载即走
 
-## 文档
+---
 
-- [产品介绍页（在线）](https://ctctoo.github.io/FatFish/) —— 由 `.github/workflows/pages.yml` 从 `promo.html` 自动部署
-- [promo.html](promo.html) —— 产品介绍页源文件
+## 文档与链接
+
+- [🌐 产品介绍页](https://ctctoo.github.io/FatFish/) —— 自动部署自 `promo.html`
 - [MvpPlan.md](docs/MvpPlan.md) —— MVP 规划
 - [UIPlan.md](docs/UIPlan.md) —— UI 设计方案
+
+---
 
 ## License
 
