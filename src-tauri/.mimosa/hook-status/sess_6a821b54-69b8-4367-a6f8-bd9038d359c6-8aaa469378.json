@@ -1,0 +1,14 @@
+{
+  "schemaVersion": "mimosa-hook-status/v1",
+  "recordedAt": "2026-08-29T10:02:19.074Z",
+  "sessionId": "sess_6a821b54-69b8-4367-a6f8-bd9038d359c6",
+  "event": "PostToolUse",
+  "toolName": "Edit",
+  "file": "D:\\Project\\My\\Project Hub\\src\\router\\index.ts",
+  "outcome": "inconclusive",
+  "coverage": "partial",
+  "findingCount": 0,
+  "durationMs": 12,
+  "hostState": "hook_complete",
+  "reportHint": ".mimosa/reports/"
+}

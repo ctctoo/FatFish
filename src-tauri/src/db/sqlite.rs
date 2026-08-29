@@ -1,0 +1,142 @@
+use rusqlite::Connection;
+
+/// 打开数据库连接并执行迁移。基础表结构与 MvpPlan 第 13 节一致，
+/// UIPlan 重构新增的列/表在这里做幂等迁移。
+pub fn init_connection(db_path: &std::path::Path) -> Result<Connection, rusqlite::Error> {
+    let conn = Connection::open(db_path)?;
+    conn.pragma_update(None, "foreign_keys", "ON")?;
+    conn.pragma_update(None, "journal_mode", "WAL")?;
+
+    conn.execute_batch(
+        r#"
+        CREATE TABLE IF NOT EXISTS projects (
+            id TEXT PRIMARY KEY,
+            name TEXT NOT NULL,
+            path TEXT NOT NULL UNIQUE,
+            description TEXT,
+            status TEXT NOT NULL DEFAULT 'IN_PROGRESS',
+            favorite INTEGER NOT NULL DEFAULT 0,
+            cover_emoji TEXT,
+            cover_color TEXT,
+            notes TEXT,
+            language TEXT,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL,
+            last_opened_at TEXT
+        );
+
+        CREATE TABLE IF NOT EXISTS tags (
+            id TEXT PRIMARY KEY,
+            name TEXT NOT NULL UNIQUE,
+            color TEXT
+        );
+
+        CREATE TABLE IF NOT EXISTS project_tags (
+            project_id TEXT NOT NULL,
+            tag_id TEXT NOT NULL,
+            PRIMARY KEY (project_id, tag_id),
+            FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE CASCADE,
+            FOREIGN KEY(tag_id) REFERENCES tags(id) ON DELETE CASCADE
+        );
+
+        CREATE TABLE IF NOT EXISTS git_info (
+            project_id TEXT PRIMARY KEY,
+            remote_url TEXT,
+            branch TEXT,
+            commit_hash TEXT,
+            commit_message TEXT,
+            commit_time TEXT,
+            is_dirty INTEGER DEFAULT 0,
+            FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE CASCADE
+        );
+
+        CREATE TABLE IF NOT EXISTS collections (
+            id TEXT PRIMARY KEY,
+            name TEXT NOT NULL UNIQUE
+        );
+
+        CREATE TABLE IF NOT EXISTS project_collections (
+            project_id TEXT NOT NULL,
+            collection_id TEXT NOT NULL,
+            PRIMARY KEY (project_id, collection_id),
+            FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE CASCADE,
+            FOREIGN KEY(collection_id) REFERENCES collections(id) ON DELETE CASCADE
+        );
+
+        CREATE TABLE IF NOT EXISTS links (
+            id TEXT PRIMARY KEY,
+            project_id TEXT NOT NULL,
+            title TEXT NOT NULL,
+            url TEXT NOT NULL,
+            link_type TEXT,
+            FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE CASCADE
+        );
+
+        CREATE TABLE IF NOT EXISTS todos (
+            id TEXT PRIMARY KEY,
+            title TEXT NOT NULL,
+            done INTEGER NOT NULL DEFAULT 0,
+            project_id TEXT,
+            due_date TEXT,
+            sort_order INTEGER NOT NULL DEFAULT 0,
+            created_at TEXT NOT NULL,
+            FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE SET NULL
+        );
+        "#,
+    )?;
+
+    migrate(&conn)?;
+
+    Ok(conn)
+}
+
+/// 对旧版本数据库做幂等迁移
+fn migrate(conn: &Connection) -> Result<(), rusqlite::Error> {
+    add_column_if_missing(conn, "projects", "cover_emoji", "TEXT")?;
+    add_column_if_missing(conn, "projects", "cover_color", "TEXT")?;
+    add_column_if_missing(conn, "projects", "notes", "TEXT")?;
+
+    // 状态枚举统一到 UIPlan：进行中 / 计划中 / 暂停 / 已完成 / 归档
+    conn.execute(
+        "UPDATE projects SET status = 'IN_PROGRESS' WHERE status IN ('DEVELOPING', 'MAINTAINING')",
+        [],
+    )?;
+
+    // 旧版 github_url 迁移为 links 中的一条 GitHub 链接
+    conn.execute(
+        r#"INSERT INTO links (id, project_id, title, url, link_type)
+           SELECT lower(hex(randomblob(16))), p.id, 'GitHub', p.github_url, 'github'
+           FROM projects p
+           WHERE p.github_url IS NOT NULL AND p.github_url != ''
+             AND NOT EXISTS (
+                SELECT 1 FROM links l WHERE l.project_id = p.id AND l.link_type = 'github'
+             )"#,
+        [],
+    )?;
+
+    Ok(())
+}
+
+fn add_column_if_missing(
+    conn: &Connection,
+    table: &str,
+    column: &str,
+    decl: &str,
+) -> Result<(), rusqlite::Error> {
+    let has_column = conn
+        .prepare(&format!("PRAGMA table_info({table})"))?
+        .query_map([], |row| {
+            let name: String = row.get(1)?;
+            Ok(name)
+        })?
+        .filter_map(Result::ok)
+        .any(|name| name == column);
+    if !has_column {
+        conn.execute_batch(&format!("ALTER TABLE {table} ADD COLUMN {column} {decl};"))?;
+    }
+    Ok(())
+}
+
+pub fn now() -> String {
+    chrono::Local::now().to_rfc3339()
+}

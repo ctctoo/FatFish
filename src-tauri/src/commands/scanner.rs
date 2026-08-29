@@ -1,0 +1,19 @@
+use tauri::State;
+
+use crate::Db;
+use crate::models::scanned::ScannedProject;
+use crate::services::project_service;
+
+type CmdResult<T> = Result<T, String>;
+
+#[tauri::command]
+pub fn scan_directory(db: State<Db>, path: String) -> CmdResult<Vec<ScannedProject>> {
+    let conn = db.0.lock().map_err(|_| "数据库忙，请稍后重试".to_string())?;
+    project_service::scan_directory(&conn, &path)
+}
+
+#[tauri::command]
+pub fn import_projects(db: State<Db>, paths: Vec<String>) -> CmdResult<Vec<ScannedProject>> {
+    let conn = db.0.lock().map_err(|_| "数据库忙，请稍后重试".to_string())?;
+    project_service::import_scanned(&conn, &paths)
+}

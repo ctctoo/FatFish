@@ -1,0 +1,491 @@
+{
+  "schema_version": "mimosa-task-review/v2",
+  "run_id": "20260829T095731793Z-24584-9873512d7493",
+  "run_status": "inconclusive",
+  "errors": [
+    {
+      "stage": "baseline",
+      "target": ".",
+      "reason": "baseline_partial: baseline capture had enumeration or snapshot errors"
+    }
+  ],
+  "coverage": {
+    "schema_version": "mimosa-hook-coverage/v1",
+    "status": "partial",
+    "scope": "hook_observed_diff",
+    "baseline": {
+      "complete": false,
+      "captured_files": 33,
+      "candidate_limit": 5000,
+      "truncated": false,
+      "enumeration_error_count": 0,
+      "snapshot_error_count": 11,
+      "compensated_target_count": 15
+    },
+    "change_tracking": {
+      "touched_observed": 15,
+      "touched_retained": 15,
+      "truncated": false,
+      "bash_mutation": true,
+      "bash_discovered": 15,
+      "bash_discovery_limit": 80,
+      "bash_discovery_truncated": false
+    },
+    "candidates": {
+      "eligible_files": 15,
+      "selected_files": 15,
+      "limit": 20,
+      "truncated": false
+    },
+    "scanning": {
+      "required_files": 15,
+      "scanned_files": 15,
+      "skipped_files": 0,
+      "failed_files": 0,
+      "project_checks_required": 0,
+      "project_checks_completed": 0
+    },
+    "notification": {
+      "eligible_findings": 0,
+      "detailed_findings": 0,
+      "detail_limit": 3,
+      "truncated": false
+    },
+    "reason_counts": {
+      "baseline_partial": 1,
+      "project_check_failed": 1
+    },
+    "reasons": [
+      {
+        "code": "baseline_partial",
+        "stage": "baseline",
+        "target": ".",
+        "detail": "baseline capture had enumeration or snapshot errors",
+        "affects_completion": true
+      },
+      {
+        "code": "project_check_failed",
+        "stage": "baseline",
+        "target": ".",
+        "detail": "baseline_partial: baseline capture had enumeration or snapshot errors",
+        "affects_completion": true
+      }
+    ],
+    "reasons_truncated": false
+  },
+  "generated_at": "2026-08-29T09:57:31.793Z",
+  "session_id": "sess_6a821b54-69b8-4367-a6f8-bd9038d359c6",
+  "target": ".",
+  "revision": null,
+  "rules_version": "unavailable",
+  "diff_hash": "9475cd1dd33d2959c715036313b6a08b7ac461a21a92ca755ea4dd21a5c833ee",
+  "diff": {
+    "algorithm": "sha256",
+    "changed_file_count": 15,
+    "changed_files": [
+      {
+        "file": "src/commands/collection.rs",
+        "ranges": [
+          {
+            "start": 1,
+            "end": 50
+          }
+        ],
+        "before_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "after_hash": "da2318a43121cede1eb59e66630b9b03cc3f00e2155e3ccced4a197ad80f4d36"
+      },
+      {
+        "file": "src/commands/link.rs",
+        "ranges": [
+          {
+            "start": 1,
+            "end": 39
+          }
+        ],
+        "before_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "after_hash": "10eef687d1b0e48ced84e603c201bf451fc0484124f982ddd92a7bd35e8c9eff"
+      },
+      {
+        "file": "src/commands/mod.rs",
+        "ranges": [
+          {
+            "start": 1,
+            "end": 1
+          },
+          {
+            "start": 3,
+            "end": 3
+          }
+        ],
+        "before_hash": "994fa5bc7938d7be3780164a4278bc6a04b768e07c20109aba6c72e5d5f7476b",
+        "after_hash": "b53f096f77f443ab4c919977a2c16e63d47ea450e68508c994ff992ab9324e20"
+      },
+      {
+        "file": "src/db/sqlite.rs",
+        "ranges": [
+          {
+            "start": 3,
+            "end": 4
+          },
+          {
+            "start": 17,
+            "end": 17
+          },
+          {
+            "start": 19,
+            "end": 21
+          },
+          {
+            "start": 52,
+            "end": 73
+          },
+          {
+            "start": 77,
+            "end": 78
+          },
+          {
+            "start": 82,
+            "end": 128
+          }
+        ],
+        "before_hash": "7a041951298ee87728fa4218ee227c5a9f4e9c46a6f9f83668c6a86879dabbd4",
+        "after_hash": "3528430f9e98949a164351e1e57d35f47b77087ba5128c9db04bb3e1d7067e58"
+      },
+      {
+        "file": "src/lib.rs",
+        "ranges": [
+          {
+            "start": 41,
+            "end": 48
+          }
+        ],
+        "before_hash": "e24fdf3086c1a4f076612244f418a12051b1d932a37ec9aa8a189e65e6861f94",
+        "after_hash": "1e071ee563d761149053d7eaa5f6e16e67be79accdc8e2ccde5910a006d1b077"
+      },
+      {
+        "file": "src/models/collection.rs",
+        "ranges": [
+          {
+            "start": 1,
+            "end": 15
+          }
+        ],
+        "before_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "after_hash": "86399f0750a1f626f793225e103b5df22b3b3d87aaf719351cba44efe377588a"
+      },
+      {
+        "file": "src/models/link.rs",
+        "ranges": [
+          {
+            "start": 1,
+            "end": 21
+          }
+        ],
+        "before_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "after_hash": "7be0c2595bc1f5e030430759d19013cd269fafc14e9812e76120c886a5914d24"
+      },
+      {
+        "file": "src/models/mod.rs",
+        "ranges": [
+          {
+            "start": 1,
+            "end": 1
+          },
+          {
+            "start": 3,
+            "end": 3
+          }
+        ],
+        "before_hash": "1d7f2d3a150a0944924f3549facee35a9f7876ca58230fc2b296f99513bb5108",
+        "after_hash": "fff2ee146d34f18a4f8f241a906adbc2cc791eab6f68644d6990e45acfe4c220"
+      },
+      {
+        "file": "src/models/project.rs",
+        "ranges": [
+          {
+            "start": 3,
+            "end": 3
+          },
+          {
+            "start": 5,
+            "end": 5
+          },
+          {
+            "start": 18,
+            "end": 24
+          },
+          {
+            "start": 27,
+            "end": 30
+          },
+          {
+            "start": 40,
+            "end": 42
+          },
+          {
+            "start": 45,
+            "end": 45
+          },
+          {
+            "start": 53,
+            "end": 53
+          },
+          {
+            "start": 55,
+            "end": 56
+          },
+          {
+            "start": 59,
+            "end": 60
+          },
+          {
+            "start": 66,
+            "end": 67
+          }
+        ],
+        "before_hash": "cfd18c4e79d306e219fd3668406011cf9d86e20bb52cd1d158823e4e3e799e32",
+        "after_hash": "893ad548a39aa6a3d6135f27d49830f63c15374e160369aad2e229e2364adb2f"
+      },
+      {
+        "file": "src/repository/collection_repository.rs",
+        "ranges": [
+          {
+            "start": 1,
+            "end": 83
+          }
+        ],
+        "before_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "after_hash": "736390cc98d7b8f60f432ca2009cfbf4ba506bfc8ae90cedde36549482a2a679"
+      },
+      {
+        "file": "src/repository/link_repository.rs",
+        "ranges": [
+          {
+            "start": 1,
+            "end": 49
+          }
+        ],
+        "before_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "after_hash": "f5848c33f59af06febdfeee99be58de5e1c29ee5489b910198629da5b95ed4ba"
+      },
+      {
+        "file": "src/repository/mod.rs",
+        "ranges": [
+          {
+            "start": 1,
+            "end": 1
+          },
+          {
+            "start": 3,
+            "end": 3
+          }
+        ],
+        "before_hash": "e4a1b147bf1c463ea09dea708493dbec458613dbe657911c513df209a6097b2e",
+        "after_hash": "877bf531b8b5ae7eb02cc34c59c723b081a18c92123a3a09e6a8bcbc385df921"
+      },
+      {
+        "file": "src/repository/project_repository.rs",
+        "ranges": [
+          {
+            "start": 5,
+            "end": 5
+          },
+          {
+            "start": 11,
+            "end": 12
+          },
+          {
+            "start": 15,
+            "end": 42
+          },
+          {
+            "start": 65,
+            "end": 65
+          },
+          {
+            "start": 81,
+            "end": 82
+          },
+          {
+            "start": 88,
+            "end": 91
+          },
+          {
+            "start": 95,
+            "end": 95
+          },
+          {
+            "start": 101,
+            "end": 101
+          },
+          {
+            "start": 108,
+            "end": 111
+          },
+          {
+            "start": 125,
+            "end": 125
+          },
+          {
+            "start": 141,
+            "end": 141
+          },
+          {
+            "start": 146,
+            "end": 147
+          },
+          {
+            "start": 160,
+            "end": 161
+          },
+          {
+            "start": 163,
+            "end": 167
+          },
+          {
+            "start": 188,
+            "end": 194
+          },
+          {
+            "start": 201,
+            "end": 208
+          },
+          {
+            "start": 210,
+            "end": 210
+          },
+          {
+            "start": 213,
+            "end": 213
+          },
+          {
+            "start": 218,
+            "end": 218
+          }
+        ],
+        "before_hash": "ea0df4c3b26843a763b327ece90c6baa23d444de9ef29d387c25015023aabc59",
+        "after_hash": "49e78a2d1f0ec2b2f37a9dad9da8ccbb79c107be1d1bbf1fe58572fe30025217"
+      },
+      {
+        "file": "src/repository/tag_repository.rs",
+        "ranges": [
+          {
+            "start": 21,
+            "end": 38
+          }
+        ],
+        "before_hash": "59aa56965bb77bc14c8e9c6e8e59ae91752eeba8876b201673e6b078c83bd841",
+        "after_hash": "f7d79bc23145747ee1b8b943a08cedc16b77a9836854f04aebc54c53c6258739"
+      },
+      {
+        "file": "src/services/project_service.rs",
+        "ranges": [
+          {
+            "start": 5,
+            "end": 5
+          },
+          {
+            "start": 8,
+            "end": 8
+          },
+          {
+            "start": 21,
+            "end": 22
+          },
+          {
+            "start": 27,
+            "end": 32
+          },
+          {
+            "start": 35,
+            "end": 35
+          },
+          {
+            "start": 37,
+            "end": 53
+          },
+          {
+            "start": 70,
+            "end": 70
+          },
+          {
+            "start": 72,
+            "end": 74
+          },
+          {
+            "start": 82,
+            "end": 82
+          },
+          {
+            "start": 85,
+            "end": 85
+          },
+          {
+            "start": 89,
+            "end": 89
+          },
+          {
+            "start": 95,
+            "end": 98
+          },
+          {
+            "start": 125,
+            "end": 128
+          }
+        ],
+        "before_hash": "dafd416db4ac4c229f8a2a912ffd0c3d24f78028249809a4c5ee02860f3e2f03",
+        "after_hash": "93914a46b139560f7b34f5f61338082a9c99f3c832bcd3df5e7bb7dabf2bd1e5"
+      }
+    ]
+  },
+  "timing": {
+    "started_at": "2026-08-29T09:57:30.232Z",
+    "completed_at": "2026-08-29T09:57:31.793Z",
+    "duration_ms": 1561,
+    "measurement": "hook_wall_clock"
+  },
+  "tokens": {
+    "input": 0,
+    "output": 0,
+    "total": 0,
+    "model_calls": 0,
+    "measurement": "known-zero"
+  },
+  "telemetry": {
+    "schemaVersion": "mimosa-gate-telemetry/v1",
+    "profile": "gate",
+    "operation": "Stop",
+    "outcome": "partial/INCONCLUSIVE",
+    "latencyMs": 1561,
+    "peakMemoryBytes": 152330240,
+    "memoryMeasurement": "max-observed-process-rss",
+    "scannedFiles": 15,
+    "cache": {
+      "hits": 0,
+      "misses": 0,
+      "measurement": "not-applicable"
+    },
+    "denyCount": 0,
+    "tokens": {
+      "input": 0,
+      "output": 0,
+      "total": 0,
+      "modelCalls": 0,
+      "measurement": "known-zero"
+    }
+  },
+  "finding_count": 0,
+  "rewake_finding_count": 0,
+  "evidence_boundary": {
+    "scan": "candidate",
+    "static_fix_verification": "observed_static_only",
+    "runtime_verification": "not_performed"
+  },
+  "finding_events": [],
+  "findings": [],
+  "artifacts": {
+    "immutable_report": ".mimosa/reports/task-review-sess_6a821b54-69b8-4367-a6f8-bd9038d359c6-20260829T095731793Z-24584-9873512d7493.json",
+    "latest_report": ".mimosa/reports/task-review-sess_6a821b54-69b8-4367-a6f8-bd9038d359c6.json",
+    "history_summary": ".mimosa/history/run-20260829T095731793Z-24584-9873512d7493.json"
+  }
+}
