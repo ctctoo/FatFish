@@ -5,6 +5,7 @@ import { ChevronRight, Plus, Trash2, CalendarDays, Folder } from "lucide-vue-nex
 import { useTodoStore } from "../../stores/todo";
 import { useProjectStore } from "../../stores/project";
 import { useUiStore } from "../../stores/ui";
+import { useI18n } from "../../i18n";
 
 const props = defineProps<{
   /** compact：首页组件只展示未完成任务；all：任务页展示全部 */
@@ -15,12 +16,13 @@ const router = useRouter();
 const todoStore = useTodoStore();
 const projectStore = useProjectStore();
 const uiStore = useUiStore();
+const { t } = useI18n();
 
 const visibleTodos = computed(() =>
-  props.mode === "all" ? todoStore.todos : todoStore.todos.filter((t) => !t.done).slice(0, 6)
+  props.mode === "all" ? todoStore.todos : todoStore.todos.filter((todo) => !todo.done).slice(0, 6)
 );
 
-const doneCount = computed(() => todoStore.todos.filter((t) => t.done).length);
+const doneCount = computed(() => todoStore.todos.filter((todo) => todo.done).length);
 
 const adding = ref(false);
 const newTitle = ref("");
@@ -49,7 +51,7 @@ async function addTodo() {
     newTitle.value = "";
     newProjectId.value = "";
     newDueDate.value = "";
-    uiStore.showToast("任务已添加", "success");
+    uiStore.showToast(t("todo.addedToast"), "success");
   } catch (e) {
     uiStore.showToast(String(e), "error");
   }
@@ -71,30 +73,25 @@ async function remove(id: string) {
   }
 }
 
-function dueLabel(due: string | null): string {
-  if (!due) return "";
-  const today = new Date();
-  const todayStr = toDateStr(today);
-  const tomorrow = new Date(today.getTime() + 86_400_000);
-  const tomorrowStr = toDateStr(tomorrow);
-  if (due === todayStr) return "今天";
-  if (due === tomorrowStr) return "明天";
-  const d = new Date(due + "T00:00:00");
-  if (isNaN(d.getTime())) return due;
-  return `${d.getMonth() + 1}月${d.getDate()}日`;
-}
-
-function isOverdue(due: string | null): boolean {
-  if (!due) return false;
-  const now = new Date();
-  const todayStr = toDateStr(now);
-  return due < todayStr;
-}
-
 function toDateStr(d: Date): string {
   const m = String(d.getMonth() + 1).padStart(2, "0");
   const day = String(d.getDate()).padStart(2, "0");
   return `${d.getFullYear()}-${m}-${day}`;
+}
+
+function dueLabel(due: string | null): string {
+  if (!due) return "";
+  const now = new Date();
+  if (due === toDateStr(now)) return t("rel.today");
+  if (due === toDateStr(new Date(now.getTime() + 86_400_000))) return t("rel.tomorrow");
+  const d = new Date(due + "T00:00:00");
+  if (isNaN(d.getTime())) return due;
+  return `${d.getMonth() + 1}/${d.getDate()}`;
+}
+
+function isOverdue(due: string | null): boolean {
+  if (!due) return false;
+  return due < toDateStr(new Date());
 }
 
 function goProject(projectId: string | null) {
@@ -108,11 +105,11 @@ function goProject(projectId: string | null) {
       <span class="todo-title">Todo</span>
       <span class="todo-count">{{ mode === "all" ? todoStore.todos.length : todoStore.todos.length - doneCount }}</span>
       <button v-if="mode !== 'all'" class="todo-all" @click="router.push('/todos')">
-        全部任务 <ChevronRight :size="14" :stroke-width="1.8" />
+        {{ t("todo.allTasks") }} <ChevronRight :size="14" :stroke-width="1.8" />
       </button>
       <span class="spacer"></span>
       <button class="link-btn" @click="adding = !adding">
-        <Plus :size="14" :stroke-width="1.8" /> 添加任务
+        <Plus :size="14" :stroke-width="1.8" /> {{ t("todo.addTask") }}
       </button>
     </div>
 
@@ -120,17 +117,17 @@ function goProject(projectId: string | null) {
       <input
         v-model="newTitle"
         type="text"
-        placeholder="要做什么？"
+        :placeholder="t('todo.placeholder')"
         autofocus
         @keyup.enter="addTodo"
       />
       <select v-model="newProjectId">
-        <option value="">关联项目（可选）</option>
+        <option value="">{{ t("todo.projectPh") }}</option>
         <option v-for="p in projectStore.projects" :key="p.id" :value="p.id">{{ p.name }}</option>
       </select>
       <input v-model="newDueDate" type="date" />
-      <button class="btn small primary" @click="addTodo">保存</button>
-      <button class="btn small" @click="adding = false">取消</button>
+      <button class="btn small primary" @click="addTodo">{{ t("common.save") }}</button>
+      <button class="btn small" @click="adding = false">{{ t("common.cancel") }}</button>
     </div>
 
     <div v-if="visibleTodos.length" class="todo-grid" :class="{ single: mode === 'all' }">
@@ -138,7 +135,7 @@ function goProject(projectId: string | null) {
         <button
           class="todo-check"
           :class="{ on: todo.done }"
-          :title="todo.done ? '标记未完成' : '标记完成'"
+          :title="todo.done ? t('todo.markUndone') : t('todo.markDone')"
           @click="toggle(todo.id, !todo.done)"
         >
           <svg v-if="todo.done" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">
@@ -160,13 +157,13 @@ function goProject(projectId: string | null) {
           {{ dueLabel(todo.dueDate) }}
         </span>
 
-        <button class="todo-del" title="删除任务" @click="remove(todo.id)">
+        <button class="todo-del" :title="t('todo.del')" @click="remove(todo.id)">
           <Trash2 :size="13" :stroke-width="1.8" />
         </button>
       </div>
     </div>
     <div v-else class="todo-empty caption">
-      {{ mode === "all" ? "还没有任务。点击右上角「添加任务」创建一个。" : "暂待办。点击右上角「添加任务」记录下一步要做的事。" }}
+      {{ mode === "all" ? t("todo.emptyAll") : t("todo.emptyHome") }}
     </div>
   </div>
 </template>

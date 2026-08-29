@@ -1,18 +1,20 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { open } from "@tauri-apps/plugin-dialog";
+import { appDataDir } from "@tauri-apps/api/path";
 import { useSettingsStore } from "../stores/settings";
+import { useI18n } from "../i18n";
 
 const settingsStore = useSettingsStore();
-const dataDir = ref("读取中…");
+const { t } = useI18n();
+const dataDir = ref(t("misc.loading"));
 
-import { appDataDir } from "@tauri-apps/api/path";
 appDataDir()
   .then((dir) => (dataDir.value = dir))
-  .catch(() => (dataDir.value = "无法获取"));
+  .catch(() => (dataDir.value = t("misc.cannotGet")));
 
 async function pickDefaultFolder() {
-  const dir = await open({ directory: true, multiple: false, title: "选择默认项目目录" });
+  const dir = await open({ directory: true, multiple: false, title: t("settings.defaultFolder") });
   if (typeof dir === "string") settingsStore.defaultFolder = dir;
 }
 </script>
@@ -20,64 +22,89 @@ async function pickDefaultFolder() {
 <template>
   <div class="page">
     <div class="page-header">
-      <h1>Settings</h1>
+      <h1>{{ t("settings.title") }}</h1>
     </div>
 
     <div class="settings-section">
-      <h3>Appearance</h3>
-      <div class="desc">选择界面主题。跟随系统时会自动响应系统深浅色变化。</div>
+      <h3>{{ t("settings.appearance") }}</h3>
+      <p class="desc">{{ t("settings.appearanceDesc") }}</p>
       <div class="radio-row">
         <button
           class="radio-pill"
           :class="{ active: settingsStore.theme === 'system' }"
           @click="settingsStore.theme = 'system'"
         >
-          System
+          {{ t("settings.themeSystem") }}
         </button>
         <button
           class="radio-pill"
           :class="{ active: settingsStore.theme === 'light' }"
           @click="settingsStore.theme = 'light'"
         >
-          Light
+          {{ t("settings.themeLight") }}
         </button>
         <button
           class="radio-pill"
           :class="{ active: settingsStore.theme === 'dark' }"
           @click="settingsStore.theme = 'dark'"
         >
-          Dark
+          {{ t("settings.themeDark") }}
         </button>
       </div>
     </div>
 
     <div class="settings-section">
-      <h3>Project Library</h3>
+      <h3>{{ t("settings.language") }}</h3>
+      <p class="desc">{{ t("settings.languageDesc") }}</p>
+      <div class="radio-row">
+        <button
+          class="radio-pill"
+          :class="{ active: settingsStore.locale === 'zh' }"
+          @click="settingsStore.locale = 'zh'"
+        >
+          {{ t("settings.langZh") }}
+        </button>
+        <button
+          class="radio-pill"
+          :class="{ active: settingsStore.locale === 'en' }"
+          @click="settingsStore.locale = 'en'"
+        >
+          {{ t("settings.langEn") }}
+        </button>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <h3>{{ t("settings.library") }}</h3>
       <div class="settings-row">
-        <span class="k">Default Project Folder</span>
+        <span class="k">{{ t("settings.defaultFolder") }}</span>
         <span class="spacer"></span>
         <code class="caption" style="max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">
-          {{ settingsStore.defaultFolder || "未设置" }}
+          {{ settingsStore.defaultFolder || t("settings.defaultFolderUnset") }}
         </code>
-        <button class="btn small" @click="pickDefaultFolder">浏览…</button>
+        <button class="btn small" @click="pickDefaultFolder">{{ t("common.browse") }}</button>
       </div>
     </div>
 
     <div class="settings-section">
-      <h3>Behavior</h3>
+      <h3>{{ t("settings.behavior") }}</h3>
       <div class="settings-row">
-        <span class="k">删除项目前确认</span>
+        <span class="k">{{ t("settings.confirmRemove") }}</span>
         <span class="spacer"></span>
-        <button class="toggle" :class="{ on: settingsStore.confirmRemove }" @click="settingsStore.confirmRemove = !settingsStore.confirmRemove"></button>
+        <button
+          class="toggle"
+          :class="{ on: settingsStore.confirmRemove }"
+          @click="settingsStore.confirmRemove = !settingsStore.confirmRemove"
+        ></button>
       </div>
     </div>
 
     <div class="settings-section">
-      <h3>About</h3>
+      <h3>{{ t("settings.about") }}</h3>
       <p class="desc" style="margin-bottom: 0">
-        Project Hub v0.1.0 — 你电脑里所有正在做的事，都在这里。<br />
-        数据目录：<code class="caption">{{ dataDir }}</code><br />
-        快捷键：Ctrl+K 打开全局搜索。
+        {{ t("settings.aboutText") }}<br />
+        {{ t("settings.dataDir") }}<code class="caption">{{ dataDir }}</code><br />
+        {{ t("settings.shortcut") }}
       </p>
     </div>
   </div>

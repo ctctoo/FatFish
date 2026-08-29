@@ -4,12 +4,19 @@ import { MoreHorizontal, Star, Folder } from "lucide-vue-next";
 import ProjectStatus from "./ProjectStatus.vue";
 import ProjectMenu from "./ProjectMenu.vue";
 import TagBadge from "../tag/TagBadge.vue";
+import { useI18n } from "../../i18n";
+
+const { t } = useI18n();
 import type { Project } from "../../types";
-import { coverColorFor, relativeTime } from "../../types";
+import { coverColorFor } from "../../types";
+import { relativeTime } from "../../i18n";
+import { useSettingsStore } from "../../stores/settings";
 
 const props = defineProps<{
   project: Project;
 }>();
+
+const settings = useSettingsStore();
 
 const emit = defineEmits<{
   open: [project: Project];
@@ -75,7 +82,7 @@ const tileLetter = computed(() => props.project.name.charAt(0).toUpperCase() || 
         <Folder :size="13" :stroke-width="1.8" />
         本地项目
       </span>
-      <span class="card-updated">更新于 {{ relativeTime(project.updatedAt) }}</span>
+      <span class="card-updated">{{ t("card.updated") }} {{ relativeTime(settings.locale, project.updatedAt) }}</span>
       <button class="card-more" title="更多操作" @click.stop="openMenu($event)">
         <MoreHorizontal :size="16" :stroke-width="1.8" />
       </button>

@@ -19,6 +19,7 @@ import {
   Globe,
 } from "lucide-vue-next";
 import ProjectCover from "../components/project/ProjectCover.vue";
+import ProjectTimeline from "../components/project/ProjectTimeline.vue";
 import ProjectDialog from "../components/dialog/ProjectDialog.vue";
 import LinkDialog from "../components/dialog/LinkDialog.vue";
 import ConfirmDialog from "../components/common/ConfirmDialog.vue";
@@ -26,8 +27,8 @@ import { tauriApi } from "../services/tauri";
 import { useProjectStore } from "../stores/project";
 import { useSettingsStore } from "../stores/settings";
 import { useUiStore } from "../stores/ui";
-import { statusLabel, linkTypeLabel, relativeTime } from "../types";
-import type { Project } from "../types";
+import { statusLabel, linkTypeLabel, relativeTime, useI18n } from "../i18n";
+import type { Activity, Link, Project } from "../types";
 
 const props = defineProps<{ id: string }>();
 
@@ -35,11 +36,13 @@ const router = useRouter();
 const projectStore = useProjectStore();
 const settingsStore = useSettingsStore();
 const uiStore = useUiStore();
+const { t } = useI18n();
 
 const project = ref<Project | null>(null);
+const activities = ref<Activity[]>([]);
 const showForm = ref(false);
 const linkDialogMode = ref<"add" | "edit">("add");
-const editingLink = ref<Project["links"][number] | null>(null);
+const editingLink = ref<Link | null>(null);
 const showLinkDialog = ref(false);
 const deleteTarget = ref(false);
 const showMenu = ref(false);
@@ -58,6 +61,7 @@ watch(() => props.id, load);
 async function load() {
   try {
     project.value = await tauriApi.getProject(props.id);
+    activities.value = await tauriApi.listActivities(props.id);
   } catch (e) {
     uiStore.showToast(String(e), "error");
     router.push("/projects");
@@ -73,7 +77,7 @@ async function toggleFavorite() {
 async function refreshGit() {
   if (!project.value) return;
   project.value = await tauriApi.refreshGitInfo(project.value.id);
-  uiStore.showToast("Git 信息已刷新", "success");
+  uiStore.showToast(t("toast.gitRefreshed"), "success");
 }
 
 async function openFolder() {
@@ -97,7 +101,7 @@ async function openTerminal() {
 async function copyPath() {
   if (!project.value) return;
   await navigator.clipboard.writeText(project.value.path);
-  uiStore.showToast("路径已复制", "success");
+  uiStore.showToast(t("toast.copied"), "success");
 }
 
 function openLink(url: string) {
@@ -111,7 +115,7 @@ function openGitHub() {
 async function removeLink(linkId: string) {
   await tauriApi.deleteLink(linkId);
   await load();
-  uiStore.showToast("链接已删除", "success");
+  uiStore.showToast(t("toast.linkDeleted"), "success");
 }
 
 let notesTimer: ReturnType<typeof setTimeout> | null = null;
@@ -159,7 +163,7 @@ function onMenuAction(action: string) {
 async function remove() {
   if (!project.value) return;
   await projectStore.deleteProject(project.value.id);
-  uiStore.showToast("项目已删除", "success");
+  uiStore.showToast(t("toast.projectDeleted"), "success");
   router.push("/projects");
 }
 
@@ -185,11 +189,11 @@ function shortHash(hash: string | null): string {
   <div class="page">
     <div class="detail" v-if="project">
       <button class="back-link" @click="router.push('/projects')">
-        <ChevronLeft :size="15" :stroke-width="1.8" /> 返回项目列表
+        <ChevronLeft :size="15" :stroke-width="1.8" /> {{ t("detail.back") }}
       </button>
 
       <div style="display: flex; justify-content: flex-end; gap: 6px; margin-bottom: -34px; position: relative">
-        <button class="btn ghost small" :title="project.favorite ? '取消收藏' : '收藏'" @click="toggleFavorite">
+        <button class="btn ghost small" :title="project.favorite ? t('menu.unfavorite') : t('menu.favorite')" @click="toggleFavorite">
           <Star
             :size="16"
             :stroke-width="1.8"
@@ -204,45 +208,45 @@ function shortHash(hash: string | null): string {
       <div class="detail-hero">
         <ProjectCover :name="project.name" :emoji="project.coverEmoji" :color="project.coverColor" size="detail" />
         <h1>{{ project.name }}</h1>
-        <div class="subtitle">{{ project.description?.split("\n")[0] || "暂无描述" }}</div>
+        <div class="subtitle">{{ project.description?.split("\n")[0] || t("card.noDesc") }}</div>
         <div class="status-chip" style="justify-content: center">
           <span class="status-dot" :class="`status-${project.status}`"></span>
-          {{ statusLabel(project.status) }}
+          {{ statusLabel(settingsStore.locale, project.status) }}
           <template v-if="project.language"> · {{ project.language }}</template>
         </div>
         <div class="chip-row" style="justify-content: center; margin-top: 10px">
           <span v-for="c in project.collections" :key="c.id" class="collection-badge">{{ c.name }}</span>
-          <span v-for="t in project.tags" :key="t.id" class="tag-badge">{{ t.name }}</span>
+          <span v-for="item in project.tags" :key="item.id" class="tag-badge">{{ item.name }}</span>
         </div>
       </div>
 
       <div class="detail-section">
-        <h3>Location</h3>
+        <h3>{{ t("detail.location") }}</h3>
         <div class="kv-row">
           <FolderOpen :size="15" :stroke-width="1.8" style="color: var(--text-tertiary)" />
           <span class="v"><code>{{ project.path }}</code></span>
-          <button class="link-btn" @click="openFolder">打开</button>
-          <button class="link-btn" @click="copyPath">复制</button>
-          <button class="link-btn" @click="openTerminal">终端</button>
+          <button class="link-btn" @click="openFolder">{{ t("common.open") }}</button>
+          <button class="link-btn" @click="copyPath">{{ t("common.copy") }}</button>
+          <button class="link-btn" @click="openTerminal">{{ t("common.terminal") }}</button>
         </div>
       </div>
 
       <div class="detail-section">
         <h3 style="display: flex; align-items: center">
-          Links
+          {{ t("detail.links") }}
           <button
             class="link-btn"
             style="margin-left: auto; text-transform: none; letter-spacing: 0"
             @click="linkDialogMode = 'add'; editingLink = null; showLinkDialog = true"
           >
-            <Plus :size="13" :stroke-width="1.8" /> 添加链接
+            <Plus :size="13" :stroke-width="1.8" /> {{ t("detail.linksAdd") }}
           </button>
         </h3>
         <div v-if="project.links.length">
           <div v-for="link in project.links" :key="link.id" class="link-row">
             <Globe :size="14" :stroke-width="1.8" style="color: var(--text-tertiary); flex-shrink: 0" />
             <span class="link-title">{{ link.title }}</span>
-            <span class="caption">{{ linkTypeLabel(link.linkType) }}</span>
+            <span class="caption">{{ linkTypeLabel(settingsStore.locale, link.linkType) }}</span>
             <span class="link-url">{{ link.url }}</span>
             <span class="spacer" style="flex: 1"></span>
             <button class="link-btn" @click="openLink(link.url)">
@@ -259,54 +263,59 @@ function shortHash(hash: string | null): string {
             </button>
           </div>
         </div>
-        <p v-else class="caption">还没有链接。GitHub 地址会在刷新 Git 信息时自动识别。</p>
+        <p v-else class="caption">{{ t("detail.noGithubYet") }}</p>
       </div>
 
       <div class="detail-section" v-if="project.description">
-        <h3>Description</h3>
+        <h3>{{ t("detail.description") }}</h3>
         <div class="md" v-html="renderedDescription"></div>
       </div>
 
       <div class="detail-section">
-        <h3>Notes</h3>
+        <h3>{{ t("detail.notes") }}</h3>
         <textarea
           v-model="project.notes"
           class="notes-editor"
-          placeholder="记录下一步计划、想法…（自动保存，支持 Markdown）"
+          :placeholder="t('detail.notesPh')"
           @input="onNotesInput"
         ></textarea>
       </div>
 
+      <div class="detail-section" v-if="activities.length">
+        <h3>{{ t("detail.timeline") }}</h3>
+        <ProjectTimeline :activities="activities" />
+      </div>
+
       <div class="detail-section">
         <h3 style="display: flex; align-items: center">
-          开发者信息（可选模块）
+          {{ t("detail.devSection") }}
           <button class="link-btn" style="margin-left: auto; text-transform: none; letter-spacing: 0" @click="refreshGit">
-            <RefreshCw :size="12" :stroke-width="1.8" /> 刷新
+            <RefreshCw :size="12" :stroke-width="1.8" /> {{ t("common.refresh") }}
           </button>
         </h3>
         <template v-if="project.gitInfo && (project.gitInfo.branch || project.gitInfo.remoteUrl)">
           <div class="kv-row">
-            <span class="k">Branch</span>
+            <span class="k">{{ t("detail.branch") }}</span>
             <span class="v"><code>{{ project.gitInfo.branch ?? "—" }}</code></span>
           </div>
           <div class="kv-row">
-            <span class="k">状态</span>
+            <span class="k">{{ t("detail.dirtyState") }}</span>
             <span class="v">
               <span :style="{ color: project.gitInfo.isDirty ? 'var(--status-paused)' : 'var(--status-in-progress)' }">
-                {{ project.gitInfo.isDirty == null ? "未知" : project.gitInfo.isDirty ? "有未提交更改" : "Clean" }}
+                {{ project.gitInfo.isDirty == null ? t("detail.unknown") : project.gitInfo.isDirty ? t("detail.dirty") : t("detail.clean") }}
               </span>
             </span>
           </div>
           <div class="kv-row">
-            <span class="k">最后 Commit</span>
+            <span class="k">{{ t("detail.lastCommit") }}</span>
             <span class="v"><code>{{ shortHash(project.gitInfo.commitHash) }}</code> {{ project.gitInfo.commitMessage ?? "" }}</span>
           </div>
           <div class="kv-row">
-            <span class="k">时间</span>
-            <span class="v">{{ formatTime(project.gitInfo.commitTime) }} · Updated {{ relativeTime(project.updatedAt) }}</span>
+            <span class="k">{{ t("detail.commitTime") }}</span>
+            <span class="v">{{ formatTime(project.gitInfo.commitTime) }} · {{ t("card.updated") }} {{ relativeTime(settingsStore.locale, project.updatedAt) }}</span>
           </div>
         </template>
-        <p v-else class="caption">Not a Git repository</p>
+        <p v-else class="caption">{{ t("detail.notGit") }}</p>
       </div>
 
       <ProjectDialog v-if="showForm" :project="project" @close="showForm = false" @saved="load()" />
@@ -319,9 +328,9 @@ function shortHash(hash: string | null): string {
       />
       <ConfirmDialog
         v-if="deleteTarget"
-        title="删除项目"
-        :message="`确定从索引中移除「${project.name}」吗？磁盘上的文件夹不会被删除。`"
-        confirm-text="删除"
+        :title="t('confirm.deleteProjectTitle')"
+        :message="t('confirm.deleteProjectMsg', { name: project.name })"
+        :confirm-text="t('confirm.delete')"
         danger
         @confirm="remove()"
         @cancel="deleteTarget = false"
@@ -329,16 +338,16 @@ function shortHash(hash: string | null): string {
 
       <Teleport to="body">
         <div v-if="showMenu" class="menu" :style="{ left: menuX + 'px', top: menuY + 'px' }" @click.stop>
-          <button class="menu-item" @click="onMenuAction('open-folder')"><FolderOpen :size="15" :stroke-width="1.8" /> 打开文件夹</button>
-          <button class="menu-item" @click="onMenuAction('open-terminal')"><TerminalSquare :size="15" :stroke-width="1.8" /> 打开终端</button>
-          <button class="menu-item" :disabled="!githubLink" @click="onMenuAction('open-github')"><ExternalLink :size="15" :stroke-width="1.8" /> 打开 GitHub</button>
-          <button class="menu-item" @click="onMenuAction('copy-path')"><Copy :size="15" :stroke-width="1.8" /> 复制路径</button>
+          <button class="menu-item" @click="onMenuAction('open-folder')"><FolderOpen :size="15" :stroke-width="1.8" /> {{ t("menu.openFolder") }}</button>
+          <button class="menu-item" @click="onMenuAction('open-terminal')"><TerminalSquare :size="15" :stroke-width="1.8" /> {{ t("menu.openTerminal") }}</button>
+          <button class="menu-item" :disabled="!githubLink" @click="onMenuAction('open-github')"><ExternalLink :size="15" :stroke-width="1.8" /> {{ t("menu.openGithub") }}</button>
+          <button class="menu-item" @click="onMenuAction('copy-path')"><Copy :size="15" :stroke-width="1.8" /> {{ t("menu.copyPath") }}</button>
           <div class="menu-divider"></div>
-          <button class="menu-item" @click="onMenuAction('edit')"><Pencil :size="15" :stroke-width="1.8" /> 编辑</button>
-          <button class="menu-item" @click="onMenuAction('add-link')"><Link2 :size="15" :stroke-width="1.8" /> 添加链接</button>
-          <button class="menu-item" @click="onMenuAction('refresh-git')"><RefreshCw :size="15" :stroke-width="1.8" /> 刷新 Git 信息</button>
+          <button class="menu-item" @click="onMenuAction('edit')"><Pencil :size="15" :stroke-width="1.8" /> {{ t("menu.edit") }}</button>
+          <button class="menu-item" @click="onMenuAction('add-link')"><Link2 :size="15" :stroke-width="1.8" /> {{ t("menu.addLink") }}</button>
+          <button class="menu-item" @click="onMenuAction('refresh-git')"><RefreshCw :size="15" :stroke-width="1.8" /> {{ t("menu.refreshGit") }}</button>
           <div class="menu-divider"></div>
-          <button class="menu-item danger" @click="onMenuAction('delete')"><Trash2 :size="15" :stroke-width="1.8" /> 删除项目</button>
+          <button class="menu-item danger" @click="onMenuAction('delete')"><Trash2 :size="15" :stroke-width="1.8" /> {{ t("menu.delete") }}</button>
         </div>
       </Teleport>
     </div>

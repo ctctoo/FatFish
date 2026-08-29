@@ -4,6 +4,7 @@ import { useRoute, useRouter } from "vue-router";
 import ProjectGrid from "../components/project/ProjectGrid.vue";
 import ProjectListTable from "../components/project/ProjectListTable.vue";
 import ProjectDialog from "../components/dialog/ProjectDialog.vue";
+import CollectionAddDialog from "../components/dialog/CollectionAddDialog.vue";
 import ConfirmDialog from "../components/common/ConfirmDialog.vue";
 import EmptyState from "../components/common/EmptyState.vue";
 import Skeleton from "../components/common/Skeleton.vue";
@@ -11,6 +12,7 @@ import { useProjectStore } from "../stores/project";
 import { useCollectionStore } from "../stores/collection";
 import { useUiStore } from "../stores/ui";
 import { useSettingsStore } from "../stores/settings";
+import { useI18n } from "../i18n";
 import type { Project } from "../types";
 
 const route = useRoute();
@@ -19,9 +21,11 @@ const projectStore = useProjectStore();
 const collectionStore = useCollectionStore();
 const settingsStore = useSettingsStore();
 const uiStore = useUiStore();
+const { t } = useI18n();
 
 const loading = ref(true);
 const showForm = ref(false);
+const showAdd = ref(false);
 const editing = ref(false);
 const editName = ref("");
 const deleteTarget = ref(false);
@@ -54,7 +58,7 @@ async function rename() {
   }
   try {
     await collectionStore.updateCollection(collection.value.id, { name: editName.value.trim() });
-    uiStore.showToast("集合已重命名", "success");
+    uiStore.showToast(t("toast.collectionRenamed"), "success");
   } catch (e) {
     uiStore.showToast(String(e), "error");
   } finally {
@@ -66,7 +70,7 @@ async function removeCollection() {
   if (!collection.value) return;
   try {
     await collectionStore.deleteCollection(collection.value.id);
-    uiStore.showToast("集合已删除", "success");
+    uiStore.showToast(t("toast.collectionDeleted"), "success");
     router.push("/projects");
   } catch (e) {
     uiStore.showToast(String(e), "error");
@@ -87,18 +91,19 @@ async function removeCollection() {
         />
       </template>
       <template v-else>
-        <h1>{{ collection?.name ?? "集合" }}</h1>
-        <span class="count">{{ projects.length }} 个项目</span>
+        <h1>{{ collection?.name ?? "" }}</h1>
+        <span class="count">{{ t("collection.count", { n: projects.length }) }}</span>
       </template>
       <span class="spacer"></span>
+      <button class="btn small" @click="showAdd = true">{{ t("collection.addProject") }}</button>
       <button
         v-if="collection && !editing"
         class="btn small ghost"
         @click="editing = true; editName = collection.name"
       >
-        重命名
+        {{ t("common.rename") }}
       </button>
-      <button v-if="collection" class="btn small ghost danger" @click="deleteTarget = true">删除集合</button>
+      <button v-if="collection" class="btn small ghost danger" @click="deleteTarget = true">{{ t("common.delete") }}</button>
     </div>
 
     <Skeleton v-if="loading" :count="3" />
@@ -113,16 +118,23 @@ async function removeCollection() {
       />
       <ProjectListTable v-else :projects="projects" @open="(p) => router.push(`/projects/${p.id}`)" />
     </template>
-    <EmptyState v-else title="这个集合还是空的" message="在项目编辑对话框中把它加入此集合。">
-      <button class="btn primary" @click="showForm = true">＋ 新建项目</button>
+    <EmptyState v-else :title="t('collection.emptyTitle')" :message="t('collection.emptyMsg')">
+      <button class="btn primary" @click="showAdd = true">{{ t("collection.addProject") }}</button>
     </EmptyState>
 
+    <CollectionAddDialog
+      v-if="showAdd && collection"
+      :collection-id="collection.id"
+      :collection-name="collection.name"
+      @close="showAdd = false"
+      @added="load()"
+    />
     <ProjectDialog v-if="showForm" @close="showForm = false" @saved="load()" />
     <ConfirmDialog
       v-if="deleteTarget"
-      title="删除集合"
-      :message="`删除集合「${collection?.name}」？项目本身不会被删除。`"
-      confirm-text="删除"
+      :title="t('confirm.deleteCollectionTitle')"
+      :message="t('confirm.deleteCollectionMsg', { name: collection?.name ?? '' })"
+      :confirm-text="t('confirm.delete')"
       danger
       @confirm="removeCollection()"
       @cancel="deleteTarget = false"

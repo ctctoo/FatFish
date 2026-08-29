@@ -17,7 +17,8 @@ import { useTagStore } from "../stores/tag";
 import { useCollectionStore } from "../stores/collection";
 import { useSettingsStore } from "../stores/settings";
 import { useUiStore } from "../stores/ui";
-import { STATUS_OPTIONS } from "../types";
+import { STATUS_VALUES } from "../types";
+import { statusLabel, useI18n } from "../i18n";
 import type { Project } from "../types";
 
 const route = useRoute();
@@ -27,21 +28,22 @@ const tagStore = useTagStore();
 const collectionStore = useCollectionStore();
 const settingsStore = useSettingsStore();
 const uiStore = useUiStore();
+const { t } = useI18n();
 
 const mode = computed(() => (route.meta.mode as string) ?? "all");
 
 const title = computed(() => {
   switch (mode.value) {
     case "recent":
-      return "最近";
+      return t("projects.recent");
     case "favorite":
-      return "收藏";
+      return t("projects.favorites");
     case "tag": {
-      const tag = tagStore.tags.find((t) => t.id === route.params.id);
-      return tag ? `标签：${tag.name}` : "标签";
+      const tag = tagStore.tags.find((item) => item.id === route.params.id);
+      return tag ? `${t("projects.tagPrefix")}${tag.name}` : t("side.tags");
     }
     default:
-      return "全部项目";
+      return t("projects.all");
   }
 });
 
@@ -126,7 +128,7 @@ function handleAction(action: string, project: Project) {
       }
       case "copy-path":
         await navigator.clipboard.writeText(project.path);
-        uiStore.showToast("路径已复制", "success");
+        uiStore.showToast(t("toast.copied"), "success");
         break;
       case "edit":
         editProject(project);
@@ -137,7 +139,7 @@ function handleAction(action: string, project: Project) {
       case "refresh-git":
         await tauriApi.refreshGitInfo(project.id);
         await projectStore.fetchProjects();
-        uiStore.showToast("Git 信息已刷新", "success");
+        uiStore.showToast(t("toast.gitRefreshed"), "success");
         break;
       case "delete":
         if (settingsStore.confirmRemove) {
@@ -153,7 +155,7 @@ function handleAction(action: string, project: Project) {
 
 async function removeProject(project: Project) {
   await projectStore.deleteProject(project.id);
-  uiStore.showToast("项目已删除", "success");
+  uiStore.showToast(t("toast.projectDeleted"), "success");
 }
 
 function setSort(key: string) {
@@ -162,7 +164,10 @@ function setSort(key: string) {
 }
 
 const sortLabel = computed(
-  () => ({ updated: "按更新时间", name: "按名称", opened: "按最近打开" })[settingsStore.sort] ?? "排序"
+  () =>
+    ({ updated: t("projects.sortUpdated"), name: t("projects.sortName"), opened: t("projects.sortOpened") })[
+      settingsStore.sort
+    ] ?? t("projects.sort")
 );
 </script>
 
@@ -170,43 +175,43 @@ const sortLabel = computed(
   <div class="page">
     <div class="page-header">
       <h1>{{ title }}</h1>
-      <span class="count">{{ projectStore.projects.length }} 个项目</span>
+      <span class="count">{{ t("projects.count", { n: projectStore.projects.length }) }}</span>
       <span class="spacer"></span>
       <button class="btn" @click="showScan = true">
-        <FolderSearch :size="15" :stroke-width="1.8" /> 扫描文件夹
+        <FolderSearch :size="15" :stroke-width="1.8" /> {{ t("projects.scanFolder") }}
       </button>
       <button class="btn primary" @click="newProject">
-        <Plus :size="15" :stroke-width="1.8" /> 新建项目
+        <Plus :size="15" :stroke-width="1.8" /> {{ t("projects.newProject") }}
       </button>
     </div>
 
     <div class="page-toolbar" v-if="mode === 'all'">
       <div class="toolbar-search">
         <Search :size="14" :stroke-width="1.8" />
-        <input v-model="projectStore.query" type="text" placeholder="在全部项目中搜索…" />
+        <input v-model="projectStore.query" type="text" :placeholder="t('projects.searchPh')" />
       </div>
 
       <div style="position: relative">
         <button class="tool-btn" :class="{ active: showFilter || activeCount > 0 }" @click="showFilter = !showFilter">
           <ListFilter :size="14" :stroke-width="1.8" />
-          筛选{{ activeCount ? ` (${activeCount})` : "" }}
+          {{ t("projects.filter") }}{{ activeCount ? ` (${activeCount})` : "" }}
         </button>
         <div v-if="showFilter" class="popover" style="left: 0">
-          <h4>Status</h4>
+          <h4>{{ t("projects.filterStatus") }}</h4>
           <button class="opt-row" :class="{ active: !projectStore.status }" @click="projectStore.status = null">
-            全部
+            {{ t("projects.filterAll") }}
           </button>
           <button
-            v-for="opt in STATUS_OPTIONS"
-            :key="opt.value"
+            v-for="value in STATUS_VALUES"
+            :key="value"
             class="opt-row"
-            :class="{ active: projectStore.status === opt.value }"
-            @click="projectStore.status = opt.value"
+            :class="{ active: projectStore.status === value }"
+            @click="projectStore.status = value"
           >
-            {{ opt.label }}
+            {{ statusLabel(settingsStore.locale, value) }}
           </button>
 
-          <h4>Collections</h4>
+          <h4>{{ t("projects.filterCollections") }}</h4>
           <button
             v-for="c in collectionStore.collections"
             :key="c.id"
@@ -217,24 +222,24 @@ const sortLabel = computed(
             {{ c.name }}
           </button>
 
-          <h4>Tags</h4>
+          <h4>{{ t("projects.filterTags") }}</h4>
           <button
-            v-for="t in tagStore.tags"
-            :key="t.id"
+            v-for="item in tagStore.tags"
+            :key="item.id"
             class="opt-row"
-            :class="{ active: projectStore.tagId === t.id }"
-            @click="projectStore.tagId = projectStore.tagId === t.id ? null : t.id"
+            :class="{ active: projectStore.tagId === item.id }"
+            @click="projectStore.tagId = projectStore.tagId === item.id ? null : item.id"
           >
-            {{ t.name }}
+            {{ item.name }}
           </button>
 
-          <h4>其它</h4>
+          <h4>{{ t("projects.filterOther") }}</h4>
           <button
             class="opt-row"
             :class="{ active: projectStore.favorite }"
             @click="projectStore.favorite = !projectStore.favorite"
           >
-            ★ 只看收藏
+            {{ t("projects.favOnly") }}
           </button>
         </div>
       </div>
@@ -245,19 +250,19 @@ const sortLabel = computed(
           {{ sortLabel }}
         </button>
         <div v-if="showSort" class="popover" style="left: 0; width: 160px">
-          <button class="opt-row" :class="{ active: settingsStore.sort === 'updated' }" @click="setSort('updated')">按更新时间</button>
-          <button class="opt-row" :class="{ active: settingsStore.sort === 'name' }" @click="setSort('name')">按名称</button>
-          <button class="opt-row" :class="{ active: settingsStore.sort === 'opened' }" @click="setSort('opened')">按最近打开</button>
+          <button class="opt-row" :class="{ active: settingsStore.sort === 'updated' }" @click="setSort('updated')">{{ t("projects.sortUpdated") }}</button>
+          <button class="opt-row" :class="{ active: settingsStore.sort === 'name' }" @click="setSort('name')">{{ t("projects.sortName") }}</button>
+          <button class="opt-row" :class="{ active: settingsStore.sort === 'opened' }" @click="setSort('opened')">{{ t("projects.sortOpened") }}</button>
         </div>
       </div>
 
       <span class="spacer" style="flex: 1"></span>
 
       <div class="view-toggle">
-        <button :class="{ active: settingsStore.viewMode === 'grid' }" title="网格视图" @click="settingsStore.viewMode = 'grid'">
+        <button :class="{ active: settingsStore.viewMode === 'grid' }" :title="t('projects.grid')" @click="settingsStore.viewMode = 'grid'">
           <LayoutGrid :size="15" :stroke-width="1.8" />
         </button>
-        <button :class="{ active: settingsStore.viewMode === 'list' }" title="列表视图" @click="settingsStore.viewMode = 'list'">
+        <button :class="{ active: settingsStore.viewMode === 'list' }" :title="t('projects.list')" @click="settingsStore.viewMode = 'list'">
           <List :size="15" :stroke-width="1.8" />
         </button>
       </div>
@@ -281,12 +286,12 @@ const sortLabel = computed(
 
     <EmptyState
       v-else
-      :title="projectStore.query ? '没有找到项目' : '还没有项目'"
-      :message="projectStore.query ? '换个关键词，或清除筛选条件试试。' : '添加本地项目，或扫描一个文件夹来建立你的项目空间。'"
+      :title="projectStore.query ? t('projects.emptySearchTitle') : t('projects.emptyTitle')"
+      :message="projectStore.query ? t('projects.emptySearchMsg') : t('projects.emptyMsg')"
     >
       <template v-if="!projectStore.query">
-        <button class="btn primary" @click="newProject">＋ 添加项目</button>
-        <button class="btn" @click="showScan = true">扫描文件夹</button>
+        <button class="btn primary" @click="newProject">＋ {{ t("home.addProject") }}</button>
+        <button class="btn" @click="showScan = true">{{ t("home.scanFolder") }}</button>
       </template>
     </EmptyState>
 
@@ -295,9 +300,9 @@ const sortLabel = computed(
     <LinkDialog v-if="linkTarget" :project-id="linkTarget.id" @close="linkTarget = null" @saved="projectStore.fetchProjects()" />
     <ConfirmDialog
       v-if="deleteTarget"
-      title="删除项目"
-      :message="`确定从索引中移除「${deleteTarget.name}」吗？磁盘上的文件夹不会被删除。`"
-      confirm-text="删除"
+      :title="t('confirm.deleteProjectTitle')"
+      :message="t('confirm.deleteProjectMsg', { name: deleteTarget.name })"
+      :confirm-text="t('confirm.delete')"
       danger
       @confirm="removeProject(deleteTarget!); deleteTarget = null"
       @cancel="deleteTarget = null"

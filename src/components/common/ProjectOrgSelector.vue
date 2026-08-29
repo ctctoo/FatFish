@@ -2,6 +2,7 @@
 import { onMounted } from "vue";
 import { useTagStore } from "../../stores/tag";
 import { useCollectionStore } from "../../stores/collection";
+import { useI18n } from "../../i18n";
 
 defineProps<{
   selectedTagIds: string[];
@@ -15,6 +16,7 @@ const emit = defineEmits<{
 
 const tagStore = useTagStore();
 const collectionStore = useCollectionStore();
+const { t } = useI18n();
 
 onMounted(async () => {
   if (!tagStore.tags.length) await tagStore.fetchTags();
@@ -25,7 +27,7 @@ onMounted(async () => {
 <template>
   <div class="form-grid" style="gap: 12px">
     <div class="field">
-      <label>Collections（人为组织项目）</label>
+      <label>{{ t("dialog.project.collectionsHint") }}</label>
       <div class="chip-row">
         <button
           v-for="c in collectionStore.collections"
@@ -36,23 +38,23 @@ onMounted(async () => {
         >
           {{ c.name }}
         </button>
-        <span v-if="!collectionStore.collections.length" class="caption">暂无集合，可在侧栏创建</span>
+        <span v-if="!collectionStore.collections.length" class="caption">{{ t("dialog.project.noCollections") }}</span>
       </div>
     </div>
 
     <div class="field">
-      <label>Tags（描述项目属性）</label>
+      <label>{{ t("dialog.project.tagsHint") }}</label>
       <div class="chip-row">
         <button
-          v-for="t in tagStore.tags"
-          :key="t.id"
+          v-for="item in tagStore.tags"
+          :key="item.id"
           class="chip"
-          :class="{ selected: selectedTagIds.includes(t.id) }"
-          @click="emit('toggleTag', t.id)"
+          :class="{ selected: selectedTagIds.includes(item.id) }"
+          @click="emit('toggleTag', item.id)"
         >
-          {{ t.name }}
+          {{ item.name }}
         </button>
-        <span v-if="!tagStore.tags.length" class="caption">暂无标签，可在「管理标签」中创建</span>
+        <span v-if="!tagStore.tags.length" class="caption">{{ t("dialog.project.noTags") }}</span>
       </div>
     </div>
   </div>

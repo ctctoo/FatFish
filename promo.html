@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Hub - 本地项目管理工具</title>
+    <link rel="icon" href="src-tauri\icons\icon.png" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #F7F7F5;
+            --surface: #FFFFFF;
+            --surface-muted: #F1F1EF;
+            --border: #E7E7E3;
+            --border-strong: #D9D9D4;
+            --text-primary: #202124;
+            --text-secondary: #6B6D70;
+            --text-tertiary: #96989B;
+            --accent: #2563EB;
+            --accent-soft: #EFF6FF;
+            --green: #16A34A;
+            --green-soft: #F0FDF4;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #151515;
+                --surface: #1C1C1C;
+                --surface-muted: #232323;
+                --border: #303030;
+                --border-strong: #3A3A3A;
+                --text-primary: #F5F5F5;
+                --text-secondary: #A5A5A5;
+                --text-tertiary: #707070;
+                --accent: #3B82F6;
+                --accent-soft: #1E3A5F;
+                --green: #22C55E;
+                --green-soft: #14532D;
+            }
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 1080px;
+            margin: 0 auto;
+            padding: 0 32px;
+        }
+
+        /* Header */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 14px 0;
+            background: rgba(247, 247, 245, 0.88);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.2s;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            header {
+                background: rgba(21, 21, 21, 0.88);
+            }
+        }
+
+        header.scrolled {
+            border-bottom-color: var(--border);
+        }
+
+        header .container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+
+        .logo-mark {
+            width: 28px;
+            height: 28px;
+            border: 1.5px solid var(--border-strong);
+            border-radius: 7px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        nav {
+            display: flex;
+            gap: 32px;
+        }
+
+        nav a {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-tertiary);
+            text-decoration: none;
+            transition: color 0.15s;
+        }
+
+        nav a:hover {
+            color: var(--text-primary);
+        }
+
+        /* Hero */
+        .hero {
+            padding: 140px 0 80px;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: clamp(36px, 6vw, 52px);
+            font-weight: 700;
+            line-height: 1.15;
+            letter-spacing: -0.03em;
+            margin-bottom: 16px;
+        }
+
+        .hero p {
+            font-size: 17px;
+            color: var(--text-secondary);
+            max-width: 480px;
+            margin: 0 auto 36px;
+            line-height: 1.75;
+        }
+
+        .hero-btns {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-bottom: 64px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 11px 22px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.15s;
+        }
+
+        .btn-primary {
+            background: var(--text-primary);
+            color: var(--bg);
+        }
+
+        .btn-primary:hover {
+            opacity: 0.88;
+        }
+
+        .btn-outline {
+            background: var(--surface);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--border-strong);
+        }
+
+        /* App Preview */
+        .preview {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.06);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .preview {
+                box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3);
+            }
+        }
+
+        .preview-bar {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 12px 16px;
+            background: var(--surface-muted);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .preview-dot {
+            width: 11px;
+            height: 11px;
+            border-radius: 50%;
+            background: var(--border-strong);
+        }
+
+        .preview-dot:nth-child(1) { background: #FF5F56; }
+        .preview-dot:nth-child(2) { background: #FFBD2E; }
+        .preview-dot:nth-child(3) { background: #27C93F; }
+
+        .preview-body {
+            display: flex;
+            min-height: 380px;
+        }
+
+        .preview-nav {
+            width: 200px;
+            padding: 16px 12px;
+            border-right: 1px solid var(--border);
+            background: var(--surface-muted);
+        }
+
+        .preview-nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 6px 8px;
+            margin-bottom: 20px;
+        }
+
+        .preview-nav-icon {
+            width: 22px;
+            height: 22px;
+            border: 1px solid var(--border-strong);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+        }
+
+        .preview-nav-group {
+            margin-bottom: 16px;
+        }
+
+        .preview-nav-label {
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 0 8px;
+            margin-bottom: 6px;
+        }
+
+        .preview-nav-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .preview-nav-item.active {
+            background: var(--surface);
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .preview-main {
+            flex: 1;
+            padding: 20px;
+        }
+
+        .preview-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .preview-title {
+            font-size: 17px;
+            font-weight: 600;
+        }
+
+        .preview-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .preview-action {
+            padding: 5px 12px;
+            background: var(--surface-muted);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .preview-card {
+            background: var(--surface-muted);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px;
+            transition: border-color 0.15s;
+        }
+
+        .preview-card:hover {
+            border-color: var(--border-strong);
+        }
+
+        .preview-card-cover {
+            height: 72px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+        }
+
+        .preview-card-name {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+
+        .preview-card-desc {
+            font-size: 11px;
+            color: var(--text-tertiary);
+            margin-bottom: 10px;
+        }
+
+        .preview-card-tags {
+            display: flex;
+            gap: 5px;
+        }
+
+        .preview-tag {
+            padding: 2px 7px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 10px;
+            color: var(--text-secondary);
+        }
+
+        /* Features */
+        .features {
+            padding: 100px 0;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 56px;
+        }
+
+        .section-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 12px;
+        }
+
+        .section-title {
+            font-size: clamp(28px, 4vw, 40px);
+            font-weight: 700;
+            letter-spacing: -0.025em;
+            margin-bottom: 12px;
+        }
+
+        .section-desc {
+            font-size: 16px;
+            color: var(--text-secondary);
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .feature-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 28px 24px;
+            transition: border-color 0.15s;
+        }
+
+        .feature-card:hover {
+            border-color: var(--border-strong);
+        }
+
+        .feature-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--surface-muted);
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            margin-bottom: 18px;
+        }
+
+        .feature-title {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .feature-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        /* Tech */
+        .tech {
+            padding: 80px 0 100px;
+        }
+
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        .tech-item {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 22px 16px;
+            text-align: center;
+            transition: border-color 0.15s;
+        }
+
+        .tech-item:hover {
+            border-color: var(--border-strong);
+        }
+
+        .tech-icon {
+            width: 36px;
+            height: 36px;
+            margin: 0 auto 12px;
+            background: var(--surface-muted);
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .tech-name {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .tech-role {
+            font-size: 11px;
+            color: var(--text-tertiary);
+        }
+
+        /* CTA */
+        .cta {
+            padding: 80px 0;
+            text-align: center;
+        }
+
+        .cta h2 {
+            font-size: clamp(24px, 3.5vw, 36px);
+            font-weight: 700;
+            letter-spacing: -0.025em;
+            margin-bottom: 12px;
+        }
+
+        .cta p {
+            font-size: 15px;
+            color: var(--text-secondary);
+            margin-bottom: 28px;
+        }
+
+        /* Footer */
+        footer {
+            padding: 40px 0;
+            border-top: 1px solid var(--border);
+            text-align: center;
+        }
+
+        footer p {
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+
+        /* Scroll reveal */
+        .reveal {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease-out;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .features-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .tech-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .preview-nav {
+                display: none;
+            }
+
+            .preview-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 640px) {
+            .features-grid,
+            .tech-grid,
+            .preview-grid {
+                grid-template-columns: 1fr;
+            }
+
+            nav {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header id="header">
+        <div class="container">
+            <a href="#" class="logo">
+                <div class="logo-mark">◇</div>
+                FatFish
+            </a>
+            <nav>
+                <a href="#features">功能</a>
+                <a href="#tech">技术栈</a>
+                <a href="#cta">获取</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <h1>One<br>Have All</h1>
+                <p>不只是代码项目。论文、旅行计划、设计稿——所有你在做的事情，都在这里找到归宿。</p>
+                <div class="hero-btns">
+                    <a href="#cta" class="btn btn-primary">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="7 10 12 15 17 10"/>
+                            <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                        下载
+                    </a>
+                    <a href="#features" class="btn btn-outline">了解更多</a>
+                </div>
+
+                <div class="preview">
+                    <div class="preview-bar">
+                        <div class="preview-dot"></div>
+                        <div class="preview-dot"></div>
+                        <div class="preview-dot"></div>
+                    </div>
+                    <div class="preview-body">
+                        <div class="preview-nav">
+                            <div class="preview-nav-brand">
+                                <div class="preview-nav-icon">◇</div>
+                                Project Hub
+                            </div>
+                            <div class="preview-nav-group">
+                                <div class="preview-nav-item active">首页</div>
+                                <div class="preview-nav-item">全部项目</div>
+                                <div class="preview-nav-item">收藏</div>
+                                <div class="preview-nav-item">最近</div>
+                            </div>
+                            <div class="preview-nav-group">
+                                <div class="preview-nav-label">集合</div>
+                                <div class="preview-nav-item">学习</div>
+                                <div class="preview-nav-item">工作</div>
+                                <div class="preview-nav-item">个人</div>
+                            </div>
+                        </div>
+                        <div class="preview-main">
+                            <div class="preview-header">
+                                <div class="preview-title">你的项目</div>
+                                <div class="preview-actions">
+                                    <span class="preview-action">⌘K 搜索</span>
+                                    <span class="preview-action">+ 新建</span>
+                                </div>
+                            </div>
+                            <div class="preview-grid">
+                                <div class="preview-card">
+                                    <div class="preview-card-cover">🤖</div>
+                                    <div class="preview-card-name">AiCooking</div>
+                                    <div class="preview-card-desc">智能菜谱系统</div>
+                                    <div class="preview-card-tags">
+                                        <span class="preview-tag">AI</span>
+                                        <span class="preview-tag">Python</span>
+                                    </div>
+                                </div>
+                                <div class="preview-card">
+                                    <div class="preview-card-cover">✈️</div>
+                                    <div class="preview-card-name">Tokyo 2026</div>
+                                    <div class="preview-card-desc">东京旅行计划</div>
+                                    <div class="preview-card-tags">
+                                        <span class="preview-tag">旅行</span>
+                                    </div>
+                                </div>
+                                <div class="preview-card">
+                                    <div class="preview-card-cover">📄</div>
+                                    <div class="preview-card-name">毕业论文</div>
+                                    <div class="preview-card-desc">多模态情感分析</div>
+                                    <div class="preview-card-tags">
+                                        <span class="preview-tag">研究</span>
+                                        <span class="preview-tag">写作</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="features" id="features">
+            <div class="container">
+                <div class="section-header reveal">
+                    <div class="section-label">功能</div>
+                    <h2 class="section-title">为真实工作流设计</h2>
+                    <p class="section-desc">不是又一个项目管理工具，而是你桌面的空间整理器</p>
+                </div>
+                <div class="features-grid">
+                    <div class="feature-card reveal">
+                        <div class="feature-icon">📂</div>
+                        <h3 class="feature-title">自动扫描</h3>
+                        <p class="feature-desc">指向项目文件夹，自动识别 Java、Python、Rust、Go、JavaScript 等类型，建立索引。</p>
+                    </div>
+                    <div class="feature-card reveal">
+                        <div class="feature-icon">⌘</div>
+                        <h3 class="feature-title">快速搜索</h3>
+                        <p class="feature-desc">Ctrl+K 呼出搜索，按名称、标签、路径即时定位，不再翻找文件夹。</p>
+                    </div>
+                    <div class="feature-card reveal">
+                        <div class="feature-icon">#</div>
+                        <h3 class="feature-title">标签与集合</h3>
+                        <p class="feature-desc">用标签描述项目属性，用集合组织归类，两种维度灵活管理。</p>
+                    </div>
+                    <div class="feature-card reveal">
+                        <div class="feature-icon">→</div>
+                        <h3 class="feature-title">一键直达</h3>
+                        <p class="feature-desc">打开文件夹、启动终端、跳转 GitHub、复制路径，常用操作一步到位。</p>
+                    </div>
+                    <div class="feature-card reveal">
+                        <div class="feature-icon">◐</div>
+                        <h3 class="feature-title">深色模式</h3>
+                        <p class="feature-desc">Light / Dark / System 三种主题，跟随系统或手动切换。</p>
+                    </div>
+                    <div class="feature-card reveal">
+                        <div class="feature-icon">◎</div>
+                        <h3 class="feature-title">本地优先</h3>
+                        <p class="feature-desc">数据存于本地 SQLite，无需联网，你的项目信息只属于你。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="tech" id="tech">
+            <div class="container">
+                <div class="section-header reveal">
+                    <div class="section-label">技术栈</div>
+                    <h2 class="section-title">轻量但不简单</h2>
+                    <p class="section-desc">用现代技术构建，追求启动速度和流畅体验</p>
+                </div>
+                <div class="tech-grid">
+                    <div class="tech-item reveal">
+                        <div class="tech-icon">🦀</div>
+                        <div class="tech-name">Tauri 2</div>
+                        <div class="tech-role">桌面框架</div>
+                    </div>
+                    <div class="tech-item reveal">
+                        <div class="tech-icon">💚</div>
+                        <div class="tech-name">Vue 3</div>
+                        <div class="tech-role">前端框架</div>
+                    </div>
+                    <div class="tech-item reveal">
+                        <div class="tech-icon">🔷</div>
+                        <div class="tech-name">TypeScript</div>
+                        <div class="tech-role">类型安全</div>
+                    </div>
+                    <div class="tech-item reveal">
+                        <div class="tech-icon">⚙</div>
+                        <div class="tech-name">Rust</div>
+                        <div class="tech-role">后端引擎</div>
+                    </div>
+                    <div class="tech-item reveal">
+                        <div class="tech-icon">💾</div>
+                        <div class="tech-name">SQLite</div>
+                        <div class="tech-role">本地存储</div>
+                    </div>
+                    <div class="tech-item reveal">
+                        <div class="tech-icon">🍍</div>
+                        <div class="tech-name">Pinia</div>
+                        <div class="tech-role">状态管理</div>
+                    </div>
+                    <div class="tech-item reveal">
+                        <div class="tech-icon">⚡</div>
+                        <div class="tech-name">Vite</div>
+                        <div class="tech-role">构建工具</div>
+                    </div>
+                    <div class="tech-item reveal">
+                        <div class="tech-icon">◆</div>
+                        <div class="tech-name">Lucide</div>
+                        <div class="tech-role">图标体系</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="cta" id="cta">
+            <div class="container reveal">
+                <h2>整理你的项目空间</h2>
+                <p>免费下载，本地运行。支持 Windows、macOS、Linux。</p>
+                <a href="#" class="btn btn-primary">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="7 10 12 15 17 10"/>
+                        <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                    下载 Project Hub
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>© 2026 Project Hub · Built with Tauri + Vue</p>
+        </div>
+    </footer>
+
+    <script>
+        const header = document.getElementById('header');
+        window.addEventListener('scroll', () => {
+            header.classList.toggle('scrolled', window.scrollY > 20);
+        });
+
+        const reveals = document.querySelectorAll('.reveal');
+        const check = () => {
+            reveals.forEach(el => {
+                if (el.getBoundingClientRect().top < window.innerHeight - 60) {
+                    el.classList.add('active');
+                }
+            });
+        };
+        window.addEventListener('scroll', check);
+        check();
+
+        document.querySelectorAll('a[href^="#"]').forEach(a => {
+            a.addEventListener('click', e => {
+                e.preventDefault();
+                const t = document.querySelector(a.getAttribute('href'));
+                if (t) t.scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+    </script>
+</body>
+</html>

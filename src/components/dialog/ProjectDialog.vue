@@ -5,7 +5,8 @@ import { X } from "lucide-vue-next";
 import { useProjectStore } from "../../stores/project";
 import { useSettingsStore } from "../../stores/settings";
 import { useUiStore } from "../../stores/ui";
-import { STATUS_OPTIONS } from "../../types";
+import { STATUS_VALUES } from "../../types";
+import { statusLabel, useI18n } from "../../i18n";
 import type { Project, ProjectInput } from "../../types";
 import ProjectOrgSelector from "../common/ProjectOrgSelector.vue";
 
@@ -21,6 +22,7 @@ const emit = defineEmits<{
 const projectStore = useProjectStore();
 const settingsStore = useSettingsStore();
 const uiStore = useUiStore();
+const { t } = useI18n();
 
 const name = ref("");
 const path = ref("");
@@ -42,8 +44,8 @@ onMounted(() => {
     notes.value = props.project.notes ?? "";
     status.value = props.project.status;
     coverEmoji.value = props.project.coverEmoji ?? "";
-    selectedTagIds.value = props.project.tags.map((t) => t.id);
-    selectedCollectionIds.value = props.project.collections.map((c) => c.id);
+    selectedTagIds.value = props.project.tags.map((item) => item.id);
+    selectedCollectionIds.value = props.project.collections.map((item) => item.id);
   } else if (settingsStore.defaultFolder) {
     path.value = settingsStore.defaultFolder;
   }
@@ -54,7 +56,7 @@ async function pickDirectory() {
     directory: true,
     multiple: false,
     defaultPath: settingsStore.defaultFolder || undefined,
-    title: "选择项目文件夹",
+    title: t("dialog.project.location"),
   });
   if (typeof dir === "string") {
     path.value = dir;
@@ -72,11 +74,11 @@ function toggle(list: string[], id: string) {
 
 async function save() {
   if (!name.value.trim()) {
-    uiStore.showToast("项目名称不能为空", "error");
+    uiStore.showToast(t("toast.nameRequired"), "error");
     return;
   }
   if (!path.value.trim()) {
-    uiStore.showToast("项目路径不能为空", "error");
+    uiStore.showToast(t("toast.pathRequired"), "error");
     return;
   }
   const input: ProjectInput = {
@@ -95,7 +97,7 @@ async function save() {
       : await projectStore.createProject(input);
     await projectStore.setProjectTags(saved.id, selectedTagIds.value);
     await projectStore.setProjectCollections(saved.id, selectedCollectionIds.value);
-    uiStore.showToast(isEdit.value ? "项目已更新" : "项目已添加", "success");
+    uiStore.showToast(isEdit.value ? t("dialog.project.savedAsEdit") : t("dialog.project.savedAsNew"), "success");
     emit("saved", saved);
     emit("close");
   } catch (e) {
@@ -110,7 +112,7 @@ async function save() {
   <div class="modal-mask" @click.self="emit('close')">
     <div class="modal">
       <div class="modal-header">
-        <h2>{{ isEdit ? "编辑项目" : "新建项目" }}</h2>
+        <h2>{{ isEdit ? t("dialog.project.edit") : t("dialog.project.new") }}</h2>
         <button class="modal-close" @click="emit('close')">
           <X :size="17" :stroke-width="1.8" />
         </button>
@@ -118,21 +120,21 @@ async function save() {
 
       <div class="form-grid">
         <div class="field">
-          <label>Name</label>
-          <input v-model="name" type="text" placeholder="项目名称" />
+          <label>{{ t("dialog.project.name") }}</label>
+          <input v-model="name" type="text" :placeholder="t('dialog.project.name')" />
         </div>
 
         <div class="field">
-          <label>Location</label>
+          <label>{{ t("dialog.project.location") }}</label>
           <div class="path-row">
-            <input v-model="path" type="text" placeholder="D:\Projects\xxx" :disabled="isEdit" />
-            <button class="btn" :disabled="isEdit" @click="pickDirectory">浏览…</button>
+            <input v-model="path" type="text" :placeholder="t('dialog.project.pathPh')" :disabled="isEdit" />
+            <button class="btn" :disabled="isEdit" @click="pickDirectory">{{ t("common.browse") }}</button>
           </div>
         </div>
 
         <div class="field">
-          <label>Description</label>
-          <textarea v-model="description" placeholder="这个项目是做什么的？"></textarea>
+          <label>{{ t("dialog.project.description") }}</label>
+          <textarea v-model="description" :placeholder="t('dialog.project.descPh')"></textarea>
         </div>
 
         <ProjectOrgSelector
@@ -144,22 +146,22 @@ async function save() {
 
         <div class="form-row">
           <div class="field">
-            <label>Icon（Emoji，可选）</label>
-            <input v-model="coverEmoji" type="text" placeholder="如 ✈️ 📚 🎨，留空自动生成" />
+            <label>{{ t("dialog.project.icon") }}</label>
+            <input v-model="coverEmoji" type="text" :placeholder="t('dialog.project.iconPh')" />
           </div>
           <div class="field">
-            <label>Status</label>
+            <label>{{ t("dialog.project.status") }}</label>
             <select v-model="status">
-              <option v-for="opt in STATUS_OPTIONS" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+              <option v-for="value in STATUS_VALUES" :key="value" :value="value">{{ statusLabel(settingsStore.locale, value) }}</option>
             </select>
           </div>
         </div>
       </div>
 
       <div class="modal-actions">
-        <button class="btn" @click="emit('close')">取消</button>
+        <button class="btn" @click="emit('close')">{{ t("common.cancel") }}</button>
         <button class="btn primary" :disabled="saving" @click="save">
-          {{ saving ? "保存中…" : isEdit ? "保存" : "创建" }}
+          {{ saving ? t("common.save") + "…" : isEdit ? t("common.save") : t("common.create") }}
         </button>
       </div>
     </div>

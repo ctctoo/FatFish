@@ -2,7 +2,11 @@
 import ProjectStatus from "./ProjectStatus.vue";
 import TagBadge from "../tag/TagBadge.vue";
 import type { Project } from "../../types";
-import { relativeTime } from "../../types";
+import { relativeTime, useI18n } from "../../i18n";
+import { useSettingsStore } from "../../stores/settings";
+
+const { t } = useI18n();
+const settings = useSettingsStore();
 
 defineProps<{
   projects: Project[];
@@ -17,10 +21,10 @@ const emit = defineEmits<{
   <table class="project-table">
     <thead>
       <tr>
-        <th>项目</th>
-        <th>标签</th>
-        <th>状态</th>
-        <th>更新时间</th>
+        <th>{{ t("side.allProjects") }}</th>
+        <th>{{ t("side.tags") }}</th>
+        <th>{{ t("projects.filterStatus") }}</th>
+        <th>{{ t("card.updated") }}</th>
       </tr>
     </thead>
     <tbody>
@@ -32,7 +36,7 @@ const emit = defineEmits<{
           </span>
         </td>
         <td><ProjectStatus :status="project.status" /></td>
-        <td class="dim-cell">{{ relativeTime(project.updatedAt) }}</td>
+        <td class="dim-cell">{{ relativeTime(settings.locale, project.updatedAt) }}</td>
       </tr>
     </tbody>
   </table>

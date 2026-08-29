@@ -1,14 +1,14 @@
 {
   "schemaVersion": "mimosa-hook-status/v1",
-  "recordedAt": "2026-08-29T10:36:02.327Z",
+  "recordedAt": "2026-08-29T11:29:38.740Z",
   "sessionId": "sess_6a821b54-69b8-4367-a6f8-bd9038d359c6",
   "event": "PostToolUse",
   "toolName": "Edit",
-  "file": "src/main.ts",
+  "file": "src/components/project/ProjectMenu.vue",
   "outcome": "clear",
   "coverage": "complete",
   "findingCount": 0,
-  "durationMs": 15,
+  "durationMs": 7,
   "hostState": "hook_complete",
   "reportHint": ".mimosa/reports/"
 }

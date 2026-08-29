@@ -4,11 +4,14 @@ import { useRouter } from "vue-router";
 import { Search } from "lucide-vue-next";
 import { tauriApi } from "../../services/tauri";
 import type { Project } from "../../types";
-import { statusLabel, relativeTime } from "../../types";
+import { statusLabel, relativeTime, useI18n } from "../../i18n";
+import { useSettingsStore } from "../../stores/settings";
 
 const emit = defineEmits<{ close: [] }>();
 
 const router = useRouter();
+const { t } = useI18n();
+const settings = useSettingsStore();
 
 const query = ref("");
 const results = ref<Project[]>([]);
@@ -69,8 +72,8 @@ function onKeydown(e: KeyboardEvent) {
 function itemSub(project: Project): string {
   const parts: string[] = [];
   if (project.collections.length) parts.push(project.collections.map((c) => c.name).join(" · "));
-  if (project.tags.length) parts.push(project.tags.map((t) => t.name).join(" · "));
-  return parts.join("  ·  ") || statusLabel(project.status);
+  if (project.tags.length) parts.push(project.tags.map((tag) => tag.name).join(" · "));
+  return parts.join("  ·  ") || statusLabel(settings.locale, project.status);
 }
 </script>
 
@@ -83,13 +86,13 @@ function itemSub(project: Project): string {
           ref="inputEl"
           v-model="query"
           type="text"
-          placeholder="搜索项目、标签、路径、链接..."
+          :placeholder="t('palette.ph')"
           @input="onInput"
         />
       </div>
 
       <div class="palette-list">
-        <div class="palette-group-label">{{ query.trim() ? "RESULTS" : "RECENT" }}</div>
+        <div class="palette-group-label">{{ query.trim() ? t("palette.results") : t("palette.recent") }}</div>
         <button
           v-for="(project, i) in items"
           :key="project.id"
@@ -100,17 +103,17 @@ function itemSub(project: Project): string {
           @mousemove="activeIndex = i"
         >
           <span class="name">{{ project.name }}</span>
-          <span class="sub">{{ itemSub(project) }} · {{ relativeTime(project.updatedAt) }}</span>
+          <span class="sub">{{ itemSub(project) }} · {{ relativeTime(settings.locale, project.updatedAt) }}</span>
         </button>
         <div v-if="!items.length" class="palette-empty caption" style="padding: 14px">
-          {{ query.trim() ? "没有匹配的项目" : "还没有项目，先去添加一个吧" }}
+          {{ query.trim() ? t("palette.noMatch") : t("palette.noProjects") }}
         </div>
       </div>
 
       <div class="palette-footer">
-        <span>↑↓ 导航</span>
-        <span>Enter 打开</span>
-        <span>Esc 关闭</span>
+        <span>{{ t("palette.navigate") }}</span>
+        <span>{{ t("palette.enter") }}</span>
+        <span>{{ t("palette.esc") }}</span>
       </div>
     </div>
   </div>

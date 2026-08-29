@@ -1,0 +1,53 @@
+import { computed } from "vue";
+import { useSettingsStore, type Locale } from "../stores/settings";
+import { messages } from "./messages";
+
+/** 轻量 i18n：文案来自 messages.ts，语言跟随 settings.locale（持久化） */
+export function useI18n() {
+  const settings = useSettingsStore();
+  const locale = computed<Locale>(() => settings.locale);
+
+  function t(key: string, params?: Record<string, string | number>): string {
+    const dict = messages[locale.value] ?? messages.zh;
+    let text = dict[key] ?? messages.zh[key] ?? key;
+    if (params) {
+      for (const [k, v] of Object.entries(params)) {
+        text = text.replaceAll(`{${k}}`, String(v));
+      }
+    }
+    return text;
+  }
+
+  return { t, locale };
+}
+
+/** 状态标签 */
+export function statusLabel(locale: Locale, status: string): string {
+  const key = `status.${status}`;
+  return messages[locale][key] ?? messages.zh[key] ?? status;
+}
+
+/** 链接类型标签 */
+export function linkTypeLabel(locale: Locale, type: string | null): string {
+  if (!type) return messages[locale]["linkType.none"];
+  const key = `linkType.${type}`;
+  return messages[locale][key] ?? messages.zh[key] ?? type;
+}
+
+/** 相对时间 */
+export function relativeTime(locale: Locale, iso: string | null | undefined): string {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return iso;
+  const diff = Date.now() - d.getTime();
+  const minute = 60_000;
+  const hour = 60 * minute;
+  const day = 24 * hour;
+  const dict = messages[locale];
+  if (diff < minute) return dict["rel.justNow"];
+  if (diff < hour) return dict["rel.minAgo"].replace("{n}", String(Math.floor(diff / minute)));
+  if (diff < day) return dict["rel.hourAgo"].replace("{n}", String(Math.floor(diff / hour)));
+  if (diff < 2 * day) return dict["rel.yesterday"];
+  if (diff < 30 * day) return dict["rel.dayAgo"].replace("{n}", String(Math.floor(diff / day)));
+  return d.toLocaleDateString();
+}

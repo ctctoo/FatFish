@@ -5,6 +5,7 @@ import { X } from "lucide-vue-next";
 import { useProjectStore } from "../../stores/project";
 import { useSettingsStore } from "../../stores/settings";
 import { useUiStore } from "../../stores/ui";
+import { useI18n } from "../../i18n";
 import type { ScannedProject } from "../../types";
 
 const emit = defineEmits<{
@@ -15,6 +16,7 @@ const emit = defineEmits<{
 const projectStore = useProjectStore();
 const settingsStore = useSettingsStore();
 const uiStore = useUiStore();
+const { t } = useI18n();
 
 const rootDir = ref("");
 const results = ref<ScannedProject[]>([]);
@@ -27,13 +29,13 @@ onMounted(() => {
 });
 
 async function pickDirectory() {
-  const dir = await open({ directory: true, multiple: false, title: "选择要扫描的目录" });
+  const dir = await open({ directory: true, multiple: false, title: t("dialog.scan.title") });
   if (typeof dir === "string") rootDir.value = dir;
 }
 
 async function scan() {
   if (!rootDir.value.trim()) {
-    uiStore.showToast("请先选择要扫描的目录", "error");
+    uiStore.showToast(t("toast.pickScanDir"), "error");
     return;
   }
   scanning.value = true;
@@ -46,7 +48,7 @@ async function scan() {
     }
     settingsStore.addScanDir(rootDir.value);
     if (!settingsStore.defaultFolder) settingsStore.defaultFolder = rootDir.value;
-    if (!results.value.length) uiStore.showToast("该目录下没有识别到项目", "info");
+    if (!results.value.length) uiStore.showToast(t("toast.scanEmpty"), "info");
   } catch (e) {
     uiStore.showToast(String(e), "error");
   } finally {
@@ -65,7 +67,7 @@ async function importSelected() {
   importing.value = true;
   try {
     const count = await projectStore.importProjects(paths);
-    uiStore.showToast(`已导入 ${count} 个项目`, "success");
+    uiStore.showToast(t("toast.imported", { n: count }), "success");
     emit("imported");
     emit("close");
   } catch (e) {
@@ -80,7 +82,7 @@ async function importSelected() {
   <div class="modal-mask" @click.self="emit('close')">
     <div class="modal">
       <div class="modal-header">
-        <h2>扫描文件夹</h2>
+        <h2>{{ t("dialog.scan.title") }}</h2>
         <button class="modal-close" @click="emit('close')">
           <X :size="17" :stroke-width="1.8" />
         </button>
@@ -88,15 +90,15 @@ async function importSelected() {
 
       <div class="form-grid">
         <div class="field">
-          <label>扫描目录（识别一级子目录中的项目）</label>
+          <label>{{ t("dialog.scan.dirLabel") }}</label>
           <div class="path-row">
             <input v-model="rootDir" type="text" placeholder="D:\Projects" />
-            <button class="btn" @click="pickDirectory">浏览…</button>
+            <button class="btn" @click="pickDirectory">{{ t("common.browse") }}</button>
           </div>
         </div>
 
         <div v-if="settingsStore.scanDirs.length" class="field">
-          <label>最近扫描</label>
+          <label>{{ t("dialog.scan.recent") }}</label>
           <div class="chip-row">
             <button v-for="dir in settingsStore.scanDirs" :key="dir" class="chip" @click="rootDir = dir">
               {{ dir }}
@@ -104,10 +106,10 @@ async function importSelected() {
           </div>
         </div>
 
-        <div v-if="scanning" class="caption">正在发现项目…</div>
+        <div v-if="scanning" class="caption">{{ t("dialog.scan.discovering") }}</div>
 
         <div v-if="results.length" class="field">
-          <label>发现 {{ results.length }} 个项目（已导入 {{ results.filter(r => r.alreadyImported).length }} 个）</label>
+          <label>{{ t("dialog.scan.found", { n: results.length, m: results.filter((r) => r.alreadyImported).length }) }}</label>
           <div class="scan-list">
             <label
               v-for="item in results"
@@ -126,7 +128,7 @@ async function importSelected() {
                 <div class="caption" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap">{{ item.path }}</div>
               </div>
               <span style="margin-left: auto; flex-shrink: 0" class="caption">
-                {{ item.alreadyImported ? "已导入" : item.language ?? "" }}
+                {{ item.alreadyImported ? t("dialog.scan.imported") : item.language ?? "" }}
               </span>
             </label>
           </div>
@@ -134,9 +136,9 @@ async function importSelected() {
       </div>
 
       <div class="modal-actions">
-        <button class="btn" @click="emit('close')">取消</button>
+        <button class="btn" @click="emit('close')">{{ t("common.cancel") }}</button>
         <button class="btn" :disabled="scanning" @click="scan">
-          {{ scanning ? "扫描中…" : "开始扫描" }}
+          {{ scanning ? t("dialog.scan.scanning") : t("dialog.scan.start") }}
         </button>
         <button
           v-if="results.length"
@@ -144,7 +146,7 @@ async function importSelected() {
           :disabled="importing || !selected.size"
           @click="importSelected"
         >
-          {{ importing ? "导入中…" : `导入 ${selected.size} 个` }}
+          {{ importing ? t("dialog.scan.scanning") : t("dialog.scan.importBtn", { n: selected.size }) }}
         </button>
       </div>
     </div>

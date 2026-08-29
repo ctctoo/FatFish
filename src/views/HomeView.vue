@@ -11,11 +11,13 @@ import EmptyState from "../components/common/EmptyState.vue";
 import Skeleton from "../components/common/Skeleton.vue";
 import { useProjectStore } from "../stores/project";
 import { useSettingsStore } from "../stores/settings";
+import { useI18n } from "../i18n";
 import type { Project } from "../types";
 
 const router = useRouter();
 const projectStore = useProjectStore();
 const settingsStore = useSettingsStore();
+const { t } = useI18n();
 
 const recentProjects = ref<Project[]>([]);
 const loading = ref(true);
@@ -49,21 +51,21 @@ function handleAction(action: string, project: Project) {
   <div class="page">
     <div class="home-hero" style="display: flex; align-items: flex-start">
       <div>
-        <h1>Good afternoon <span style="font-weight: 400">👋</span></h1>
-        <p>Keep track of everything you're working on.</p>
+        <h1>{{ t("home.greeting") }} <span style="font-weight: 400">👋</span></h1>
+        <p>{{ t("home.subline") }}</p>
       </div>
       <span style="flex: 1"></span>
       <div class="view-toggle" style="margin-top: 8px">
         <button
           :class="{ active: settingsStore.viewMode === 'grid' }"
-          title="网格视图"
+          :title="t('home.gridView')"
           @click="settingsStore.viewMode = 'grid'"
         >
           <LayoutGrid :size="15" :stroke-width="1.8" />
         </button>
         <button
           :class="{ active: settingsStore.viewMode === 'list' }"
-          title="列表视图"
+          :title="t('home.listView')"
           @click="settingsStore.viewMode = 'list'"
         >
           <List :size="15" :stroke-width="1.8" />
@@ -76,7 +78,7 @@ function handleAction(action: string, project: Project) {
     </div>
 
     <div class="home-section">
-      <h2>Your Projects</h2>
+      <h2>{{ t("home.yourProjects") }}</h2>
       <Skeleton v-if="loading" :count="3" />
       <template v-else-if="recentProjects.length">
         <ProjectGrid
@@ -89,9 +91,9 @@ function handleAction(action: string, project: Project) {
         />
         <ProjectListTable v-else :projects="recentProjects" @open="(p) => router.push(`/projects/${p.id}`)" />
       </template>
-      <EmptyState v-else title="还没有项目" message="添加本地项目，或扫描一个文件夹来建立你的项目空间。">
-        <button class="btn primary" @click="showForm = true"><Plus :size="15" :stroke-width="1.8" /> 添加项目</button>
-        <button class="btn" @click="showScan = true"><FolderSearch :size="15" :stroke-width="1.8" /> 扫描文件夹</button>
+      <EmptyState v-else :title="t('home.emptyTitle')" :message="t('home.emptyMsg')">
+        <button class="btn primary" @click="showForm = true"><Plus :size="15" :stroke-width="1.8" /> {{ t("home.addProject") }}</button>
+        <button class="btn" @click="showScan = true"><FolderSearch :size="15" :stroke-width="1.8" /> {{ t("home.scanFolder") }}</button>
       </EmptyState>
     </div>
 

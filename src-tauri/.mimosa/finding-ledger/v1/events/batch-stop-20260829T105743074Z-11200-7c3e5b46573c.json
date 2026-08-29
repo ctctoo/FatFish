@@ -1,0 +1,87 @@
+{
+  "schemaVersion": "mimosa-finding-ledger-batch/v1",
+  "batchId": "stop-20260829T105743074Z-11200-7c3e5b46573c",
+  "runId": "20260829T105743074Z-11200-7c3e5b46573c",
+  "runStatus": "completed",
+  "coverage": {
+    "status": "complete",
+    "reasons": [
+      {
+        "code": "baseline_partial",
+        "stage": "baseline",
+        "target": ".",
+        "detail": "baseline capture had enumeration or snapshot errors",
+        "affectsCompletion": false
+      }
+    ]
+  },
+  "source": {
+    "component": "zcode-hook",
+    "operationId": "Stop"
+  },
+  "revision": "2eaf289aa94cc5ff6fb054747b5cfe0f1cb2308d",
+  "diffHash": "a6574deef02a440c7be48bc4d57165cd739e5071700c29f4be8a7e3195b4da71",
+  "rulesVersion": "unavailable",
+  "sessionHash": "8aaa4693788ae28921921bc3d5c475d9849f0f2e1fa810d4e1ad1f8f95a1b40d",
+  "reportRef": ".mimosa/reports/task-review-sess_6a821b54-69b8-4367-a6f8-bd9038d359c6-20260829T105743074Z-11200-7c3e5b46573c.json",
+  "events": [],
+  "observedFindingIds": [],
+  "verifiedFiles": [
+    {
+      "file": "src/models/activity.rs",
+      "direct": "complete",
+      "projectContext": "partial"
+    },
+    {
+      "file": "src/models/mod.rs",
+      "direct": "complete",
+      "projectContext": "partial"
+    },
+    {
+      "file": "src/db/sqlite.rs",
+      "direct": "complete",
+      "projectContext": "partial"
+    },
+    {
+      "file": "src/repository/activity_repository.rs",
+      "direct": "complete",
+      "projectContext": "partial"
+    },
+    {
+      "file": "src/repository/mod.rs",
+      "direct": "complete",
+      "projectContext": "partial"
+    },
+    {
+      "file": "src/commands/activity.rs",
+      "direct": "complete",
+      "projectContext": "partial"
+    },
+    {
+      "file": "src/commands/mod.rs",
+      "direct": "complete",
+      "projectContext": "partial"
+    },
+    {
+      "file": "src/lib.rs",
+      "direct": "complete",
+      "projectContext": "partial"
+    },
+    {
+      "file": "src/services/project_service.rs",
+      "direct": "complete",
+      "projectContext": "partial"
+    },
+    {
+      "file": "src/commands/link.rs",
+      "direct": "complete",
+      "projectContext": "partial"
+    },
+    {
+      "file": "src/commands/todo.rs",
+      "direct": "complete",
+      "projectContext": "partial"
+    }
+  ],
+  "recordedAt": "2026-08-29T10:57:43.426Z"
+}

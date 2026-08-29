@@ -18,6 +18,7 @@ import { useProjectStore } from "../../stores/project";
 import { useTagStore } from "../../stores/tag";
 import { useCollectionStore } from "../../stores/collection";
 import { useUiStore } from "../../stores/ui";
+import { useI18n } from "../../i18n";
 
 const emit = defineEmits<{ openSearch: [] }>();
 
@@ -27,6 +28,7 @@ const projectStore = useProjectStore();
 const tagStore = useTagStore();
 const collectionStore = useCollectionStore();
 const uiStore = useUiStore();
+const { t } = useI18n();
 
 const collapsed = ref(false);
 const newCollectionName = ref("");
@@ -74,7 +76,7 @@ async function addCollection() {
 
     <button class="sidebar-item" @click="emit('openSearch')">
       <Search :size="16" :stroke-width="1.8" />
-      <span class="label">搜索</span>
+      <span class="label">{{ t("side.search") }}</span>
       <span class="count">⌘K</span>
     </button>
 
@@ -82,7 +84,7 @@ async function addCollection() {
       <div class="sidebar-label">Home</div>
       <button class="sidebar-item" :class="{ active: activeNav === 'home' }" @click="go('/home')">
         <House :size="16" :stroke-width="1.8" />
-        <span class="label">主页</span>
+        <span class="label">{{ t("side.home") }}</span>
       </button>
     </div>
 
@@ -90,23 +92,23 @@ async function addCollection() {
       <div class="sidebar-label">Projects</div>
       <button class="sidebar-item" :class="{ active: activeNav === 'projects' }" @click="go('/projects')">
         <LayoutGrid :size="16" :stroke-width="1.8" />
-        <span class="label">全部项目</span>
+        <span class="label">{{ t("side.allProjects") }}</span>
         <span class="count">{{ projectStore.projects.length }}</span>
       </button>
       <button class="sidebar-item" :class="{ active: activeNav === 'recent' }" @click="go('/recent')">
         <Clock :size="16" :stroke-width="1.8" />
-        <span class="label">最近</span>
+        <span class="label">{{ t("side.recent") }}</span>
       </button>
       <button class="sidebar-item" :class="{ active: activeNav === 'favorites' }" @click="go('/favorites')">
         <Star :size="16" :stroke-width="1.8" />
-        <span class="label">收藏</span>
+        <span class="label">{{ t("side.favorites") }}</span>
       </button>
     </div>
 
     <div class="sidebar-section">
       <div class="sidebar-label">
-        Collections
-        <button class="section-add-btn" title="新建集合" @click="addingCollection = !addingCollection">
+        {{ t("side.collections") }}
+        <button class="section-add-btn" :title="t('side.newCollection')" @click="addingCollection = !addingCollection">
           <Plus :size="13" :stroke-width="1.8" />
         </button>
       </div>
@@ -115,7 +117,7 @@ async function addCollection() {
         v-model="newCollectionName"
         class="collection-input"
         type="text"
-        placeholder="集合名称，回车确认"
+        :placeholder="t('side.collectionPh')"
         @keyup.enter="addCollection"
         @blur="addCollection"
       />
@@ -131,12 +133,12 @@ async function addCollection() {
       </button>
       <button v-if="!collectionStore.collections.length && !addingCollection" class="sidebar-item" @click="addingCollection = true">
         <Plus :size="16" :stroke-width="1.8" />
-        <span class="label">新建集合</span>
+        <span class="label">{{ t("side.newCollection") }}</span>
       </button>
     </div>
 
     <div class="sidebar-section">
-      <div class="sidebar-label">Tags</div>
+      <div class="sidebar-label">{{ t("side.tags") }}</div>
       <button
         v-for="tag in tagStore.tags"
         :key="tag.id"
@@ -148,19 +150,19 @@ async function addCollection() {
         <span class="label">{{ tag.name }}</span>
       </button>
       <button class="sidebar-item" :class="{ active: activeNav === 'manage-tags' }" @click="go('/tags')">
-        <span class="label" style="padding-left: 26px">管理标签…</span>
+        <span class="label" style="padding-left: 26px">{{ t("side.manageTags") }}</span>
       </button>
     </div>
 
     <div class="sidebar-footer">
       <button class="sidebar-item" :class="{ active: activeNav === 'settings' }" @click="go('/settings')">
         <Settings :size="16" :stroke-width="1.8" />
-        <span class="label">设置</span>
+        <span class="label">{{ t("side.settings") }}</span>
       </button>
       <button class="sidebar-item collapse-btn" @click="collapsed = !collapsed">
         <PanelLeftClose v-if="!collapsed" :size="16" :stroke-width="1.8" />
         <PanelLeftOpen v-else :size="16" :stroke-width="1.8" />
-        <span class="label">折叠侧栏</span>
+        <span class="label">{{ t("side.collapse") }}</span>
       </button>
     </div>
   </aside>

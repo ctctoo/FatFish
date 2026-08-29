@@ -3,7 +3,9 @@ import { computed, ref } from "vue";
 import { X } from "lucide-vue-next";
 import { tauriApi } from "../../services/tauri";
 import { useUiStore } from "../../stores/ui";
-import { LINK_TYPE_OPTIONS } from "../../types";
+import { LINK_TYPE_VALUES } from "../../types";
+import { linkTypeLabel, useI18n } from "../../i18n";
+import { useSettingsStore } from "../../stores/settings";
 import type { Link, LinkInput } from "../../types";
 
 const props = defineProps<{
@@ -17,6 +19,8 @@ const emit = defineEmits<{
 }>();
 
 const uiStore = useUiStore();
+const settings = useSettingsStore();
+const { t } = useI18n();
 
 const title = ref(props.link?.title ?? "");
 const url = ref(props.link?.url ?? "");
@@ -27,11 +31,11 @@ const isEdit = computed(() => !!props.link);
 
 async function save() {
   if (!title.value.trim()) {
-    uiStore.showToast("链接名称不能为空", "error");
+    uiStore.showToast(t("toast.titleRequired"), "error");
     return;
   }
   if (!url.value.trim()) {
-    uiStore.showToast("链接地址不能为空", "error");
+    uiStore.showToast(t("toast.urlRequired"), "error");
     return;
   }
   const input: LinkInput = {
@@ -46,7 +50,7 @@ async function save() {
     } else {
       await tauriApi.addLink(props.projectId, input);
     }
-    uiStore.showToast(isEdit.value ? "链接已更新" : "链接已添加", "success");
+    uiStore.showToast(isEdit.value ? t("toast.linkUpdated") : t("toast.linkAdded"), "success");
     emit("saved");
     emit("close");
   } catch (e) {
@@ -61,7 +65,7 @@ async function save() {
   <div class="modal-mask" @click.self="emit('close')">
     <div class="modal" style="width: min(440px, 90vw)">
       <div class="modal-header">
-        <h2>{{ isEdit ? "编辑链接" : "添加链接" }}</h2>
+        <h2>{{ isEdit ? t("dialog.link.edit") : t("dialog.link.add") }}</h2>
         <button class="modal-close" @click="emit('close')">
           <X :size="17" :stroke-width="1.8" />
         </button>
@@ -69,24 +73,26 @@ async function save() {
 
       <div class="form-grid">
         <div class="field">
-          <label>名称</label>
-          <input v-model="title" type="text" placeholder="GitHub / 官网 / 文档 / Figma…" @keyup.enter="save" />
+          <label>{{ t("dialog.link.title") }}</label>
+          <input v-model="title" type="text" :placeholder="t('dialog.link.titlePh')" @keyup.enter="save" />
         </div>
         <div class="field">
-          <label>地址</label>
+          <label>{{ t("dialog.link.url") }}</label>
           <input v-model="url" type="text" placeholder="https://…" @keyup.enter="save" />
         </div>
         <div class="field">
-          <label>类型</label>
+          <label>{{ t("dialog.link.type") }}</label>
           <select v-model="linkType">
-            <option v-for="opt in LINK_TYPE_OPTIONS" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+            <option v-for="value in LINK_TYPE_VALUES" :key="value" :value="value">
+              {{ linkTypeLabel(settings.locale, value) }}
+            </option>
           </select>
         </div>
       </div>
 
       <div class="modal-actions">
-        <button class="btn" @click="emit('close')">取消</button>
-        <button class="btn primary" :disabled="saving" @click="save">{{ saving ? "保存中…" : "保存" }}</button>
+        <button class="btn" @click="emit('close')">{{ t("common.cancel") }}</button>
+        <button class="btn primary" :disabled="saving" @click="save">{{ saving ? t("common.save") + "…" : t("common.save") }}</button>
       </div>
     </div>
   </div>
