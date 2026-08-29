@@ -1,8 +1,13 @@
-# Project Hub
+# FatFish
+
+[![Deploy promo page to GitHub Pages](https://github.com/ctctoo/FatFish/actions/workflows/pages.yml/badge.svg)](https://github.com/ctctoo/FatFish/actions/workflows/pages.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/ctctoo/FatFish#license)
 
 **Local-First 的桌面项目管理工具** —— 把散落在磁盘各处的项目收进一个清爽的首页：扫描、索引、组织、记录，随时一键回到工作现场。
 
-> 数据全部存在本机，不依赖任何云端服务。你的项目文件夹永远不会被改动——Project Hub 只做记录者。
+> 数据全部存在本机，不依赖任何云端服务。你的项目文件夹永远不会被改动——FatFish 只做记录者。
+
+🌐 **[产品介绍页](https://ctctoo.github.io/FatFish/)**
 
 ## 功能
 
@@ -56,15 +61,16 @@ npm run tauri build  # 构建发行版（exe + 安装包，位于 src-tauri/targ
 
 ## 数据与隐私
 
-- SQLite 数据库位于系统应用数据目录：`%APPDATA%/com.projecthub.app/project-hub.db`
+- SQLite 数据库位于系统应用数据目录：`%APPDATA%/com.fatfish.app/fatfish.db`
 - 从索引中移除项目**不会**删除磁盘上的项目文件夹
 - 不联网、不上报、不同步，卸载即走
 
 ## 文档
 
+- [产品介绍页（在线）](https://ctctoo.github.io/FatFish/) —— 由 `.github/workflows/pages.yml` 从 `promo.html` 自动部署
+- [promo.html](promo.html) —— 产品介绍页源文件
 - [MvpPlan.md](docs/MvpPlan.md) —— MVP 规划
 - [UIPlan.md](docs/UIPlan.md) —— UI 设计方案
-- [promo.html](promo.html) —— 产品介绍页
 
 ## License
 

@@ -1,5 +1,6 @@
 node_modules/
 dist/
+_site/
 src-tauri/target/
 src-tauri/gen/schemas/
 *.log

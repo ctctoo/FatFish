@@ -1,8 +1,8 @@
-# Project Hub — MVP Plan
+# FatFish — MVP Plan
 
 ## 1. 项目定位
 
-**Project Hub** 是一个 Local-First 的桌面项目管理工具，用于统一管理本机开发项目文件夹，并通过项目元数据建立项目索引。
+**FatFish** 是一个 Local-First 的桌面项目管理工具，用于统一管理本机开发项目文件夹，并通过项目元数据建立项目索引。
 
 MVP 的核心价值：
 
@@ -441,7 +441,7 @@ IntelliJ IDEA / VS Code 专属检测可以放到下一版本。
 
 ```
 ┌──────────────────────────────────────────────────────┐
-│ Project Hub                         Search   Settings │
+│ FatFish                         Search   Settings │
 ├──────────────┬───────────────────────────────────────┤
 │              │                                       │
 │ Dashboard    │  All Projects                         │
@@ -916,7 +916,7 @@ MCP
 最终 MVP 应该形成这样一个闭环：
 
 ```
-                Project Hub
+                FatFish
                      │
         ┌────────────┼────────────┐
         │            │            │

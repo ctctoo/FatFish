@@ -70,8 +70,8 @@ async function addCollection() {
 <template>
   <aside class="sidebar" :class="{ collapsed }">
     <div class="sidebar-logo">
-      <img src="../../assets/logo.png" alt="Project Hub" />
-      <span class="logo-text">Project Hub</span>
+      <img src="../../assets/logo.png" alt="FatFish" />
+      <span class="logo-text">FatFish</span>
     </div>
 
     <button class="sidebar-item" @click="emit('openSearch')">

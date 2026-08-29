@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "Project Hub",
+  "productName": "FatFish",
   "version": "0.1.0",
-  "identifier": "com.projecthub.app",
+  "identifier": "com.fatfish.app",
   "build": {
     "beforeDevCommand": "npm run dev",
     "devUrl": "http://127.0.0.1:5173",
@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "Project Hub",
+        "title": "FatFish",
         "width": 1280,
         "height": 840,
         "minWidth": 1000,

@@ -1,8 +1,8 @@
-# Project Hub — UI Plan
+# FatFish — UI Plan
 
 ## 1. UI 产品定位
 
-Project Hub 是一个**通用的本地项目空间管理器**，而不是开发者专用工具。
+FatFish 是一个**通用的本地项目空间管理器**，而不是开发者专用工具。
 
 UI 需要同时适用于：
 
@@ -213,7 +213,7 @@ background: transparent
 结构：
 
 ```
-Project Hub
+FatFish
 
 ⌕ Search                         ⌘K
 
@@ -249,7 +249,7 @@ TAGS
 使用简洁几何图标：
 
 ```
-◇ Project Hub
+◇ FatFish
 ```
 
 不要使用代码符号作为 Logo。
@@ -924,7 +924,7 @@ Confirm project removal
 
 About
 ────────────────────────
-Project Hub
+FatFish
 Version 0.1.0
 ```
 
@@ -1321,7 +1321,7 @@ Notes
 最终应该让用户产生这样的感觉：
 
 ```
-              Project Hub
+              FatFish
 
         ┌───────────────────┐
         │                   │

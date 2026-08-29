@@ -6,7 +6,8 @@ type ViewMode = "grid" | "list";
 type SortKey = "updated" | "name" | "opened";
 export type Locale = "zh" | "en";
 
-const KEY = "project-hub.settings";
+const KEY = "fatfish.settings";
+const LEGACY_KEY = "project-hub.settings";
 
 interface Persisted {
   theme: Theme;
@@ -29,7 +30,7 @@ function load(): Persisted {
     locale: "zh",
   };
   try {
-    const raw = localStorage.getItem(KEY);
+    const raw = localStorage.getItem(KEY) ?? localStorage.getItem(LEGACY_KEY);
     return raw ? { ...fallback, ...(JSON.parse(raw) as Persisted) } : fallback;
   } catch {
     return fallback;

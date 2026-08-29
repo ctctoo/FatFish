@@ -21,7 +21,7 @@ pub fn run() {
                 .app_data_dir()
                 .expect("failed to resolve app data dir");
             std::fs::create_dir_all(&dir)?;
-            let conn = db::sqlite::init_connection(&dir.join("project-hub.db"))?;
+            let conn = db::sqlite::init_connection(&dir.join("fatfish.db"))?;
             app.manage(Db(Mutex::new(conn)));
             Ok(())
         })

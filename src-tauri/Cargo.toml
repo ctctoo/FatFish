@@ -1,12 +1,12 @@
 [package]
-name = "project-hub"
+name = "fatfish"
 version = "0.1.0"
-description = "Local-first project management tool for developers"
+description = "FatFish - Local-first project management tool for developers"
 authors = ["you"]
 edition = "2021"
 
 [lib]
-name = "project_hub_lib"
+name = "fatfish_lib"
 crate-type = ["rlib"]
 
 [build-dependencies]
