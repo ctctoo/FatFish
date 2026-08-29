@@ -16,13 +16,14 @@ const zh: Record<string, string> = {
   "common.refresh": "刷新",
   "common.rename": "重命名",
   "common.optional": "可选",
+  "common.more": "更多操作",
 
   // 状态 / 链接类型 / 相对时间
   "status.IN_PROGRESS": "进行中",
   "status.PLANNED": "计划中",
-  "status.PAUSED": "暂停",
+  "status.PAUSED": "已暂停",
   "status.COMPLETED": "已完成",
-  "status.ARCHIVED": "归档",
+  "status.ARCHIVED": "已归档",
   "linkType.github": "GitHub",
   "linkType.website": "官网",
   "linkType.docs": "文档",
@@ -121,6 +122,7 @@ const zh: Record<string, string> = {
   "menu.delete": "删除项目",
   "menu.favorite": "收藏",
   "menu.unfavorite": "取消收藏",
+  "menu.status": "状态",
 
   // Toast
   "toast.copied": "路径已复制",
@@ -128,6 +130,7 @@ const zh: Record<string, string> = {
   "toast.projectDeleted": "项目已删除",
   "toast.projectAdded": "项目已添加",
   "toast.projectUpdated": "项目已更新",
+  "toast.statusChanged": "状态已更新",
   "toast.linkCopied": "链接已复制",
   "toast.tagCreated": "标签已创建",
   "toast.tagUpdated": "标签已更新",
@@ -301,6 +304,7 @@ const en: Record<string, string> = {
   "common.refresh": "Refresh",
   "common.rename": "Rename",
   "common.optional": "optional",
+  "common.more": "More actions",
 
   "status.IN_PROGRESS": "In Progress",
   "status.PLANNED": "Planned",
@@ -400,12 +404,14 @@ const en: Record<string, string> = {
   "menu.delete": "Remove Project",
   "menu.favorite": "Favorite",
   "menu.unfavorite": "Unfavorite",
+  "menu.status": "Status",
 
   "toast.copied": "Path copied",
   "toast.gitRefreshed": "Git info refreshed",
   "toast.projectDeleted": "Project removed",
   "toast.projectAdded": "Project added",
   "toast.projectUpdated": "Project updated",
+  "toast.statusChanged": "Status updated",
   "toast.linkCopied": "Link copied",
   "toast.tagCreated": "Tag created",
   "toast.tagUpdated": "Tag updated",

@@ -62,6 +62,19 @@ export const useProjectStore = defineStore("project", () => {
     return updated;
   }
 
+  /** 快捷改状态（卡片菜单用）：仅改 status，其余字段保持原值 */
+  async function changeStatus(project: Project, status: string): Promise<Project> {
+    return updateProject(project.id, {
+      name: project.name,
+      path: project.path,
+      description: project.description,
+      status,
+      coverEmoji: project.coverEmoji,
+      coverColor: project.coverColor,
+      notes: project.notes,
+    });
+  }
+
   async function deleteProject(id: string) {
     await tauriApi.deleteProject(id);
     await fetchProjects();
@@ -118,6 +131,7 @@ export const useProjectStore = defineStore("project", () => {
     resetFilter,
     createProject,
     updateProject,
+    changeStatus,
     deleteProject,
     toggleFavorite,
     markOpened,

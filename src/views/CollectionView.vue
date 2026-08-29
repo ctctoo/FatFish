@@ -51,6 +51,21 @@ async function load() {
 onMounted(load);
 watch(collectionId, load);
 
+async function handleGridAction(action: string, project: Project) {
+  if (action.startsWith("status:")) {
+    try {
+      const updated = await projectStore.changeStatus(project, action.slice("status:".length));
+      const idx = projects.value.findIndex((p) => p.id === project.id);
+      if (idx !== -1) projects.value[idx] = updated;
+      uiStore.showToast(t("toast.statusChanged"), "success");
+    } catch (e) {
+      uiStore.showToast(String(e), "error");
+    }
+    return;
+  }
+  router.push(`/projects/${project.id}`);
+}
+
 async function rename() {
   if (!collection.value || !editName.value.trim()) {
     editing.value = false;
@@ -114,7 +129,7 @@ async function removeCollection() {
         @open="(p) => router.push(`/projects/${p.id}`)"
         @open-folder="projectStore.openInFolder($event)"
         @toggle-favorite="projectStore.toggleFavorite($event)"
-        @action="(_, p) => router.push(`/projects/${p.id}`)"
+        @action="handleGridAction"
       />
       <ProjectListTable v-else :projects="projects" @open="(p) => router.push(`/projects/${p.id}`)" />
     </template>

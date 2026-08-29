@@ -60,14 +60,14 @@ const tileLetter = computed(() => props.project.name.charAt(0).toUpperCase() || 
           <button
             class="card-star"
             :class="{ on: project.favorite }"
-            title="收藏"
+            :title="t('menu.favorite')"
             @click.stop="emit('toggleFavorite', props.project)"
           >
             <Star :size="16" :stroke-width="1.8" :fill="project.favorite ? 'currentColor' : 'none'" />
           </button>
         </div>
 
-        <div class="card-desc">{{ project.description || "暂无描述" }}</div>
+        <div class="card-desc">{{ project.description || t("card.noDesc") }}</div>
 
         <div class="card-tags">
           <TagBadge v-for="tag in project.tags.slice(0, 3)" :key="tag.id" :tag="tag" />
@@ -80,14 +80,14 @@ const tileLetter = computed(() => props.project.name.charAt(0).toUpperCase() || 
       <span class="card-divider"></span>
       <span class="card-local">
         <Folder :size="13" :stroke-width="1.8" />
-        本地项目
+        {{ t("card.local") }}
       </span>
       <span class="card-updated">{{ t("card.updated") }} {{ relativeTime(settings.locale, project.updatedAt) }}</span>
-      <button class="card-more" title="更多操作" @click.stop="openMenu($event)">
+      <button class="card-more" :title="t('common.more')" @click.stop="openMenu($event)">
         <MoreHorizontal :size="16" :stroke-width="1.8" />
       </button>
     </div>
 
-    <ProjectMenu ref="menuRef" :hasGitHubLink="githubLink()" @action="onMenuAction" />
+    <ProjectMenu ref="menuRef" :hasGitHubLink="githubLink()" :status="project.status" @action="onMenuAction" />
   </div>
 </template>

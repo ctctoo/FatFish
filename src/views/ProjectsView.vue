@@ -113,6 +113,11 @@ function editProject(project: Project) {
 
 function handleAction(action: string, project: Project) {
   const run = async () => {
+    if (action.startsWith("status:")) {
+      await projectStore.changeStatus(project, action.slice("status:".length));
+      uiStore.showToast(t("toast.statusChanged"), "success");
+      return;
+    }
     switch (action) {
       case "open":
       case "open-folder":
@@ -208,6 +213,7 @@ const sortLabel = computed(
             :class="{ active: projectStore.status === value }"
             @click="projectStore.status = value"
           >
+            <span class="status-dot" :class="`status-${value}`"></span>
             {{ statusLabel(settingsStore.locale, value) }}
           </button>
 

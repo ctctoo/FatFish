@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import { FolderOpen, TerminalSquare, Link2, Copy, Pencil, RefreshCw, Trash2, ExternalLink } from "lucide-vue-next";
-import { useI18n } from "../../i18n";
+import { FolderOpen, TerminalSquare, Link2, Copy, Pencil, RefreshCw, Trash2, ExternalLink, Check } from "lucide-vue-next";
+import { useI18n, statusLabel } from "../../i18n";
+import { STATUS_VALUES } from "../../types";
+import { useSettingsStore } from "../../stores/settings";
 
 const props = defineProps<{
   hasGitHubLink: boolean;
+  status: string;
 }>();
 
 const emit = defineEmits<{
@@ -12,6 +15,7 @@ const emit = defineEmits<{
 }>();
 
 const { t } = useI18n();
+const settings = useSettingsStore();
 
 const visible = ref(false);
 const x = ref(0);
@@ -21,7 +25,7 @@ function open(e: MouseEvent) {
   e.preventDefault();
   e.stopPropagation();
   x.value = Math.min(e.clientX, window.innerWidth - 230);
-  y.value = Math.min(e.clientY, window.innerHeight - 320);
+  y.value = Math.min(e.clientY, Math.max(40, window.innerHeight - 520));
   visible.value = true;
   setTimeout(() => document.addEventListener("click", close, { once: true }), 0);
 }
@@ -68,9 +72,41 @@ defineExpose({ open });
         <ExternalLink :size="15" :stroke-width="1.8" /> {{ t("menu.openGithub") }}
       </button>
       <div class="menu-divider"></div>
+      <div class="menu-heading">{{ t("menu.status") }}</div>
+      <button
+        v-for="value in STATUS_VALUES"
+        :key="value"
+        class="menu-item status-option"
+        :class="{ current: value === props.status }"
+        @click="run(`status:${value}`)"
+      >
+        <span class="status-dot" :class="`status-${value}`"></span>
+        {{ statusLabel(settings.locale, value) }}
+        <Check v-if="value === props.status" :size="14" :stroke-width="2" class="status-check" />
+      </button>
+      <div class="menu-divider"></div>
       <button class="menu-item danger" @click="run('delete')">
         <Trash2 :size="15" :stroke-width="1.8" /> {{ t("menu.delete") }}
       </button>
     </div>
   </Teleport>
 </template>
+
+<style scoped>
+.menu-heading {
+  padding: 6px 12px 2px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+.status-option .status-dot {
+  flex: none;
+  margin-right: 2px;
+}
+.status-option .status-check {
+  margin-left: auto;
+  color: var(--accent);
+}
+</style>

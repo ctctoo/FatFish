@@ -41,9 +41,18 @@ async function openInFolder(project: Project) {
   await projectStore.openInFolder(project);
 }
 
-function handleAction(action: string, project: Project) {
-  if (action === "open-folder" || action === "open") openInFolder(project);
-  else router.push(`/projects/${project.id}`);
+async function handleAction(action: string, project: Project) {
+  if (action === "open-folder" || action === "open") {
+    await openInFolder(project);
+    return;
+  }
+  if (action.startsWith("status:")) {
+    const updated = await projectStore.changeStatus(project, action.slice("status:".length));
+    const idx = recentProjects.value.findIndex((p) => p.id === project.id);
+    if (idx !== -1) recentProjects.value[idx] = updated;
+    return;
+  }
+  router.push(`/projects/${project.id}`);
 }
 </script>
 

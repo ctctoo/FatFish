@@ -12,9 +12,9 @@ fn status_label(status: &str) -> String {
     match status {
         "IN_PROGRESS" => "进行中".to_string(),
         "PLANNED" => "计划中".to_string(),
-        "PAUSED" => "暂停".to_string(),
+        "PAUSED" => "已暂停".to_string(),
         "COMPLETED" => "已完成".to_string(),
-        "ARCHIVED" => "归档".to_string(),
+        "ARCHIVED" => "已归档".to_string(),
         other => other.to_string(),
     }
 }
