@@ -3,7 +3,7 @@ import { ref } from "vue";
 import { open } from "@tauri-apps/plugin-dialog";
 import { appDataDir } from "@tauri-apps/api/path";
 import { getVersion } from "@tauri-apps/api/app";
-import { useSettingsStore } from "../stores/settings";
+import { useSettingsStore, type Gender } from "../stores/settings";
 import { useI18n } from "../i18n";
 
 const settingsStore = useSettingsStore();
