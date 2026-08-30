@@ -1,0 +1,1614 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FatFish — 你在本机做的一切，都有一个归宿</title>
+<meta name="description" content="FatFish 是一个 Local-First 的桌面项目空间管理器。Tauri 2 + Rust + Vue 3 构建，离线运行，扫描本地项目、建立索引、Git 只读解析、Ctrl+K 秒级检索。">
+<link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAIVUlEQVR42t1XXWwdRxk9M7t7f/xzbSexHScmbUjiNKYNQqkgglRJVSpQQKGRmlCV3yIIqugTFQ+IB8tQqSpSJFD70EChQHmA3CAlUlRRikhMJVKaJlXS2qpRSJz4J/b1vb6+/3t3d2Y4c+3QJK5T8gRipdXe3Tsz3zfnO+fMjIv/8uX+Tyew7/Bhp//hh8WIEKbfGNP4OPje/4O36stOmX4jukaESaeFWq6deL+PWmvxxSNCpvcv3/F2rn37jJNOGw1I84EIDGgtebEx1PNTwb3FQOytBqY/CNDqR5BBYESkpXAkhGaryRmIms+ZcGgd2V78zaejRNH1zTvxyBxJf1e82Rh7QMvBwcbY74+AnTmDE2wtfnIl+kXNeI/VOHClClQZpB5wfHZXDDJfBC6MAbUKkHAWZmJvO0f7dNguxmciBOJ+9PPjT3kHFoMIyPeQEDdh3/jz4KXgWJj09kyMhWG1LrQfGqmNQMDB5uYFZmYMgqLCgxtsYhoTWSBfNihWDeq+QKgkWuIOWmNCu5GRq5o9L14Ijxx7LrZv2QQGTmh38H4ZPXMhOBDGvUPjl8NaGJq4YuD5qsCVq8D4pIKsKmQyPr59n4Pnv9GCDAN3xAwKhKpUA3Ilg1xR47mjES5MuUzCNTJE2BX3EolS8PX0S/Ff79yp3aEhaQsG+W9G70SDcMUaDsxMA1EAt8jA5y4AoyMKPZz+k/cq/OlxBy9+SeDutiqOjTn41RmiUNPIMqhibXraDT6zLYmUDtnPoDxHCVW1U2HJwjoetzGGTkDdgMC12g+8U15dqMZGK1WZmisYFfON+NydBltWC3SkgGnCOzwnsL1dIyoWoac7EG/T6FivUCNPpNCIxZJkZwlDr/4WzXIKB4/uJyIbDcvgpLTJ9wR+38+Op1g0loKMkYt6biRS8t12TrS5UNTm/LsaP/ikwd2bJN4l/Q8NAy+8Dbw8anAuJ9HdHsdVvwLlmAY5y9WIJYgjFo1iTeHL2L0xDa92Cc8++jSqhTx0PTImNC1zJa99QRELMeX1HDQQnl8Xzj8mpJm+GojLsxFOjgu4YQWirk1hFjj7txAn3lKE3cXvek8h151HMUdSKoNEUiKefZbZXEEhn8TsXBs2pCbQGRsTfk0aoYwjnDB2fcwbEkgIiLEZgRKJ5NcVjp2q4GPM9+V/tuP0GQ8ZonIHxT7+VgXnLkf4ir8N3X4HDDVXDVoQn3wJqcxxMtFgnTeOr953EpUrdSYbQagIJmSVlJBLjWjRU8+MQWQpMx1ppJICbWviKFMx28kD3auEYcXqKoF6aHCGMlybJ+xkVk0J1HQZ8H1cVN9HTq5BLlyJWrgCp0emMF1oxZYmali5JGq4NIFrnl6pWEaS1RWNvl6Jj96TwGtjpmE8BRpRxTfoYmIEEw6tcL6jHT6DW6laWv8l/i1EZoFQylmAt61/E1pfPYvID+HEk/BC79ZWrK2Vct2plCNczRPaukC+0pAlntwusGUV0WCIhWk4sI5ilyn77jgBHHqydX1WE9aqY0kHAxMr8IffVNHbk4LUkVyWAyH5YTs7nEJmJjDZeQU/pAllgC9sENjWS27QPjzRAAo0QcK/MEqdj/myxOy8g3LooBgQoRpdkUk6NuUwMh6VR9GI5RHgimNYJ7tcFEsRMtkQJTeGDtfggY0Gc0RCSIEXLgJ/nWBzlj03w+Q2Abs7DV75pUE+T594CNixm2Vh8pWywum/Z5F01jAJs2QtvyGBwJaAXBHMNKobkc0GKDe14JE+IJWwi5HASQb88euEtkDoS+QGXTOcAnp7BS6+7SDL9aBvnq6oOVXpYGKygssXquiMx+BxYr1e06L3LyRxQwmIFxGwRRUNhxqfDLAyDnz2LmtSAh4/DnNNkEwiMcdS5ZjsHIlJEnb3a3g7itj8UA1byZUypey6EsPDeZTYJuG4WJ2Q6Gy6xX4g8kkB0thERnhk+ZWpOr6zF+huFcjRam0CY5NEicFDqsIqrzZPpguBdN/rSHdNoL3ejAcSu9AWNCNKUtpv0nUDBm9KiDYOUC5ptWwCyvdqKogi+oATKaHbUBef/rBCiUqwTLewRkUux9wHWFmHFTpgVZrNfXXxIskwm/VNtuyI4A4m51keKZw/m8OHWnvNqliTjEIVOkJXl3JgsKEm1CvzGaVb8hKys1wJ8ciuJnSnJKZyCgQERQZ97BMGa9grsuUiWms7tdixVULNb8VIVBAfaVmBlTJJE6KSZqsoXophU6oHLl2Yi1U2V01cXYxvrkOAdsd928VnRGHtE9VTQib3uEJE07OBF9JompIL9m13Q+vXAk+s4wyt4VBQkVrYLX2taXNDm9aIKmwo4hKv/TkDr9iBlnWJqNWlAgOcOHheVA4z1v7FjeoSI1LV4EcceU97sxd75XQp/ObgqPupe5qo0JDGYl2RN70gostEDGRL4wkrXafhmIgEt2IOZifrOP/HCtZ13hm2xRLxMKAGff1DG2M4bZbZkjEzMLOeR3MHhJs6ZOgLc1OTOqjklQm45QkpbBtFWaaSB04SHU4rWmSziNF7Y5RvjPqJc5gWkcDajja3p7VJSK4tqu7vHXyj+ejAzhPu4ND90fLb8n2HmcR+tXb/7P3COE+zFB9nKGGsibDwTqiwgubU5XHXw95xY3fAaGg8Zm++x/XCuwrCQCo9pIPoe0+90XLueuhveS64hoT92fP5S3cJ5W2kGSZVoNDtJcX6WBulZZEIYJcWO3un8Vy4Gdxw3SvWq2b0p+c6xhq+c9PMb53AtSR+z5VBLj1M3M5lzwIjI0dEmqj+xyejm04qEjxmIXOy0XbnBzTftfgc6dpl+km2Qdx4ELn9BP7fT8f/AvRFY+sYfz7OAAAAAElFTkSuQmCC" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+SC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   Design Tokens —— 与 FatFish 应用内 tokens.css 保持一致
+   ============================================================ */
+:root{
+  --bg:#f7f7f5;
+  --surface:#ffffff;
+  --surface-muted:#f1f1ef;
+  --border:#e7e7e3;
+  --border-strong:#d9d9d4;
+  --text:#202124;
+  --text-2:#6b6d70;
+  --text-3:#96989b;
+
+  --accent:#5457cd;
+  --accent-hover:#4649b8;
+  --accent-soft:rgba(84,87,205,.10);
+
+  --s-progress:#4d9e6c;
+  --s-planned:#5b8fd6;
+  --s-paused:#d0a13c;
+  --s-completed:#979793;
+  --s-archived:#71716e;
+
+  --radius-lg:14px;
+  --radius-md:10px;
+  --radius-sm:8px;
+
+  --shadow-modal:0 20px 50px rgba(0,0,0,.14);
+  --shadow-menu:0 8px 28px rgba(0,0,0,.10);
+
+  --grid-line:rgba(0,0,0,.05);
+  --spot:rgba(84,87,205,.10);
+  --noise-op:.035;
+  --orb-op:.42;
+
+  --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --sans:'Inter','Noto Sans SC',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
+}
+html[data-theme="dark"]{
+  --bg:#151515;
+  --surface:#1c1c1c;
+  --surface-muted:#232323;
+  --border:#303030;
+  --border-strong:#3a3a3a;
+  --text:#f5f5f5;
+  --text-2:#a5a5a5;
+  --text-3:#707070;
+
+  --accent:#8b8df0;
+  --accent-hover:#9fa1f4;
+  --accent-soft:rgba(139,141,240,.14);
+
+  --s-progress:#5cb87f;
+  --s-planned:#6fa0dd;
+  --s-paused:#d9b258;
+  --s-completed:#979793;
+  --s-archived:#707070;
+
+  --shadow-modal:0 24px 60px rgba(0,0,0,.55);
+  --shadow-menu:0 10px 34px rgba(0,0,0,.45);
+
+  --grid-line:rgba(255,255,255,.045);
+  --spot:rgba(139,141,240,.13);
+  --noise-op:.05;
+  --orb-op:.55;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{
+  font-family:var(--sans);
+  background:var(--bg);
+  color:var(--text);
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  overflow-x:hidden;
+  transition:background .4s ease,color .4s ease;
+}
+::selection{background:var(--accent);color:#fff}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+
+.wrap{max-width:1180px;margin:0 auto;padding:0 28px}
+.mono{font-family:var(--mono)}
+
+/* ============ 滚动进度 ============ */
+#progress{
+  position:fixed;top:0;left:0;height:2px;width:0;z-index:200;
+  background:linear-gradient(90deg,var(--s-planned),var(--accent),var(--s-progress));
+  transition:width .1s linear;
+}
+
+/* ============ 环境光 / 网格 / 噪点 ============ */
+.ambient{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0}
+.orb{position:absolute;border-radius:50%;filter:blur(100px);opacity:var(--orb-op);will-change:transform}
+.orb.a{width:640px;height:640px;top:-260px;left:50%;margin-left:-520px;background:var(--s-planned);animation:drift1 22s ease-in-out infinite}
+.orb.b{width:560px;height:560px;top:-180px;left:50%;margin-left:60px;background:var(--accent);animation:drift2 26s ease-in-out infinite}
+.orb.c{width:480px;height:480px;top:120px;left:50%;margin-left:-200px;background:var(--s-progress);animation:drift3 30s ease-in-out infinite;opacity:calc(var(--orb-op) * .55)}
+@keyframes drift1{0%,100%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(60px,50px,0) scale(1.12)}}
+@keyframes drift2{0%,100%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(-70px,40px,0) scale(1.08)}}
+@keyframes drift3{0%,100%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(40px,-40px,0) scale(1.15)}}
+
+.gridlines{
+  position:absolute;inset:0;z-index:0;pointer-events:none;
+  background-image:linear-gradient(var(--grid-line) 1px,transparent 1px),linear-gradient(90deg,var(--grid-line) 1px,transparent 1px);
+  background-size:58px 58px;
+  -webkit-mask-image:radial-gradient(ellipse 90% 62% at 50% 22%,#000 25%,transparent 78%);
+  mask-image:radial-gradient(ellipse 90% 62% at 50% 22%,#000 25%,transparent 78%);
+}
+.noise{
+  position:fixed;inset:0;z-index:1;pointer-events:none;opacity:var(--noise-op);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ============ Header ============ */
+header{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  padding:13px 0;
+  background:color-mix(in srgb,var(--bg) 78%,transparent);
+  backdrop-filter:blur(18px) saturate(160%);
+  -webkit-backdrop-filter:blur(18px) saturate(160%);
+  border-bottom:1px solid transparent;
+  transition:border-color .25s,background .25s;
+}
+header.scrolled{border-bottom-color:var(--border)}
+header .wrap{display:flex;align-items:center;justify-content:space-between;gap:24px}
+.brand{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:600;letter-spacing:-.01em}
+.brand-mark{
+  width:28px;height:28px;border:1.5px solid var(--border-strong);border-radius:8px;
+  display:grid;place-items:center;font-size:13px;color:var(--accent);
+  background:var(--surface);transition:transform .5s cubic-bezier(.2,.8,.2,1),border-color .3s;
+}
+.brand:hover .brand-mark{transform:rotate(180deg);border-color:var(--accent)}
+nav{display:flex;gap:30px}
+nav a{
+  font-size:13px;font-weight:500;color:var(--text-3);position:relative;padding:3px 0;
+  transition:color .2s;
+}
+nav a::after{
+  content:'';position:absolute;left:0;right:0;bottom:-2px;height:1px;background:var(--accent);
+  transform:scaleX(0);transform-origin:right;transition:transform .3s cubic-bezier(.2,.8,.2,1);
+}
+nav a:hover{color:var(--text)}
+nav a:hover::after{transform:scaleX(1);transform-origin:left}
+.hd-right{display:flex;align-items:center;gap:10px}
+
+/* ============ 通用控件 ============ */
+.btn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:10px 20px;border-radius:var(--radius-sm);
+  font-size:14px;font-weight:500;letter-spacing:-.005em;
+  border:1px solid transparent;
+  transition:transform .18s cubic-bezier(.2,.8,.2,1),background .2s,border-color .2s,box-shadow .25s,opacity .2s;
+  white-space:nowrap;
+}
+.btn:active{transform:translateY(1px) scale(.99)}
+.btn-primary{background:var(--text);color:var(--bg)}
+.btn-primary:hover{opacity:.86;box-shadow:0 8px 24px rgba(0,0,0,.18)}
+.btn-accent{background:var(--accent);color:#fff}
+.btn-accent:hover{background:var(--accent-hover);box-shadow:0 10px 30px color-mix(in srgb,var(--accent) 35%,transparent)}
+.btn-outline{background:var(--surface);color:var(--text);border-color:var(--border)}
+.btn-outline:hover{border-color:var(--border-strong);background:var(--surface-muted)}
+.btn-ghost{color:var(--text-2)}
+.btn-ghost:hover{color:var(--text);background:var(--surface-muted)}
+
+.icon-btn{
+  width:34px;height:34px;border-radius:var(--radius-sm);border:1px solid var(--border);
+  background:var(--surface);display:grid;place-items:center;color:var(--text-2);
+  transition:color .2s,border-color .2s,transform .4s;
+}
+.icon-btn:hover{color:var(--text);border-color:var(--border-strong);transform:rotate(30deg)}
+
+.chip{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:5px 13px;border-radius:999px;
+  border:1px solid var(--border);background:var(--surface);
+  font-size:12px;font-weight:500;color:var(--text-2);
+}
+.chip .dot{width:6px;height:6px;border-radius:50%;background:var(--s-progress);box-shadow:0 0 0 3px color-mix(in srgb,var(--s-progress) 22%,transparent)}
+
+/* ============ Hero ============ */
+.hero{position:relative;padding:150px 0 30px;overflow:hidden}
+.hero-inner{position:relative;z-index:2;text-align:center}
+
+h1{
+  font-size:clamp(40px,7.2vw,76px);
+  font-weight:800;line-height:1.08;letter-spacing:-.045em;
+  margin:22px 0 0;
+}
+h1 .line{display:block;overflow:hidden;padding-bottom:.1em;margin-bottom:-.1em}
+h1 .w{display:inline-block;transform:translateY(110%);opacity:0;animation:rise .95s cubic-bezier(.16,1,.3,1) forwards}
+@keyframes rise{to{transform:translateY(0);opacity:1}}
+.grad{
+  background:linear-gradient(100deg,var(--s-planned),var(--accent) 46%,var(--s-progress));
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.hero-sub{
+  font-size:clamp(15px,1.6vw,18px);color:var(--text-2);
+  max-width:560px;margin:22px auto 0;line-height:1.75;
+  animation:fadeUp .9s .5s cubic-bezier(.16,1,.3,1) both;
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.hero-cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:34px;animation:fadeUp .9s .62s cubic-bezier(.16,1,.3,1) both}
+.kbd{
+  font-family:var(--mono);font-size:11px;padding:2px 6px;border-radius:5px;
+  border:1px solid var(--border);background:var(--surface-muted);color:var(--text-3);
+}
+
+/* 指标条 */
+.metrics{
+  display:flex;justify-content:center;flex-wrap:wrap;gap:0;
+  margin:46px auto 0;max-width:820px;
+  border:1px solid var(--border);border-radius:var(--radius-lg);
+  background:var(--surface);overflow:hidden;
+  animation:fadeUp .9s .74s cubic-bezier(.16,1,.3,1) both;
+  box-shadow:0 1px 2px rgba(0,0,0,.04);
+}
+.metric{flex:1 1 150px;padding:18px 20px;border-right:1px solid var(--border);position:relative}
+.metric:last-child{border-right:none}
+.metric b{display:block;font-size:24px;font-weight:700;letter-spacing:-.03em;font-family:var(--mono)}
+.metric b i{font-style:normal;font-size:14px;color:var(--text-3);font-weight:500}
+.metric span{font-size:11.5px;color:var(--text-3);letter-spacing:.02em}
+
+/* ============ 应用窗口 ============ */
+.stage{
+  position:relative;z-index:2;
+  margin:64px auto 0;max-width:1080px;
+  perspective:1800px;
+}
+.window{
+  border:1px solid var(--border);border-radius:16px;overflow:hidden;
+  background:var(--surface);
+  box-shadow:var(--shadow-modal);
+  transform-style:preserve-3d;
+  will-change:transform;
+}
+.win-bar{
+  display:flex;align-items:center;gap:8px;padding:11px 15px;
+  background:var(--surface-muted);border-bottom:1px solid var(--border);
+}
+.win-dot{width:11px;height:11px;border-radius:50%}
+.win-dot:nth-child(1){background:#ff5f56}
+.win-dot:nth-child(2){background:#ffbd2e}
+.win-dot:nth-child(3){background:#27c93f}
+.win-title{margin-left:10px;font-size:11.5px;color:var(--text-3);font-family:var(--mono);letter-spacing:.02em}
+.win-body{display:flex;min-height:452px;text-align:left}
+
+/* 侧栏 */
+.win-side{
+  width:216px;flex:none;padding:14px 11px;
+  border-right:1px solid var(--border);background:var(--surface-muted);
+}
+.side-brand{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;padding:5px 8px;margin-bottom:18px}
+.side-mark{width:21px;height:21px;border:1px solid var(--border-strong);border-radius:6px;display:grid;place-items:center;font-size:10px;color:var(--accent);background:var(--surface)}
+.side-label{font-size:9.5px;font-weight:700;color:var(--text-3);letter-spacing:.09em;text-transform:uppercase;padding:0 8px;margin:16px 0 6px}
+.side-item{
+  display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:7px;
+  font-size:12.5px;color:var(--text-2);cursor:default;
+  transition:background .18s,color .18s;
+}
+.side-item:hover{background:var(--hover-tint);color:var(--text)}
+:root{--hover-tint:rgba(0,0,0,.035)}
+html[data-theme="dark"]{--hover-tint:rgba(255,255,255,.045)}
+.side-item.on{background:var(--surface);color:var(--text);font-weight:600;box-shadow:0 1px 2px rgba(0,0,0,.05)}
+.side-item svg{width:14px;height:14px;flex:none;opacity:.85}
+.side-item .cnt{margin-left:auto;font-size:10.5px;color:var(--text-3);font-family:var(--mono)}
+.side-dot{width:7px;height:7px;border-radius:3px;flex:none}
+
+/* 主区 */
+.win-main{flex:1;min-width:0;padding:18px 20px}
+.win-top{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.win-h{font-size:16.5px;font-weight:700;letter-spacing:-.02em}
+.win-spacer{flex:1}
+.searchbox{
+  display:flex;align-items:center;gap:8px;
+  padding:7px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);
+  background:var(--surface-muted);color:var(--text-3);font-size:12px;
+  min-width:186px;transition:border-color .2s,background .2s,color .2s;
+}
+.searchbox:hover{border-color:var(--accent);color:var(--text-2);background:var(--surface)}
+.searchbox kbd{margin-left:auto}
+.seg{display:flex;border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;background:var(--surface-muted)}
+.seg button{
+  padding:6px 11px;font-size:12px;color:var(--text-3);display:grid;place-items:center;
+  transition:background .18s,color .18s;
+}
+.seg button.on{background:var(--surface);color:var(--text);font-weight:600}
+.seg button:hover:not(.on){color:var(--text-2)}
+
+/* 卡片网格 */
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.card{
+  border:1px solid var(--border);border-radius:var(--radius-md);
+  background:var(--surface);padding:14px;position:relative;overflow:hidden;
+  transition:border-color .22s,transform .28s cubic-bezier(.2,.8,.2,1),box-shadow .28s;
+}
+.card:hover{border-color:var(--border-strong);transform:translateY(-3px);box-shadow:0 12px 30px rgba(0,0,0,.10)}
+html[data-theme="dark"] .card:hover{box-shadow:0 14px 34px rgba(0,0,0,.4)}
+.card::before{
+  content:'';position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .3s;
+  background:radial-gradient(320px circle at var(--mx,50%) var(--my,50%),var(--spot),transparent 62%);
+}
+.card:hover::before{opacity:1}
+.cover{
+  height:66px;border-radius:var(--radius-sm);border:1px solid var(--border);
+  background:var(--surface-muted);display:grid;place-items:center;font-size:26px;margin-bottom:11px;
+  position:relative;overflow:hidden;
+}
+.cover::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(120deg,transparent 30%,rgba(255,255,255,.35) 50%,transparent 70%);
+  transform:translateX(-120%);
+}
+.card:hover .cover::after{animation:sheen .85s ease-out}
+@keyframes sheen{to{transform:translateX(120%)}}
+.card-top{display:flex;align-items:flex-start;gap:8px}
+.card-name{font-size:13.5px;font-weight:650;letter-spacing:-.01em;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fav{color:var(--s-paused);font-size:12px;line-height:1.4}
+.card-desc{font-size:11.5px;color:var(--text-3);margin:3px 0 10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px}
+.tag{
+  padding:2px 7px;border:1px solid var(--border);border-radius:5px;
+  font-size:10px;color:var(--text-2);background:var(--surface-muted);
+}
+.card-foot{display:flex;align-items:center;gap:7px;font-size:10.5px;color:var(--text-3);font-family:var(--mono);border-top:1px solid var(--border);padding-top:9px}
+.st{display:inline-flex;align-items:center;gap:5px;color:var(--text-2);font-family:var(--sans);font-weight:500}
+.st i{width:6px;height:6px;border-radius:50%;background:var(--c,var(--text-3));display:block}
+.dot-sep{opacity:.4}
+
+/* 列表视图 */
+.table{width:100%;border-collapse:collapse;font-size:12.5px}
+.table th{
+  text-align:left;padding:8px 10px;font-size:10.5px;font-weight:600;color:var(--text-3);
+  text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid var(--border);
+}
+.table td{padding:10px;border-bottom:1px solid var(--border);color:var(--text-2)}
+.table tr{transition:background .18s}
+.table tbody tr:hover{background:var(--hover-tint)}
+.table .nm{color:var(--text);font-weight:600;display:flex;align-items:center;gap:8px}
+.table .lang{font-family:var(--mono);font-size:11px}
+.badge-lang{
+  display:inline-block;padding:2px 6px;border-radius:5px;font-size:10px;font-family:var(--mono);
+  background:var(--surface-muted);border:1px solid var(--border);color:var(--text-2);
+}
+.badge-lang[data-lang="Rust"]{color:#c77b4a;border-color:color-mix(in srgb,#c77b4a 40%,transparent)}
+.badge-lang[data-lang="Go"]{color:#00add8;border-color:color-mix(in srgb,#00add8 40%,transparent)}
+.badge-lang[data-lang="TypeScript"]{color:#3178c6;border-color:color-mix(in srgb,#3178c6 40%,transparent)}
+.badge-lang[data-lang="Python"]{color:#f0a83c;border-color:color-mix(in srgb,#f0a83c 40%,transparent)}
+.badge-lang[data-lang="Java"]{color:#e76f00;border-color:color-mix(in srgb,#e76f00 40%,transparent)}
+.badge-lang[data-lang="Android"]{color:#3ddc84;border-color:color-mix(in srgb,#3ddc84 40%,transparent)}
+.badge-lang[data-lang="JavaScript"]{color:#c8b23a;border-color:color-mix(in srgb,#c8b23a 40%,transparent)}
+
+/* ============ 章节 ============ */
+section.band{position:relative;padding:132px 0}
+.sec-head{max-width:660px;margin-bottom:52px}
+.sec-head.center{text-align:center;margin-left:auto;margin-right:auto}
+.eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--accent);margin-bottom:16px;
+}
+.eyebrow::before{content:'';width:22px;height:1px;background:currentColor;opacity:.55}
+h2{font-size:clamp(28px,4.2vw,44px);font-weight:750;letter-spacing:-.035em;line-height:1.15}
+.sec-desc{font-size:16px;color:var(--text-2);margin-top:14px;line-height:1.75}
+
+/* Bento */
+.bento{display:grid;grid-template-columns:repeat(6,1fr);gap:14px}
+.cell{
+  grid-column:span 2;
+  border:1px solid var(--border);border-radius:var(--radius-lg);
+  background:var(--surface);padding:26px;position:relative;overflow:hidden;
+  transition:border-color .25s,transform .3s cubic-bezier(.2,.8,.2,1);
+}
+.cell:hover{border-color:var(--border-strong);transform:translateY(-2px)}
+.cell::before{
+  content:'';position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .35s;
+  background:radial-gradient(420px circle at var(--mx,50%) var(--my,50%),var(--spot),transparent 60%);
+}
+.cell:hover::before{opacity:1}
+.cell.wide{grid-column:span 3}
+.cell.big{grid-column:span 4}
+.cell.half{grid-column:span 2}
+.cell h3{font-size:16px;font-weight:650;letter-spacing:-.02em;margin-bottom:8px;display:flex;align-items:center;gap:9px}
+.cell p{font-size:13.5px;color:var(--text-2);line-height:1.72}
+.ico{
+  width:34px;height:34px;flex:none;border-radius:9px;border:1px solid var(--border);
+  background:var(--surface-muted);display:grid;place-items:center;color:var(--accent);
+}
+.ico svg{width:16px;height:16px}
+.cell .meta{
+  margin-top:16px;padding-top:14px;border-top:1px solid var(--border);
+  font-family:var(--mono);font-size:11px;color:var(--text-3);letter-spacing:.01em;
+}
+
+/* 扫描演示 */
+.scan{display:grid;grid-template-columns:1.05fr .95fr;gap:14px}
+.panel{
+  border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--surface);overflow:hidden;
+}
+.panel-head{
+  display:flex;align-items:center;gap:9px;padding:13px 18px;border-bottom:1px solid var(--border);
+  background:var(--surface-muted);
+}
+.panel-head .t{font-size:12px;font-weight:600}
+.panel-head .r{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--text-3)}
+.panel-body{padding:16px 18px}
+.filerow{
+  display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--radius-sm);
+  font-family:var(--mono);font-size:12px;color:var(--text-2);
+  opacity:0;transform:translateX(-8px);
+  transition:opacity .35s,transform .35s,background .2s;
+}
+.filerow.in{opacity:1;transform:none}
+.filerow:hover{background:var(--hover-tint)}
+.filerow .fp{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.filerow .fk{width:15px;text-align:center;opacity:.75}
+.filerow .fr{
+  font-size:10.5px;padding:2px 7px;border-radius:5px;border:1px solid var(--border);
+  background:var(--surface-muted);color:var(--text-3);white-space:nowrap;
+  opacity:0;transition:opacity .3s .15s;
+}
+.filerow.in .fr{opacity:1}
+.filerow.skip{color:var(--text-3);text-decoration:line-through;text-decoration-color:var(--border-strong)}
+.filerow.skip .fr{color:var(--text-3)}
+.progress{height:3px;background:var(--surface-muted);border-radius:2px;overflow:hidden;margin-top:6px}
+.progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--s-planned),var(--accent));transition:width .3s ease}
+.scan-ctl{display:flex;align-items:center;gap:10px;margin-top:16px;flex-wrap:wrap}
+.scan-out{font-family:var(--mono);font-size:11.5px;color:var(--text-3)}
+
+.rules{display:grid;gap:8px}
+.rule{
+  display:flex;align-items:center;gap:10px;padding:11px 13px;
+  border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface-muted);
+  font-size:12.5px;
+}
+.rule code{
+  font-family:var(--mono);font-size:11.5px;color:var(--accent);
+  background:var(--surface);border:1px solid var(--border);border-radius:5px;padding:2px 7px;
+}
+.rule .arr{color:var(--text-3)}
+.rule .res{margin-left:auto;font-weight:600;font-size:11.5px;font-family:var(--mono)}
+
+/* 架构流水线 */
+.arch{
+  border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--surface);
+  padding:30px 26px;overflow:hidden;
+}
+.flow{display:flex;align-items:stretch;gap:0}
+.node{
+  flex:1;min-width:0;text-align:center;padding:0 8px;position:relative;
+}
+.node .box{
+  border:1px solid var(--border);border-radius:var(--radius-md);background:var(--surface-muted);
+  padding:16px 10px;transition:border-color .25s,transform .25s,background .25s;
+}
+.node:hover .box{border-color:var(--accent);transform:translateY(-3px)}
+.node .lv{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;color:var(--text-3);text-transform:uppercase}
+.node .nm{font-size:13.5px;font-weight:650;margin:7px 0 4px;letter-spacing:-.015em}
+.node .rl{font-size:11px;color:var(--text-3);line-height:1.5}
+.node .tech{
+  display:inline-block;margin-top:10px;font-family:var(--mono);font-size:10px;
+  padding:2px 7px;border-radius:5px;background:var(--surface);border:1px solid var(--border);color:var(--text-2);
+}
+.bridge{flex:0 0 46px;position:relative;display:grid;place-items:center}
+.bridge::before{
+  content:'';position:absolute;left:0;right:0;top:50%;height:1px;
+  background:repeating-linear-gradient(90deg,var(--border-strong) 0 4px,transparent 4px 9px);
+}
+.bridge span{
+  position:relative;width:8px;height:8px;border-radius:50%;background:var(--accent);
+  box-shadow:0 0 0 4px var(--accent-soft);
+  animation:packet 2.6s cubic-bezier(.5,0,.5,1) infinite;
+}
+@keyframes packet{
+  0%{transform:translateX(0);opacity:0}
+  12%{opacity:1}
+  88%{opacity:1}
+  100%{transform:translateX(46px);opacity:0}
+}
+.arch-foot{
+  margin-top:26px;padding-top:20px;border-top:1px solid var(--border);
+  display:grid;grid-template-columns:repeat(4,1fr);gap:16px;
+}
+.af{font-size:12.5px}
+.af b{display:block;font-family:var(--mono);font-size:13px;color:var(--accent);margin-bottom:2px}
+.af span{color:var(--text-3);font-size:11.5px;line-height:1.55;display:block}
+
+/* 代码区 */
+.code-grid{display:grid;grid-template-columns:1.02fr .98fr;gap:14px;align-items:start}
+.code{
+  border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;background:#111114;
+  position:relative;
+}
+html[data-theme="light"] .code{background:#1b1b1f}
+.code-head{
+  display:flex;align-items:center;gap:8px;padding:11px 15px;border-bottom:1px solid rgba(255,255,255,.07);
+  background:rgba(255,255,255,.03);
+}
+.code-head .f{font-family:var(--mono);font-size:11.5px;color:#8b8d95}
+.code-head .cp{
+  margin-left:auto;font-size:11px;color:#8b8d95;border:1px solid rgba(255,255,255,.12);
+  border-radius:6px;padding:3px 9px;transition:color .2s,border-color .2s,background .2s;
+}
+.code-head .cp:hover{color:#fff;border-color:rgba(255,255,255,.3);background:rgba(255,255,255,.06)}
+pre{
+  margin:0;padding:18px 20px 22px;overflow-x:auto;
+  font-family:var(--mono);font-size:12.3px;line-height:1.85;color:#d6d8de;
+  tab-size:4;
+}
+pre .c{color:#6a6d78;font-style:italic}
+pre .k{color:#c792ea}
+pre .f{color:#82aaff}
+pre .s{color:#c3e88d}
+pre .n{color:#f78c6c}
+pre .t{color:#ffcb6b}
+pre .p{color:#89ddff}
+.term{
+  border:1px solid var(--border);border-radius:var(--radius-lg);background:#111114;overflow:hidden;
+}
+html[data-theme="light"] .term{background:#1b1b1f}
+.term-body{padding:16px 20px 20px;font-family:var(--mono);font-size:12.2px;line-height:1.9;color:#d6d8de;min-height:236px}
+.term-body .cmd{color:#c3e88d}
+.term-body .ok{color:#5cb87f}
+.term-body .dim{color:#6a6d78}
+.term-body .hl{color:#82aaff}
+.term-body div{opacity:0}
+.term-body div.in{opacity:1}
+
+/* 技术栈 */
+.stack{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.stk{
+  border:1px solid var(--border);border-radius:var(--radius-md);background:var(--surface);
+  padding:20px 18px;display:flex;align-items:center;gap:14px;
+  transition:border-color .22s,transform .26s cubic-bezier(.2,.8,.2,1);
+}
+.stk:hover{border-color:var(--border-strong);transform:translateY(-2px)}
+.mono-tile{
+  width:38px;height:38px;flex:none;border-radius:10px;display:grid;place-items:center;
+  font-family:var(--mono);font-weight:700;font-size:14px;letter-spacing:-.02em;
+  border:1px solid color-mix(in srgb,var(--bc) 34%,transparent);
+  background:color-mix(in srgb,var(--bc) 12%,transparent);
+  color:var(--bc);
+}
+.stk .nm{font-size:13.5px;font-weight:650;letter-spacing:-.01em}
+.stk .rl{font-size:11.5px;color:var(--text-3)}
+
+/* CTA */
+.cta-band{position:relative;padding:120px 0 130px;text-align:center;overflow:hidden}
+.cta-card{
+  position:relative;z-index:2;max-width:760px;margin:0 auto;
+  border:1px solid var(--border);border-radius:22px;background:var(--surface);
+  padding:56px 40px;box-shadow:var(--shadow-modal);overflow:hidden;
+}
+.cta-card::before{
+  content:'';position:absolute;top:-140px;left:50%;transform:translateX(-50%);
+  width:560px;height:320px;border-radius:50%;filter:blur(110px);opacity:var(--orb-op);
+  background:var(--accent);pointer-events:none;
+}
+.cta-card h2{position:relative}
+.cta-card p{position:relative;font-size:15.5px;color:var(--text-2);margin-top:14px}
+.cta-actions{position:relative;display:flex;gap:12px;justify-content:center;margin-top:30px;flex-wrap:wrap}
+.plats{position:relative;display:flex;gap:22px;justify-content:center;margin-top:30px;font-size:12px;color:var(--text-3);font-family:var(--mono)}
+
+footer{position:relative;z-index:2;border-top:1px solid var(--border);padding:34px 0}
+footer .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+footer p{font-size:12px;color:var(--text-3)}
+footer .fl{display:flex;gap:20px}
+footer .fl a{font-size:12px;color:var(--text-3);transition:color .2s}
+footer .fl a:hover{color:var(--text)}
+
+/* ============ 命令面板 ============ */
+#palette{
+  position:fixed;inset:0;z-index:300;display:none;
+  background:color-mix(in srgb,#000 45%,transparent);
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+}
+#palette.open{display:block;animation:fadeIn .18s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.pal{
+  width:min(560px,92vw);margin:12vh auto 0;
+  border:1px solid var(--border-strong);border-radius:var(--radius-lg);
+  background:var(--surface);box-shadow:var(--shadow-modal);overflow:hidden;
+  animation:pop .26s cubic-bezier(.16,1,.3,1);
+}
+@keyframes pop{from{opacity:0;transform:translateY(-14px) scale(.98)}to{opacity:1;transform:none}}
+.pal-in{display:flex;align-items:center;gap:11px;padding:15px 18px;border-bottom:1px solid var(--border)}
+.pal-in input{
+  flex:1;background:none;border:none;outline:none;font-size:15px;color:var(--text);font-family:var(--sans);
+}
+.pal-in input::placeholder{color:var(--text-3)}
+.pal-list{max-height:330px;overflow-y:auto;padding:7px}
+.pal-item{
+  display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:var(--radius-sm);
+  font-size:13.5px;color:var(--text-2);cursor:pointer;
+}
+.pal-item .g{width:26px;height:26px;border-radius:7px;background:var(--surface-muted);border:1px solid var(--border);display:grid;place-items:center;font-size:13px;flex:none}
+.pal-item .sub{margin-left:auto;font-size:11px;color:var(--text-3);font-family:var(--mono)}
+.pal-item.sel{background:var(--accent-soft);color:var(--text)}
+.pal-empty{padding:26px;text-align:center;font-size:13px;color:var(--text-3)}
+.pal-foot{
+  display:flex;gap:16px;padding:9px 18px;border-top:1px solid var(--border);
+  background:var(--surface-muted);font-size:11px;color:var(--text-3);
+}
+
+/* Toast */
+#toast{
+  position:fixed;bottom:28px;left:50%;transform:translate(-50%,20px);z-index:400;
+  background:var(--text);color:var(--bg);padding:10px 18px;border-radius:999px;
+  font-size:13px;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;
+  box-shadow:var(--shadow-menu);
+}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+
+/* 揭示动画 */
+[data-rv]{opacity:0;transform:translateY(22px);transition:opacity .7s cubic-bezier(.16,1,.3,1),transform .7s cubic-bezier(.16,1,.3,1);transition-delay:var(--d,0ms)}
+[data-rv].vis{opacity:1;transform:none}
+
+/* 响应式 */
+@media (max-width:1080px){
+  .bento{grid-template-columns:repeat(4,1fr)}
+  .cell,.cell.wide,.cell.half{grid-column:span 2}
+  .cell.big{grid-column:span 4}
+  .stack{grid-template-columns:repeat(2,1fr)}
+  #extraGrid{grid-template-columns:repeat(2,1fr)}
+}
+@media (max-width:900px){
+  .hero{padding-top:126px}
+  #features{padding-top:110px}
+  .win-side{display:none}
+  .cards{grid-template-columns:repeat(2,1fr)}
+  .scan,.code-grid{grid-template-columns:1fr}
+  .flow{flex-wrap:wrap;gap:18px 0}
+  .node{flex:0 0 50%}
+  .bridge{display:none}
+  .arch-foot{grid-template-columns:repeat(2,1fr)}
+  .metric{flex:1 1 50%;border-bottom:1px solid var(--border)}
+}
+@media (max-width:700px){
+  nav{display:none}
+  section.band{padding:88px 0}
+  .bento{grid-template-columns:1fr}
+  .cell,.cell.wide,.cell.half,.cell.big{grid-column:span 1}
+  .cards{grid-template-columns:1fr}
+  .stack{grid-template-columns:1fr}
+  #extraGrid{grid-template-columns:1fr}
+  .node{flex:0 0 100%}
+  .arch-foot{grid-template-columns:1fr}
+  .cta-card{padding:40px 22px}
+  .wrap{padding:0 20px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
+  html{scroll-behavior:auto}
+  [data-rv]{opacity:1;transform:none}
+  h1 .w{transform:none;opacity:1}
+}
+</style>
+</head>
+<body>
+
+<div id="progress"></div>
+<div class="noise"></div>
+
+<!-- ===================== Header ===================== -->
+<header id="hd">
+  <div class="wrap">
+    <a href="#" class="brand"><span class="brand-mark">◇</span>FatFish</a>
+    <nav>
+      <a href="#features">功能</a>
+      <a href="#scanner">扫描引擎</a>
+      <a href="#arch">架构</a>
+      <a href="#stack">技术栈</a>
+    </nav>
+    <div class="hd-right">
+      <button class="icon-btn" id="themeBtn" aria-label="切换主题" title="切换主题">
+        <svg id="themeIcon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+      <a class="icon-btn" href="https://github.com/ctctoo/FatFish" target="_blank" rel="noopener noreferrer" aria-label="GitHub 仓库" title="GitHub">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.55v-1.94c-3.2.7-3.88-1.54-3.88-1.54-.53-1.34-1.29-1.7-1.29-1.7-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.7 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .96-.31 3.15 1.18a10.94 10.94 0 0 1 5.74 0c2.18-1.49 3.14-1.18 3.14-1.18.63 1.59.23 2.76.12 3.05.74.81 1.18 1.84 1.18 3.1 0 4.43-2.69 5.4-5.25 5.69.41.35.78 1.05.78 2.12v3.14c0 .3.2.66.8.55A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5z"/>
+        </svg>
+      </a>
+      <a href="https://github.com/ctctoo/FatFish" target="_blank" rel="noopener noreferrer" class="btn btn-accent" style="padding:8px 16px;font-size:13px">下载</a>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<!-- ===================== Hero ===================== -->
+<section class="hero">
+  <div class="ambient">
+    <div class="orb a"></div><div class="orb b"></div><div class="orb c"></div>
+  </div>
+  <div class="gridlines"></div>
+
+  <div class="wrap hero-inner">
+    <span class="chip" style="animation:fadeUp .9s .2s both">
+      <span class="dot"></span> Local-First · 全程离线 · 数据不出本机
+    </span>
+
+    <h1>
+      <span class="line"><span class="w" style="animation-delay:.12s">你在本机做的</span></span>
+      <span class="line"><span class="w grad" style="animation-delay:.24s">每一件事</span></span>
+      <span class="line"><span class="w" style="animation-delay:.36s">都有一个归宿</span></span>
+    </h1>
+
+    <p class="hero-sub">
+      不只是代码项目。论文、旅行计划、设计稿、课程作业、创业想法——
+      扫描本地目录、建立索引、补充元数据，然后 <span class="kbd">Ctrl</span>+<span class="kbd">K</span> 秒级抵达。
+    </p>
+
+    <div class="hero-cta">
+      <a href="https://github.com/ctctoo/FatFish" target="_blank" rel="noopener noreferrer" class="btn btn-accent">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+        从 GitHub 获取
+      </a>
+      <button class="btn btn-outline" id="cloneBtn">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        <span class="mono" style="font-size:12.5px">git clone</span>
+      </button>
+      <button class="btn btn-outline" id="openPalBtn">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        体验命令面板 <span class="kbd">⌘K</span>
+      </button>
+    </div>
+
+    <div class="metrics">
+      <div class="metric"><b data-count="31">0</b><span>Tauri 指令</span></div>
+      <div class="metric"><b data-count="9">0</b><span>命令模块</span></div>
+      <div class="metric"><b data-count="7">0</b><span>可识别技术栈</span></div>
+      <div class="metric"><b data-count="3">0</b><span>目标平台</span></div>
+      <div class="metric"><b>0<i> KB</i></b><span>Chromium 体积</span></div>
+    </div>
+
+    <!-- ===== 应用窗口 ===== -->
+    <div class="stage">
+      <div class="window" id="win">
+        <div class="win-bar">
+          <span class="win-dot"></span><span class="win-dot"></span><span class="win-dot"></span>
+          <span class="win-title">FatFish — 1280 × 840</span>
+          <span class="win-title" style="margin-left:auto">com.fatfish.app</span>
+        </div>
+        <div class="win-body">
+          <!-- 侧边栏 -->
+          <aside class="win-side">
+            <div class="side-brand"><span class="side-mark">◇</span>FatFish</div>
+
+            <div class="side-item on">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>
+              首页
+            </div>
+            <div class="side-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/></svg>
+              全部项目 <span class="cnt">24</span>
+            </div>
+            <div class="side-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 2.6 5.6 6 .8-4.4 4.2 1.1 6.1L12 16.8 6.7 19.7l1.1-6.1L3.4 9.4l6-.8z"/></svg>
+              收藏 <span class="cnt">6</span>
+            </div>
+            <div class="side-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>
+              最近
+            </div>
+
+            <div class="side-label">集合</div>
+            <div class="side-item"><span class="side-dot" style="background:var(--s-planned)"></span>工作 <span class="cnt">9</span></div>
+            <div class="side-item"><span class="side-dot" style="background:var(--s-progress)"></span>学习 <span class="cnt">7</span></div>
+            <div class="side-item"><span class="side-dot" style="background:var(--s-paused)"></span>个人 <span class="cnt">8</span></div>
+
+            <div class="side-label">组织</div>
+            <div class="side-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.6 13.4 12 3 3.4 13.4a2 2 0 0 0-.2 2.1l.3.5 8.5 4.6 8.5-4.6.3-.5a2 2 0 0 0-.2-2.1z"/></svg>
+              标签 <span class="cnt">18</span>
+            </div>
+            <div class="side-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+              待办 <span class="cnt">5</span>
+            </div>
+            <div class="side-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-1.8-.3 1.6 1.6 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1A1.6 1.6 0 0 0 9 19.4a1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0 .3-1.8 1.6 1.6 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1A1.6 1.6 0 0 0 4.6 9a1.6 1.6 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 1.8.3H9a1.6 1.6 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 1 1.5 1.6 1.6 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8V9a1.6 1.6 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1z"/></svg>
+              设置
+            </div>
+          </aside>
+
+          <!-- 主区 -->
+          <div class="win-main">
+            <div class="win-top">
+              <div class="win-h">全部项目</div>
+              <div class="win-spacer"></div>
+              <div class="searchbox" id="searchBox">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                搜索项目、标签、路径…
+                <kbd>Ctrl K</kbd>
+              </div>
+              <div class="seg" id="viewSeg">
+                <button class="on" data-view="grid" title="网格视图">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+                </button>
+                <button data-view="list" title="列表视图">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01"/></svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- 网格视图 -->
+            <div class="cards" id="gridView">
+              <div class="card" data-rv>
+                <div class="cover">🤖</div>
+                <div class="card-top"><span class="card-name">AiCooking</span><span class="fav">★</span></div>
+                <div class="card-desc">基于 RAG 的智能菜谱生成系统</div>
+                <div class="tags"><span class="tag">AI</span><span class="tag">Python</span><span class="tag">RAG</span></div>
+                <div class="card-foot">
+                  <span class="st" style="--c:var(--s-progress)"><i></i>进行中</span>
+                  <span class="dot-sep">·</span>
+                  <span>⎇ main</span>
+                  <span class="dot-sep">·</span>
+                  <span>2 小时前</span>
+                </div>
+              </div>
+
+              <div class="card" data-rv>
+                <div class="cover">✈️</div>
+                <div class="card-top"><span class="card-name">Tokyo 2026</span></div>
+                <div class="card-desc">东京七日行程与预算规划</div>
+                <div class="tags"><span class="tag">旅行</span><span class="tag">计划</span></div>
+                <div class="card-foot">
+                  <span class="st" style="--c:var(--s-planned)"><i></i>计划中</span>
+                  <span class="dot-sep">·</span>
+                  <span>非代码项目</span>
+                </div>
+              </div>
+
+              <div class="card" data-rv>
+                <div class="cover">📄</div>
+                <div class="card-top"><span class="card-name">毕业论文</span></div>
+                <div class="card-desc">多模态情感分析综述与实验</div>
+                <div class="tags"><span class="tag">研究</span><span class="tag">写作</span><span class="tag">LaTeX</span></div>
+                <div class="card-foot">
+                  <span class="st" style="--c:var(--s-paused)"><i></i>暂停</span>
+                  <span class="dot-sep">·</span>
+                  <span>3 个链接</span>
+                </div>
+              </div>
+
+              <div class="card" data-rv>
+                <div class="cover">🦀</div>
+                <div class="card-top"><span class="card-name">ripgrep-lite</span><span class="fav">★</span></div>
+                <div class="card-desc">多线程文件检索 CLI 玩具</div>
+                <div class="tags"><span class="tag">Rust</span><span class="tag">CLI</span></div>
+                <div class="card-foot">
+                  <span class="st" style="--c:var(--s-progress)"><i></i>进行中</span>
+                  <span class="dot-sep">·</span>
+                  <span style="color:var(--s-paused)">● dirty</span>
+                </div>
+              </div>
+
+              <div class="card" data-rv>
+                <div class="cover">🎨</div>
+                <div class="card-top"><span class="card-name">Brand Kit</span></div>
+                <div class="card-desc">品牌视觉规范与组件库设计稿</div>
+                <div class="tags"><span class="tag">设计</span><span class="tag">Figma</span></div>
+                <div class="card-foot">
+                  <span class="st" style="--c:var(--s-completed)"><i></i>已完成</span>
+                  <span class="dot-sep">·</span>
+                  <span>5 个链接</span>
+                </div>
+              </div>
+
+              <div class="card" data-rv>
+                <div class="cover">📊</div>
+                <div class="card-top"><span class="card-name">sales-dashboard</span></div>
+                <div class="card-desc">门店实时看板 · Go + gRPC</div>
+                <div class="tags"><span class="tag">Go</span><span class="tag">后端</span></div>
+                <div class="card-foot">
+                  <span class="st" style="--c:var(--s-archived)"><i></i>已归档</span>
+                  <span class="dot-sep">·</span>
+                  <span>⎇ release/v2</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 列表视图 -->
+            <div id="listView" style="display:none">
+              <table class="table">
+                <thead>
+                  <tr><th style="width:32%">项目</th><th>栈</th><th>状态</th><th>分支</th><th>最后活动</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td class="nm">🤖 AiCooking</td><td><span class="badge-lang" data-lang="Python">Python</span></td><td><span class="st" style="--c:var(--s-progress)"><i></i>进行中</span></td><td class="lang">main</td><td>2 小时前</td></tr>
+                  <tr><td class="nm">✈️ Tokyo 2026</td><td><span class="badge-lang">—</span></td><td><span class="st" style="--c:var(--s-planned)"><i></i>计划中</span></td><td class="lang">—</td><td>昨天</td></tr>
+                  <tr><td class="nm">📄 毕业论文</td><td><span class="badge-lang">—</span></td><td><span class="st" style="--c:var(--s-paused)"><i></i>暂停</span></td><td class="lang">—</td><td>3 天前</td></tr>
+                  <tr><td class="nm">🦀 ripgrep-lite</td><td><span class="badge-lang" data-lang="Rust">Rust</span></td><td><span class="st" style="--c:var(--s-progress)"><i></i>进行中</span></td><td class="lang">feat/threads</td><td>40 分钟前</td></tr>
+                  <tr><td class="nm">🎨 Brand Kit</td><td><span class="badge-lang">—</span></td><td><span class="st" style="--c:var(--s-completed)"><i></i>已完成</span></td><td class="lang">—</td><td>上周</td></tr>
+                  <tr><td class="nm">📊 sales-dashboard</td><td><span class="badge-lang" data-lang="Go">Go</span></td><td><span class="st" style="--c:var(--s-archived)"><i></i>已归档</span></td><td class="lang">release/v2</td><td>2 个月前</td></tr>
+                  <tr><td class="nm">🧩 design-tokens</td><td><span class="badge-lang" data-lang="TypeScript">TypeScript</span></td><td><span class="st" style="--c:var(--s-progress)"><i></i>进行中</span></td><td class="lang">main</td><td>6 小时前</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 功能 Bento ===================== -->
+<section class="band" id="features">
+  <div class="wrap">
+    <div class="sec-head center" data-rv>
+      <span class="eyebrow">Capabilities</span>
+      <h2>为真实工作流而设计</h2>
+      <p class="sec-desc">不是又一个「开发者仪表盘」，而是你桌面的空间整理器。内容优先、项目中立、低视觉噪音。</p>
+    </div>
+
+    <div class="bento">
+      <div class="cell big" data-rv>
+        <h3>
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></span>
+          一次扫描，自动建档
+        </h3>
+        <p>指向任意父目录，扫描器读取一级子目录并依据特征文件判定技术栈；已导入的项目会被标记并置灰，杜绝重复。<code style="font-family:var(--mono);font-size:12px;color:var(--accent)">node_modules</code>、<code style="font-family:var(--mono);font-size:12px;color:var(--accent)">target</code>、<code style="font-family:var(--mono);font-size:12px;color:var(--accent)">dist</code>、<code style="font-family:var(--mono);font-size:12px;color:var(--accent)">venv</code> 等 8 类噪声目录与全部隐藏目录自动跳过。</p>
+        <div class="meta">scan_directory · import_projects · 只读，不改磁盘</div>
+      </div>
+
+      <div class="cell half" data-rv>
+        <h3>
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></span>
+          Ctrl+K 秒级抵达
+        </h3>
+        <p>名称、简介、路径、GitHub 地址、标签、技术栈全字段检索，键盘直达，不离开键盘流。</p>
+        <div class="meta">全字段匹配 · 最近记录 · Enter 打开</div>
+      </div>
+
+      <div class="cell" data-rv>
+        <h3>
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.6 13.4 12 3 3.4 13.4a2 2 0 0 0-.2 2.1l.3.5 8.5 4.6 8.5-4.6.3-.5a2 2 0 0 0-.2-2.1z"/></svg></span>
+          标签 × 集合
+        </h3>
+        <p>标签描述项目「是什么」，集合表达你「怎么归类」。两个正交维度，任意组合筛选。</p>
+        <div class="meta">事务内全量绑定 · 级联清理</div>
+      </div>
+
+      <div class="cell" data-rv>
+        <h3>
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="6" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="18" r="3"/><path d="M8.6 13.5 15.4 17.5M15.4 6.5 8.6 10.5"/></svg></span>
+          Git 只读解析
+        </h3>
+        <p>分支、最后提交、dirty 状态、remote origin 全部读取。Git 不可用或没装 CLI 时静默降级，绝不影响项目加载。</p>
+        <div class="meta">.git/config INI 解析 · 无 CLI 依赖</div>
+      </div>
+
+      <div class="cell" data-rv>
+        <h3>
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M8 9h8M8 13h5"/></svg></span>
+          五种状态追踪
+        </h3>
+        <p>进行中 / 计划中 / 暂停 / 已完成 / 已归档。状态变更自动写入活动流，项目详情页可回看完整时间线。</p>
+        <div class="meta">activity 表 · 最近 50 条 · 索引加速</div>
+      </div>
+
+      <div class="cell wide" data-rv>
+        <h3>
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span>
+          跨项目待办
+        </h3>
+        <p>全局待办池，可挂到具体项目、设置截止日期，也可完全独立存在。做完一件事，勾掉它——不需要为此再装一个 App。</p>
+        <div class="meta">list / create / update / toggle / delete</div>
+      </div>
+
+      <div class="cell wide" data-rv>
+        <h3>
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg></span>
+          八类链接 + 一键直达
+        </h3>
+        <p>GitHub / 官网 / 文档 / 设计稿 / Demo / 论文 / 云盘 / 其他，为项目挂上它所有的入口。同时在系统里打开文件夹、拉起终端、复制路径——Windows、macOS、Linux 三套分支各自走原生命令。</p>
+        <div class="meta">open_folder · open_terminal · explorer / open / xdg-open</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 扫描引擎演示 ===================== -->
+<section class="band" id="scanner" style="padding-top:20px">
+  <div class="wrap">
+    <div class="sec-head" data-rv>
+      <span class="eyebrow">Scanner Engine</span>
+      <h2>读目录，就能读懂项目</h2>
+      <p class="sec-desc">用一份特征文件映射表，替代所有「手动选技术栈」的表单。</p>
+    </div>
+
+    <div class="scan">
+      <div class="panel" data-rv>
+        <div class="panel-head">
+          <span class="t">扫描预览</span>
+          <span class="r" id="scanState">idle</span>
+        </div>
+        <div class="panel-body">
+          <div class="progress"><i id="scanBar"></i></div>
+          <div id="fileList" style="margin-top:10px"></div>
+          <div class="scan-ctl">
+            <button class="btn btn-accent" id="scanBtn" style="padding:8px 16px;font-size:13px">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 12 3-9 12 18 3-9"/></svg>
+              开始扫描
+            </button>
+            <span class="scan-out" id="scanOut">等待指令 · 目标 ~/Developer</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" data-rv>
+        <div class="panel-head"><span class="t">特征文件 → 技术栈规则</span><span class="r">7 rules</span></div>
+        <div class="panel-body">
+          <div class="rules">
+            <div class="rule"><code>pom.xml</code><span class="arr">→</span><span class="res">Java</span></div>
+            <div class="rule"><code>build.gradle(.kts)</code><span class="arr">→</span><span class="res">Java</span></div>
+            <div class="rule"><code>+ AndroidManifest.xml</code><span class="arr">→</span><span class="res">Android</span></div>
+            <div class="rule"><code>package.json</code><span class="arr">→</span><span class="res">JavaScript</span></div>
+            <div class="rule"><code>+ tsconfig.json</code><span class="arr">→</span><span class="res">TypeScript</span></div>
+            <div class="rule"><code>Cargo.toml</code><span class="arr">→</span><span class="res">Rust</span></div>
+            <div class="rule"><code>go.mod</code><span class="arr">→</span><span class="res">Go</span></div>
+            <div class="rule"><code>pyproject.toml / setup.py / requirements.txt</code><span class="arr">→</span><span class="res">Python</span></div>
+          </div>
+          <p style="font-size:12.5px;color:var(--text-3);margin-top:16px;line-height:1.7">
+            扫描仅遍历一级子目录（不做递归），结果按名称排序；命中已存在路径的项目会标记
+            <code style="font-family:var(--mono);color:var(--accent);font-size:11.5px">already_imported</code>
+            并在前端禁用勾选。
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 架构 ===================== -->
+<section class="band" id="arch" style="padding-top:20px">
+  <div class="wrap">
+    <div class="sec-head" data-rv>
+      <span class="eyebrow">Architecture</span>
+      <h2>四层下沉，一处落库</h2>
+      <p class="sec-desc">前端不碰 SQL，Rust 不碰 UI。每一层只做一件事，边界清晰到可以单独替换。</p>
+    </div>
+
+    <div class="arch" data-rv>
+      <div class="flow">
+        <div class="node">
+          <div class="box">
+            <div class="lv">View</div>
+            <div class="nm">Vue 3 组件</div>
+            <div class="rl">7 个视图 · 19 个组件<br>Pinia 状态</div>
+            <span class="tech">TypeScript</span>
+          </div>
+        </div>
+        <div class="bridge"><span></span></div>
+        <div class="node">
+          <div class="box">
+            <div class="lv">Bridge</div>
+            <div class="nm">Tauri IPC</div>
+            <div class="rl">invoke / 事件通道<br>最小权限能力集</div>
+            <span class="tech">@tauri-apps/api</span>
+          </div>
+        </div>
+        <div class="bridge"><span></span></div>
+        <div class="node">
+          <div class="box">
+            <div class="lv">Command</div>
+            <div class="nm">Rust 指令层</div>
+            <div class="rl">31 条指令 · 9 个模块<br>参数校验与编排</div>
+            <span class="tech">#[tauri::command]</span>
+          </div>
+        </div>
+        <div class="bridge"><span></span></div>
+        <div class="node">
+          <div class="box">
+            <div class="lv">Service</div>
+            <div class="nm">业务逻辑</div>
+            <div class="rl">扫描 / Git / 项目<br>领域规则与降级</div>
+            <span class="tech">anyhow::Result</span>
+          </div>
+        </div>
+        <div class="bridge"><span></span></div>
+        <div class="node">
+          <div class="box">
+            <div class="lv">Repository</div>
+            <div class="nm">数据访问</div>
+            <div class="rl">prepared statement<br>事务与级联</div>
+            <span class="tech">rusqlite</span>
+          </div>
+        </div>
+        <div class="bridge"><span></span></div>
+        <div class="node">
+          <div class="box">
+            <div class="lv">Storage</div>
+            <div class="nm">SQLite</div>
+            <div class="rl">bundled，随应用分发<br>系统应用数据目录</div>
+            <span class="tech">fatfish.db</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="arch-foot">
+        <div class="af"><b>SQLite bundled</b><span>rusqlite 静态链接 SQLite，零外部依赖，无需用户安装数据库。</span></div>
+        <div class="af"><b>单连接 + Mutex</b><span>全局 <code class="mono">Db(Mutex&lt;Connection&gt;)</code> 通过 <code class="mono">tauri::State</code> 注入，避免并发写冲突。</span></div>
+        <div class="af"><b>Mutex 之外的取舍</b><span>UI 偏好（主题 / 视图 / 语言）存 localStorage，不让界面状态污染领域数据。</span></div>
+        <div class="af"><b>最小权限</b><span>capabilities 仅启用 core:default、dialog:default、opener:default。</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== Git / 代码 ===================== -->
+<section class="band" style="padding-top:20px">
+  <div class="wrap">
+    <div class="sec-head" data-rv>
+      <span class="eyebrow">Git · Read Only</span>
+      <h2>拿得到信息，绝不碰你的仓库</h2>
+      <p class="sec-desc">只读、可降级、无副作用。Git 信息是锦上添花，永远不该成为加载失败的原因。</p>
+    </div>
+
+    <div class="code-grid">
+      <div class="code" data-rv>
+        <div class="code-head">
+          <span class="f">git_service.rs</span>
+          <button class="cp" data-copy="cp1">复制</button>
+        </div>
+<pre id="cp1"><span class="c">// remote origin 直接解析 .git/config —— 不依赖 git CLI</span>
+<span class="k">fn</span> <span class="f">read_remote_url</span>(repo: &amp;<span class="t">Path</span>) -&gt; <span class="t">Option</span>&lt;<span class="t">String</span>&gt; {
+    <span class="k">let</span> cfg = repo.join(<span class="s">".git/config"</span>);
+    <span class="k">let</span> text = fs::read_to_string(cfg).ok()?;
+    <span class="c">// 定位 [remote "origin"] 段，取 url = ...</span>
+    parse_ini_section(&amp;text, <span class="s">"remote"</span>, <span class="s">"origin"</span>)
+        .map(normalize_remote_url)
+}
+
+<span class="c">// commit / branch / dirty 走 CLI，输出用 \x1f 分隔，避免空格歧义</span>
+<span class="k">let</span> out = <span class="f">git</span>(&amp;[<span class="s">"log"</span>, <span class="s">"-1"</span>, <span class="s">"--pretty=format:%H%x1f%s%x1f%cI"</span>])?;
+<span class="k">let</span> parts: <span class="t">Vec</span>&lt;&amp;<span class="k">str</span>&gt; = out.split(<span class="s">'\u{1f}'</span>).collect();
+
+<span class="k">let</span> dirty = !<span class="f">git</span>(&amp;[<span class="s">"status"</span>, <span class="s">"--porcelain"</span>])?.trim().is_empty();
+
+<span class="c">// 降级：CLI 不可用时，回退到读 .git/HEAD 的 ref: refs/heads/&lt;branch&gt;</span>
+<span class="c">// 约束：任何失败都返回空字段，绝不向上抛错</span></pre>
+      </div>
+
+      <div class="term" data-rv>
+        <div class="code-head">
+          <span class="f">zsh — 一次 Git 刷新背后发生的事</span>
+        </div>
+        <div class="term-body" id="termBody">
+          <div><span class="cmd">$</span> refresh_git_info(project_id)</div>
+          <div><span class="dim">→</span> .git/ 不存在？<span class="dim">返回空 GitInfo，静默结束</span></div>
+          <div><span class="ok">✓</span> .git/config <span class="dim">解析 remote origin</span> <span class="hl">git@github.com:you/repo.git</span></div>
+          <div><span class="ok">✓</span> normalize <span class="dim">→</span> <span class="hl">https://github.com/you/repo</span></div>
+          <div><span class="ok">✓</span> rev-parse --abbrev-ref HEAD <span class="dim">→</span> <span class="hl">feat/threads</span></div>
+          <div><span class="ok">✓</span> log -1 <span class="dim">→</span> <span class="hl">a3f9c21</span> · <span class="hl">"perf: 并行遍历目录"</span></div>
+          <div><span class="ok">✓</span> status --porcelain <span class="dim">→ 输出非空 →</span> <span class="hl">dirty</span></div>
+          <div><span class="dim">→</span> 写入 git_info 表 · 追加一条 activity</div>
+          <div><span class="cmd">$</span> <span class="dim">全程无 git add / commit / checkout / push</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 技术栈 ===================== -->
+<section class="band" id="stack" style="padding-top:20px">
+  <div class="wrap">
+    <div class="sec-head center" data-rv>
+      <span class="eyebrow">Stack</span>
+      <h2>轻量，但不简单</h2>
+      <p class="sec-desc">复用系统 WebView，不打包 Chromium；用原生 Rust 承担 IO 密集工作，把启动时间和内存占用压到最低。</p>
+    </div>
+
+    <div class="stack">
+      <div class="stk" data-rv style="--bc:#ffc131"><span class="mono-tile">T</span><div><div class="nm">Tauri 2</div><div class="rl">桌面外壳 · 系统 WebView</div></div></div>
+      <div class="stk" data-rv style="--bc:#c77b4a"><span class="mono-tile">R</span><div><div class="nm">Rust</div><div class="rl">后端引擎 · 扫描与 Git</div></div></div>
+      <div class="stk" data-rv style="--bc:#42b883"><span class="mono-tile">V</span><div><div class="nm">Vue 3</div><div class="rl">组合式 API · SFC</div></div></div>
+      <div class="stk" data-rv style="--bc:#3178c6"><span class="mono-tile">TS</span><div><div class="nm">TypeScript</div><div class="rl">全链路类型安全</div></div></div>
+      <div class="stk" data-rv style="--bc:#0f80cc"><span class="mono-tile">DB</span><div><div class="nm">SQLite</div><div class="rl">rusqlite bundled 存储</div></div></div>
+      <div class="stk" data-rv style="--bc:#8b5cf6"><span class="mono-tile">Vi</span><div><div class="nm">Vite 6</div><div class="rl">构建 · 毫秒级 HMR</div></div></div>
+      <div class="stk" data-rv style="--bc:#e5a83c"><span class="mono-tile">P</span><div><div class="nm">Pinia</div><div class="rl">状态管理</div></div></div>
+      <div class="stk" data-rv style="--bc:#f56565"><span class="mono-tile">L</span><div><div class="nm">Lucide</div><div class="rl">图标体系 · 1.8px 统一线宽</div></div></div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px" id="extraGrid">
+      <div class="cell" data-rv style="grid-column:span 1">
+        <h3><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg></span>中 / 英双语</h3>
+        <p>轻量 i18n，语言随设置持久化，运行时热切，无需重启。</p>
+      </div>
+      <div class="cell" data-rv style="grid-column:span 1">
+        <h3><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 12h18"/><circle cx="12" cy="12" r="9"/></svg></span>Markdown 备注</h3>
+        <p>项目描述与备注支持 Markdown 渲染，自动保存，随写随存。</p>
+      </div>
+      <div class="cell" data-rv style="grid-column:span 1">
+        <h3><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 9 9h-9z"/></svg></span>明暗双主题</h3>
+        <p>完整设计令牌体系，Light / Dark 全量变量映射，切换无缝——就像本页右上角那个按钮。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== CTA ===================== -->
+<section class="cta-band" id="cta">
+  <div class="ambient"><div class="orb b" style="top:-220px"></div></div>
+  <div class="wrap">
+    <div class="cta-card" data-rv>
+      <span class="eyebrow" style="justify-content:center">Get Started</span>
+      <h2>整理你的项目空间</h2>
+      <p>免费、离线、本地运行。索引里的项目删掉，磁盘上的文件夹原封不动。</p>
+      <div class="cta-actions">
+        <a href="https://github.com/ctctoo/FatFish" target="_blank" rel="noopener noreferrer" class="btn btn-accent">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+          下载 FatFish
+        </a>
+        <a href="https://github.com/ctctoo/FatFish" target="_blank" rel="noopener noreferrer" class="btn btn-outline">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.55v-1.94c-3.2.7-3.88-1.54-3.88-1.54-.53-1.34-1.29-1.7-1.29-1.7-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.7 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .96-.31 3.15 1.18a10.94 10.94 0 0 1 5.74 0c2.18-1.49 3.14-1.18 3.14-1.18.63 1.59.23 2.76.12 3.05.74.81 1.18 1.84 1.18 3.1 0 4.43-2.69 5.4-5.25 5.69.41.35.78 1.05.78 2.12v3.14c0 .3.2.66.8.55A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5z"/>
+          </svg>
+          ctctoo / FatFish
+        </a>
+        <button class="btn btn-outline" id="openPalBtn2">按 ⌘K 先试试搜索</button>
+      </div>
+      <div class="plats">
+        <span>Windows 10+</span><span>macOS</span><span>Linux</span><span style="opacity:.6">v0.1.0</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>© 2026 FatFish · Built with Tauri 2 + Rust + Vue 3</p>
+    <div class="fl">
+      <a href="#features">功能</a>
+      <a href="#arch">架构</a>
+      <a href="#stack">技术栈</a>
+      <a href="https://github.com/ctctoo/FatFish" target="_blank" rel="noopener noreferrer">GitHub</a>
+    </div>
+  </div>
+</footer>
+
+<!-- ===================== 命令面板 ===================== -->
+<div id="palette" role="dialog" aria-modal="true" aria-label="命令面板">
+  <div class="pal">
+    <div class="pal-in">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="color:var(--text-3);flex:none"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="palInput" placeholder="搜索项目、标签或执行操作…" autocomplete="off" spellcheck="false">
+      <span class="kbd">ESC</span>
+    </div>
+    <div class="pal-list" id="palList"></div>
+    <div class="pal-foot">
+      <span>↑ ↓ 选择</span><span>↵ 打开</span><span>esc 关闭</span>
+      <span style="margin-left:auto" class="mono">Local-First · 无需联网</span>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+(function () {
+  'use strict';
+  const REPO = 'https://github.com/ctctoo/FatFish';
+  const REPO_GIT = REPO + '.git';
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const $  = (s, r) => (r || document).querySelector(s);
+  const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
+
+  /* ---------- 主题 ---------- */
+  const root = document.documentElement;
+  const THEME_KEY = 'fatfish.promo.theme';
+  const setTheme = (t) => {
+    root.setAttribute('data-theme', t);
+    try { localStorage.setItem(THEME_KEY, t); } catch (e) {}
+    $('#themeIcon').innerHTML = t === 'dark'
+      ? '<circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M19.1 4.9l-1.8 1.8M6.7 17.3l-1.8 1.8"/>'
+      : '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
+  };
+  let saved = null;
+  try { saved = localStorage.getItem(THEME_KEY); } catch (e) {}
+  setTheme(saved || 'dark');
+  $('#themeBtn').addEventListener('click', () => {
+    setTheme(root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+  });
+
+  /* ---------- 滚动进度 + Header ---------- */
+  const hd = $('#hd'), bar = $('#progress');
+  let ticking = false;
+  const onScroll = () => {
+    const y = window.scrollY;
+    const h = document.documentElement.scrollHeight - window.innerHeight;
+    bar.style.width = (h > 0 ? (y / h) * 100 : 0) + '%';
+    hd.classList.toggle('scrolled', y > 20);
+    ticking = false;
+  };
+  window.addEventListener('scroll', () => {
+    if (!ticking) { ticking = true; requestAnimationFrame(onScroll); }
+  }, { passive: true });
+  onScroll();
+
+  /* ---------- 揭示动画（含子序列 stagger） ---------- */
+  const groups = new Map();
+  $$('[data-rv]').forEach(el => {
+    const p = el.parentElement;
+    if (!groups.has(p)) groups.set(p, []);
+    groups.get(p).push(el);
+  });
+  groups.forEach(arr => arr.forEach((el, i) => {
+    if (!el.style.getPropertyValue('--d')) el.style.setProperty('--d', Math.min(i * 70, 420) + 'ms');
+  }));
+
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('vis'); io.unobserve(e.target); }
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+  $$('[data-rv]').forEach(el => io.observe(el));
+
+  /* ---------- 数字滚动 ---------- */
+  const counters = $$('[data-count]');
+  const cio = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      const el = e.target, target = parseInt(el.dataset.count, 10);
+      cio.unobserve(el);
+      if (reduce) { el.textContent = target; return; }
+      const dur = 1100, t0 = performance.now();
+      const step = (now) => {
+        const p = Math.min((now - t0) / dur, 1);
+        el.textContent = Math.round(target * (1 - Math.pow(1 - p, 3)));
+        if (p < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    });
+  }, { threshold: 0.5 });
+  counters.forEach(el => cio.observe(el));
+
+  /* ---------- 鼠标聚光 ---------- */
+  if (!reduce && matchMedia('(hover:hover)').matches) {
+    $$('.card, .cell').forEach(el => {
+      el.addEventListener('mousemove', (e) => {
+        const r = el.getBoundingClientRect();
+        el.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+        el.style.setProperty('--my', (e.clientY - r.top) + 'px');
+      });
+    });
+  }
+
+  /* ---------- 窗口 3D 入场 ---------- */
+  const win = $('#win');
+  if (win && !reduce) {
+    let wt = false;
+    const tilt = () => {
+      const vh = window.innerHeight;
+      // 元素顶边从「视口底部」移到「视口 15% 处」的过程中，进度 0 → 1
+      const p = Math.min(Math.max(1 - (win.getBoundingClientRect().top - vh * 0.15) / (vh * 0.85), 0), 1);
+      const e = 1 - Math.pow(1 - p, 3);
+      win.style.transform =
+        'perspective(1800px) rotateX(' + (13 * (1 - e)).toFixed(2) + 'deg) scale(' + (0.96 + 0.04 * e).toFixed(4) + ')';
+      win.style.opacity = (0.5 + 0.5 * Math.min(p * 3, 1)).toFixed(3);
+      wt = false;
+    };
+    window.addEventListener('scroll', () => {
+      if (!wt) { wt = true; requestAnimationFrame(tilt); }
+    }, { passive: true });
+    tilt();
+  }
+
+  /* ---------- 视图切换 ---------- */
+  $('#viewSeg').addEventListener('click', (e) => {
+    const b = e.target.closest('button');
+    if (!b) return;
+    $$('#viewSeg button').forEach(x => x.classList.toggle('on', x === b));
+    const isGrid = b.dataset.view === 'grid';
+    $('#gridView').style.display = isGrid ? '' : 'none';
+    $('#listView').style.display = isGrid ? 'none' : '';
+  });
+
+  /* ---------- 扫描演示 ---------- */
+  const FILES = [
+    { p: 'ai-cooking/',              r: 'Python',     k: '📄', skip: false },
+    { p: 'sales-dashboard/',         r: 'Go',         k: '📄', skip: false },
+    { p: 'node_modules/',            r: '跳过',        k: '📁', skip: true  },
+    { p: 'ripgrep-lite/',            r: 'Rust',       k: '📄', skip: false },
+    { p: 'tokyo-2026/',              r: '非代码',      k: '📁', skip: false },
+    { p: 'design-tokens/',           r: 'TypeScript', k: '📄', skip: false },
+    { p: 'legacy-billing/',          r: 'Java',       k: '📄', skip: false },
+    { p: '.cache/',                  r: '已跳过',      k: '📁', skip: true  },
+    { p: 'android-tracker/',         r: 'Android',    k: '📄', skip: false },
+    { p: 'thesis-multimodal/',       r: '非代码',      k: '📁', skip: false }
+  ];
+  const listEl = $('#fileList'), scanBar = $('#scanBar'),
+        scanOut = $('#scanOut'), scanState = $('#scanState'), scanBtn = $('#scanBtn');
+  let scanning = false;
+
+  const renderScan = () => {
+    listEl.innerHTML = FILES.map((f, i) =>
+      '<div class="filerow" data-i="' + i + '">' +
+        '<span class="fk">' + f.k + '</span>' +
+        '<span class="fp">' + f.p + '</span>' +
+        '<span class="fr">' + f.r + '</span>' +
+      '</div>'
+    ).join('');
+  };
+
+  const runScan = () => {
+    if (scanning) return;
+    scanning = true;
+    scanBtn.disabled = true;
+    scanBtn.style.opacity = .55;
+    renderScan();
+    scanBar.style.width = '0%';
+    scanState.textContent = 'running';
+    scanOut.textContent = '遍历 ~/Developer · 一级子目录';
+
+    const rows = $$('.filerow', listEl);
+    let i = 0, imported = 0;
+
+    const tick = () => {
+      if (i >= rows.length) {
+        scanState.textContent = 'done';
+        scanOut.textContent = '识别 ' + imported + ' 个项目 · 跳过 ' + (FILES.length - imported) + ' 项 · 0 次磁盘写入';
+        scanBtn.disabled = false;
+        scanBtn.style.opacity = 1;
+        scanning = false;
+        return;
+      }
+      const row = rows[i];
+      row.classList.add('in');
+      if (FILES[i].skip) row.classList.add('skip'); else imported++;
+      scanBar.style.width = Math.round(((i + 1) / rows.length) * 100) + '%';
+      scanOut.textContent = '解析 ' + FILES[i].p + ' → ' + FILES[i].r;
+      i++;
+      setTimeout(tick, reduce ? 30 : 260);
+    };
+    setTimeout(tick, 180);
+  };
+  scanBtn.addEventListener('click', runScan);
+
+  // 进入视口自动演示一次
+  new IntersectionObserver((es, ob) => {
+    es.forEach(e => { if (e.isIntersecting) { runScan(); ob.disconnect(); } });
+  }, { threshold: 0.25 }).observe($('#scanner'));
+
+  /* ---------- 终端逐行输出 ---------- */
+  const termLines = $$('#termBody div');
+  new IntersectionObserver((es, ob) => {
+    es.forEach(e => {
+      if (!e.isIntersecting) return;
+      ob.disconnect();
+      termLines.forEach(l => l.classList.remove('in'));
+      termLines.forEach((l, i) => setTimeout(() => l.classList.add('in'), reduce ? 0 : 160 + i * 190));
+    });
+  }, { threshold: 0.3 }).observe($('#termBody'));
+
+  /* ---------- 命令面板 ---------- */
+  const PALETTE = [
+    { g: '🤖', n: 'AiCooking',            s: 'Python · 进行中', k: 'ai python rag github' },
+    { g: '✈️', n: 'Tokyo 2026',            s: '旅行 · 计划中',    k: 'tokyo travel 东京 旅行' },
+    { g: '📄', n: '毕业论文',               s: '研究 · 暂停',      k: 'thesis paper 论文 latex' },
+    { g: '🦀', n: 'ripgrep-lite',         s: 'Rust · 进行中',    k: 'rust cli search 检索' },
+    { g: '🎨', n: 'Brand Kit',            s: '设计 · 已完成',     k: 'design figma 品牌 设计' },
+    { g: '📊', n: 'sales-dashboard',      s: 'Go · 已归档',      k: 'go grpc 看板 后端' },
+    { g: '🐙', n: '在 GitHub 上查看源码',   s: 'ctctoo / FatFish', k: 'github repo 源码 下载 clone git', url: REPO },
+    { g: '⌘',  n: '扫描新目录…',           s: 'action',           k: 'scan import 扫描 导入' },
+    { g: '★',  n: '只看收藏',              s: 'action',           k: 'favorite 收藏 筛选' },
+    { g: '⚙',  n: '打开设置',              s: 'action',           k: 'settings 设置 主题 语言' }
+  ];
+  const pal = $('#palette'), palInput = $('#palInput'), palList = $('#palList');
+  let sel = 0, shown = PALETTE.slice();
+
+  const drawPal = () => {
+    const q = palInput.value.trim().toLowerCase();
+    shown = q
+      ? PALETTE.filter(p => (p.n + ' ' + p.k + ' ' + p.s).toLowerCase().includes(q))
+      : PALETTE.slice();
+    sel = 0;
+    if (!shown.length) {
+      palList.innerHTML = '<div class="pal-empty">没有匹配项 —— 试试「rust」「旅行」或「扫描」</div>';
+      return;
+    }
+    palList.innerHTML = shown.map((p, i) =>
+      '<div class="pal-item' + (i === 0 ? ' sel' : '') + '" data-i="' + i + '">' +
+        '<span class="g">' + p.g + '</span>' +
+        '<span>' + p.n + '</span>' +
+        '<span class="sub">' + p.s + '</span>' +
+      '</div>'
+    ).join('');
+  };
+  const markPal = () => {
+    $$('.pal-item', palList).forEach(el => el.classList.toggle('sel', +el.dataset.i === sel));
+    const cur = $$('.pal-item', palList)[sel];
+    if (cur) cur.scrollIntoView({ block: 'nearest' });
+  };
+  const openPal = () => {
+    pal.classList.add('open');
+    palInput.value = '';
+    drawPal();
+    setTimeout(() => palInput.focus(), 20);
+  };
+  const closePal = () => pal.classList.remove('open');
+
+  const toast = (msg) => {
+    const t = $('#toast');
+    t.textContent = msg;
+    t.classList.add('on');
+    clearTimeout(toast._t);
+    toast._t = setTimeout(() => t.classList.remove('on'), 1900);
+  };
+
+  /* ---------- 复制 clone 命令 ---------- */
+  const CLONE_CMD = 'git clone ' + REPO_GIT;
+  $('#cloneBtn').addEventListener('click', () => {
+    const done = () => toast('已复制：' + CLONE_CMD);
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(CLONE_CMD).then(done, () => fallbackCopy(CLONE_CMD, done));
+    } else fallbackCopy(CLONE_CMD, done);
+  });
+
+  $('#openPalBtn').addEventListener('click', openPal);
+  $('#openPalBtn2').addEventListener('click', openPal);
+  $('#searchBox').addEventListener('click', openPal);
+  pal.addEventListener('click', (e) => { if (e.target === pal) closePal(); });
+
+  palInput.addEventListener('input', drawPal);
+  const activate = (item) => {
+    closePal();
+    if (item.url) {
+      window.open(item.url, '_blank', 'noopener');
+      toast('正在打开 ' + item.s);
+    } else {
+      toast('已进入「' + item.n + '」· 演示环境');
+    }
+  };
+
+  palList.addEventListener('click', (e) => {
+    const it = e.target.closest('.pal-item');
+    if (it) activate(shown[+it.dataset.i]);
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+      e.preventDefault();
+      pal.classList.contains('open') ? closePal() : openPal();
+      return;
+    }
+    if (!pal.classList.contains('open')) return;
+    if (e.key === 'Escape') { closePal(); return; }
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (!shown.length) return;
+      sel = (sel + (e.key === 'ArrowDown' ? 1 : -1) + shown.length) % shown.length;
+      markPal();
+    }
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (shown.length) activate(shown[sel]);
+    }
+  });
+
+  /* ---------- 复制代码 ---------- */
+  $$('.cp').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const src = document.getElementById(btn.dataset.copy);
+      const text = src ? src.innerText : '';
+      const done = () => { btn.textContent = '已复制'; setTimeout(() => (btn.textContent = '复制'), 1500); };
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(done, () => fallbackCopy(text, done));
+      } else fallbackCopy(text, done);
+    });
+  });
+  function fallbackCopy(text, cb) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); cb(); } catch (e) {}
+    document.body.removeChild(ta);
+  }
+
+  /* ---------- 平滑锚点 ---------- */
+  $$('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', (e) => {
+      const id = a.getAttribute('href');
+      if (id === '#') return;
+      const t = document.querySelector(id);
+      if (!t) return;
+      e.preventDefault();
+      t.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+    });
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,14 +1,10 @@
 name: Deploy promo page to GitHub Pages
 
+# 站点已迁移至 Cloudflare Pages，自动部署已停用。
+# 保留本工作流仅作应急回滚：在 Actions 面板手动触发即可重新发布到
+# <owner>.github.io。日常发布由 Cloudflare Pages 接管。
 on:
-  # 推送到 main 且宣传页有改动时自动部署
-  push:
-    branches: [main]
-    paths:
-      - "promo.html"
-      - "CNAME"
-      - ".github/workflows/pages.yml"
-  # 允许在 Actions 面板手动触发
+  # 仅手动触发，不再随 push 自动运行
   workflow_dispatch:
 
 # 并发控制：排队而不是互相取消，避免部署到一半被覆盖
@@ -36,8 +32,14 @@ jobs:
           mkdir -p _site
           # promo.html 作为站点首页
           cp promo.html _site/index.html
-          # 自定义域名：必须随产物一起上传，否则每次部署后域名设置会被清空
-          cp CNAME _site/CNAME
+          # 自定义域名：存在 CNAME 才随产物上传，否则每次部署会清空域名设置。
+          # 注意必须判存在——无 CNAME 时无条件 cp 会导致整个 job 失败。
+          if [ -f CNAME ]; then
+            cp CNAME _site/CNAME
+            echo "已包含自定义域名: $(cat CNAME)"
+          else
+            echo "未配置 CNAME，使用默认 Pages 域名"
+          fi
           # 跳过 Jekyll 处理（避免下划线开头的文件/目录被吞掉）
           touch _site/.nojekyll
           # 站点为单文件，无需构建；如需额外静态资源，在此一并 cp 到 _site/
