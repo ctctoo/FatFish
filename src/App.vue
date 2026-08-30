@@ -28,6 +28,12 @@ onMounted(async () => {
 });
 
 onUnmounted(() => window.removeEventListener("keydown", onGlobalKeydown));
+
+// 新页面开始入场时把滚动容器归零，避免新页面从旧页面的滚动偏移处进入
+function onPageEnter() {
+  const el = document.querySelector(".app-content");
+  if (el) el.scrollTop = 0;
+}
 </script>
 
 <template>
@@ -37,7 +43,7 @@ onUnmounted(() => window.removeEventListener("keydown", onGlobalKeydown));
     <div class="app-main">
       <div class="app-content">
         <router-view v-slot="{ Component }">
-          <Transition name="page" mode="out-in">
+          <Transition name="page" mode="out-in" @enter="onPageEnter">
             <component :is="Component" />
           </Transition>
         </router-view>
