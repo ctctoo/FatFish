@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import { Plus, FolderSearch, LayoutGrid, List } from "lucide-vue-next";
 import ProjectGrid from "../components/project/ProjectGrid.vue";
@@ -24,6 +24,19 @@ const loading = ref(true);
 
 const showForm = ref(false);
 const showScan = ref(false);
+
+// 时段化问候 + 用户称呼（初始引导收集，设置页可改）
+const greetingKey = computed(() => {
+  const h = new Date().getHours();
+  if (h < 12) return "home.greetingMorning";
+  if (h < 18) return "home.greetingAfternoon";
+  return "home.greetingEvening";
+});
+const greeting = computed(() => {
+  const name = settingsStore.profile?.name?.trim();
+  const base = t(greetingKey.value);
+  return name ? t("home.greetingName", { greeting: base, name }) : base;
+});
 
 onMounted(load);
 
@@ -60,7 +73,7 @@ async function handleAction(action: string, project: Project) {
   <div class="page">
     <div class="home-hero" style="display: flex; align-items: flex-start">
       <div>
-        <h1>{{ t("home.greeting") }} <span style="font-weight: 400">👋</span></h1>
+        <h1>{{ greeting }} <span style="font-weight: 400">👋</span></h1>
         <p>{{ t("home.subline") }}</p>
       </div>
       <span style="flex: 1"></span>

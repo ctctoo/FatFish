@@ -5,6 +5,13 @@ type Theme = "system" | "light" | "dark";
 type ViewMode = "grid" | "list";
 type SortKey = "updated" | "name" | "opened";
 export type Locale = "zh" | "en";
+export type Gender = "male" | "female" | "unspecified";
+
+export interface UserProfile {
+  name: string;
+  gender: Gender;
+  occupation: string;
+}
 
 const KEY = "fatfish.settings";
 const LEGACY_KEY = "project-hub.settings";
@@ -17,6 +24,8 @@ interface Persisted {
   scanDirs: string[];
   confirmRemove: boolean;
   locale: Locale;
+  profile: UserProfile | null;
+  onboarded: boolean;
 }
 
 function load(): Persisted {
@@ -28,6 +37,8 @@ function load(): Persisted {
     scanDirs: [],
     confirmRemove: true,
     locale: "zh",
+    profile: null,
+    onboarded: false,
   };
   try {
     const raw = localStorage.getItem(KEY) ?? localStorage.getItem(LEGACY_KEY);
@@ -47,9 +58,11 @@ export const useSettingsStore = defineStore("settings", () => {
   const scanDirs = ref<string[]>(initial.scanDirs);
   const confirmRemove = ref(initial.confirmRemove);
   const locale = ref<Locale>(initial.locale);
+  const profile = ref<UserProfile | null>(initial.profile);
+  const onboarded = ref(initial.onboarded);
 
   watch(
-    [theme, viewMode, sort, defaultFolder, scanDirs, confirmRemove, locale],
+    [theme, viewMode, sort, defaultFolder, scanDirs, confirmRemove, locale, profile, onboarded],
     () => {
       localStorage.setItem(
         KEY,
@@ -61,6 +74,8 @@ export const useSettingsStore = defineStore("settings", () => {
           scanDirs: scanDirs.value,
           confirmRemove: confirmRemove.value,
           locale: locale.value,
+          profile: profile.value,
+          onboarded: onboarded.value,
         } satisfies Persisted)
       );
     },
@@ -72,5 +87,5 @@ export const useSettingsStore = defineStore("settings", () => {
     scanDirs.value = [dir, ...scanDirs.value].slice(0, 5);
   }
 
-  return { theme, viewMode, sort, defaultFolder, scanDirs, confirmRemove, locale, addScanDir };
+  return { theme, viewMode, sort, defaultFolder, scanDirs, confirmRemove, locale, profile, onboarded, addScanDir };
 });

@@ -2,7 +2,7 @@
 import { ref } from "vue";
 import { open } from "@tauri-apps/plugin-dialog";
 import { appDataDir } from "@tauri-apps/api/path";
-import { useSettingsStore } from "../stores/settings";
+import { useSettingsStore, type Gender } from "../stores/settings";
 import { useI18n } from "../i18n";
 
 const settingsStore = useSettingsStore();
@@ -17,12 +17,65 @@ async function pickDefaultFolder() {
   const dir = await open({ directory: true, multiple: false, title: t("settings.defaultFolder") });
   if (typeof dir === "string") settingsStore.defaultFolder = dir;
 }
+
+// 个人资料：初始引导收集，这里可随时修改
+function updateProfile(patch: { name?: string; gender?: Gender; occupation?: string }) {
+  settingsStore.profile = {
+    name: "",
+    gender: "unspecified",
+    occupation: "",
+    ...(settingsStore.profile ?? {}),
+    ...patch,
+  };
+}
 </script>
 
 <template>
   <div class="page">
     <div class="page-header">
       <h1>{{ t("settings.title") }}</h1>
+    </div>
+
+    <div class="settings-section">
+      <h3>{{ t("settings.profile") }}</h3>
+      <p class="desc">{{ t("settings.profileDesc") }}</p>
+      <div class="profile-form">
+        <label class="profile-field">
+          <span>{{ t("settings.profileName") }}</span>
+          <input
+            :value="settingsStore.profile?.name ?? ''"
+            :placeholder="t('onboarding.namePlaceholder')"
+            maxlength="30"
+            @input="updateProfile({ name: ($event.target as HTMLInputElement).value })"
+          />
+        </label>
+        <div class="profile-field">
+          <span>{{ t("settings.profileGender") }}</span>
+          <div class="radio-row">
+            <button
+              v-for="g in (['male', 'female', 'unspecified'] as const)"
+              :key="g"
+              class="radio-pill"
+              :class="{ active: (settingsStore.profile?.gender ?? 'unspecified') === g }"
+              @click="updateProfile({ gender: g })"
+            >
+              {{ t(`gender.${g}`) }}
+            </button>
+          </div>
+        </div>
+        <label class="profile-field">
+          <span>{{ t("settings.profileOccupation") }}</span>
+          <input
+            :value="settingsStore.profile?.occupation ?? ''"
+            :placeholder="t('onboarding.workPlaceholder')"
+            maxlength="30"
+            @input="updateProfile({ occupation: ($event.target as HTMLInputElement).value })"
+          />
+        </label>
+        <button class="btn ghost rerun-btn" @click="settingsStore.onboarded = false">
+          {{ t("settings.rerunOnboarding") }}
+        </button>
+      </div>
     </div>
 
     <div class="settings-section">

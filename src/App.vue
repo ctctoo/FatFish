@@ -2,13 +2,16 @@
 import { onMounted, onUnmounted, ref } from "vue";
 import Sidebar from "./components/app/Sidebar.vue";
 import CommandPalette from "./components/app/CommandPalette.vue";
+import Onboarding from "./components/app/Onboarding.vue";
 import { useUiStore } from "./stores/ui";
 import { useTagStore } from "./stores/tag";
 import { useCollectionStore } from "./stores/collection";
+import { useSettingsStore } from "./stores/settings";
 
 const uiStore = useUiStore();
 const tagStore = useTagStore();
 const collectionStore = useCollectionStore();
+const settingsStore = useSettingsStore();
 
 const showPalette = ref(false);
 
@@ -51,6 +54,8 @@ function onPageEnter() {
     </div>
 
     <CommandPalette v-if="showPalette" @close="showPalette = false" />
+
+    <Onboarding v-if="!settingsStore.onboarded" />
 
     <div class="toast-wrap">
       <div

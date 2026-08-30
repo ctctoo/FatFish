@@ -21,6 +21,37 @@
   scrollbar-gutter: stable;
 }
 
+/* ---------- 设置页：个人资料 ---------- */
+.profile-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 420px;
+}
+.profile-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.profile-field > span {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+.profile-field input {
+  padding: 9px 12px;
+  font-size: 14px;
+  color: var(--text-primary);
+  background: var(--surface-muted);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.15s, background 0.15s;
+}
+.profile-field input:focus {
+  border-color: var(--accent);
+  background: var(--surface);
+}
+
 .page {
   max-width: var(--content-max-width);
   padding: var(--page-padding) 32px 48px;
