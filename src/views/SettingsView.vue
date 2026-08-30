@@ -2,16 +2,22 @@
 import { ref } from "vue";
 import { open } from "@tauri-apps/plugin-dialog";
 import { appDataDir } from "@tauri-apps/api/path";
-import { useSettingsStore, type Gender } from "../stores/settings";
+import { getVersion } from "@tauri-apps/api/app";
+import { useSettingsStore } from "../stores/settings";
 import { useI18n } from "../i18n";
 
 const settingsStore = useSettingsStore();
 const { t } = useI18n();
 const dataDir = ref(t("misc.loading"));
+const appVersion = ref("");
 
 appDataDir()
   .then((dir) => (dataDir.value = dir))
   .catch(() => (dataDir.value = t("misc.cannotGet")));
+
+getVersion()
+  .then((v) => (appVersion.value = v))
+  .catch(() => (appVersion.value = ""));
 
 async function pickDefaultFolder() {
   const dir = await open({ directory: true, multiple: false, title: t("settings.defaultFolder") });
@@ -155,7 +161,7 @@ function updateProfile(patch: { name?: string; gender?: Gender; occupation?: str
     <div class="settings-section">
       <h3>{{ t("settings.about") }}</h3>
       <p class="desc" style="margin-bottom: 0">
-        {{ t("settings.aboutText") }}<br />
+        {{ t("settings.aboutText", { version: appVersion }) }}<br />
         {{ t("settings.dataDir") }}<code class="caption">{{ dataDir }}</code><br />
         {{ t("settings.shortcut") }}
       </p>
