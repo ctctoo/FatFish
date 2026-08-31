@@ -13,7 +13,7 @@ const USER_AGENT_VALUE: &str = "FatFish";
 
 /// 内置的 GitHub OAuth App Client ID（开发者配置一次即可，用户无需自行创建 OAuth App）。
 /// 留空时可回退到前端设置里的自定义 Client ID。
-const DEFAULT_GITHUB_CLIENT_ID: &str = "";
+const DEFAULT_GITHUB_CLIENT_ID: &str = "Iv23liIZ7pNEekUuBgor";
 
 /// 解析客户端实际使用的 Client ID：优先使用前端传入的自定义值，否则使用内置默认值。
 fn resolve_client_id(candidate: &str) -> Result<String, String> {
@@ -172,6 +172,12 @@ pub fn request_device_code(client_id: &str) -> Result<GithubDeviceCode, String> 
 
     if let Some(error) = body.error {
         let detail = body.error_description.unwrap_or_default();
+        if error == "device_flow_disabled" {
+            return Err(
+                "GitHub 未启用 Device Flow。请在 GitHub OAuth App 设置中勾选 “Enable Device Flow”，并填写 Authorization callback URL 后重试。"
+                    .to_string(),
+            );
+        }
         return Err(format!("GitHub 拒绝设备授权：{error}（{detail}）"));
     }
     if !status.is_success() {
