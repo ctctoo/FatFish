@@ -1,11 +1,15 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { open } from "@tauri-apps/plugin-dialog";
 import { openUrl } from "@tauri-apps/plugin-opener";
 import { appDataDir } from "@tauri-apps/api/path";
 import { getVersion } from "@tauri-apps/api/app";
 import { useSettingsStore, type Gender } from "../stores/settings";
 import { useI18n } from "../i18n";
+import SettingsSection from "../components/settings/SettingsSection.vue";
+import SettingsRow from "../components/settings/SettingsRow.vue";
+import RadioGroup from "../components/settings/RadioGroup.vue";
+import ToggleSwitch from "../components/settings/ToggleSwitch.vue";
 
 const settingsStore = useSettingsStore();
 const { t } = useI18n();
@@ -35,6 +39,24 @@ function updateProfile(patch: { name?: string; gender?: Gender; occupation?: str
     ...patch,
   };
 }
+
+const GENDERS: Gender[] = ["male", "female", "unspecified"];
+
+// 选项数组用 computed，保证切换语言时标签实时刷新
+const themeOptions = computed(() => [
+  { value: "system", label: t("settings.themeSystem") },
+  { value: "light", label: t("settings.themeLight") },
+  { value: "dark", label: t("settings.themeDark") },
+]);
+
+const localeOptions = computed(() => [
+  { value: "zh", label: t("settings.langZh") },
+  { value: "en", label: t("settings.langEn") },
+]);
+
+const genderOptions = computed(() =>
+  GENDERS.map((g) => ({ value: g, label: t(`gender.${g}`) }))
+);
 </script>
 
 <template>
@@ -43,9 +65,7 @@ function updateProfile(patch: { name?: string; gender?: Gender; occupation?: str
       <h1>{{ t("settings.title") }}</h1>
     </div>
 
-    <div class="settings-section">
-      <h3>{{ t("settings.profile") }}</h3>
-      <p class="desc">{{ t("settings.profileDesc") }}</p>
+    <SettingsSection title="settings.profile" desc="settings.profileDesc">
       <div class="profile-form">
         <label class="profile-field">
           <span>{{ t("settings.profileName") }}</span>
@@ -58,17 +78,11 @@ function updateProfile(patch: { name?: string; gender?: Gender; occupation?: str
         </label>
         <div class="profile-field">
           <span>{{ t("settings.profileGender") }}</span>
-          <div class="radio-row">
-            <button
-              v-for="g in (['male', 'female', 'unspecified'] as const)"
-              :key="g"
-              class="radio-pill"
-              :class="{ active: (settingsStore.profile?.gender ?? 'unspecified') === g }"
-              @click="updateProfile({ gender: g })"
-            >
-              {{ t(`gender.${g}`) }}
-            </button>
-          </div>
+          <RadioGroup
+            :model-value="settingsStore.profile?.gender ?? 'unspecified'"
+            :options="genderOptions"
+            @update:model-value="updateProfile({ gender: $event as Gender })"
+          />
         </div>
         <label class="profile-field">
           <span>{{ t("settings.profileOccupation") }}</span>
@@ -83,87 +97,51 @@ function updateProfile(patch: { name?: string; gender?: Gender; occupation?: str
           {{ t("settings.rerunOnboarding") }}
         </button>
       </div>
-    </div>
+    </SettingsSection>
 
-    <div class="settings-section">
-      <h3>{{ t("settings.appearance") }}</h3>
-      <p class="desc">{{ t("settings.appearanceDesc") }}</p>
-      <div class="radio-row">
-        <button
-          class="radio-pill"
-          :class="{ active: settingsStore.theme === 'system' }"
-          @click="settingsStore.theme = 'system'"
-        >
-          {{ t("settings.themeSystem") }}
-        </button>
-        <button
-          class="radio-pill"
-          :class="{ active: settingsStore.theme === 'light' }"
-          @click="settingsStore.theme = 'light'"
-        >
-          {{ t("settings.themeLight") }}
-        </button>
-        <button
-          class="radio-pill"
-          :class="{ active: settingsStore.theme === 'dark' }"
-          @click="settingsStore.theme = 'dark'"
-        >
-          {{ t("settings.themeDark") }}
-        </button>
-      </div>
-    </div>
+    <SettingsSection title="settings.appearance" desc="settings.appearanceDesc">
+      <RadioGroup
+        :model-value="settingsStore.theme"
+        :options="themeOptions"
+        @update:model-value="settingsStore.theme = $event as typeof settingsStore.theme"
+      />
+    </SettingsSection>
 
-    <div class="settings-section">
-      <h3>{{ t("settings.language") }}</h3>
-      <p class="desc">{{ t("settings.languageDesc") }}</p>
-      <div class="radio-row">
-        <button
-          class="radio-pill"
-          :class="{ active: settingsStore.locale === 'zh' }"
-          @click="settingsStore.locale = 'zh'"
-        >
-          {{ t("settings.langZh") }}
-        </button>
-        <button
-          class="radio-pill"
-          :class="{ active: settingsStore.locale === 'en' }"
-          @click="settingsStore.locale = 'en'"
-        >
-          {{ t("settings.langEn") }}
-        </button>
-      </div>
-    </div>
+    <SettingsSection title="settings.language" desc="settings.languageDesc">
+      <RadioGroup
+        :model-value="settingsStore.locale"
+        :options="localeOptions"
+        @update:model-value="settingsStore.locale = $event as typeof settingsStore.locale"
+      />
+    </SettingsSection>
 
-    <div class="settings-section">
-      <h3>{{ t("settings.library") }}</h3>
-      <div class="settings-row">
-        <span class="k">{{ t("settings.defaultFolder") }}</span>
-        <span class="spacer"></span>
-        <code class="caption" style="max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">
+    <SettingsSection title="settings.library">
+      <SettingsRow label="settings.defaultFolder">
+        <code
+          class="caption"
+          style="max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap"
+        >
           {{ settingsStore.defaultFolder || t("settings.defaultFolderUnset") }}
         </code>
         <button class="btn small" @click="pickDefaultFolder">{{ t("common.browse") }}</button>
-      </div>
-    </div>
+      </SettingsRow>
+    </SettingsSection>
 
-    <div class="settings-section">
-      <h3>{{ t("settings.behavior") }}</h3>
-      <div class="settings-row">
-        <span class="k">{{ t("settings.confirmRemove") }}</span>
-        <span class="spacer"></span>
-        <button
-          class="toggle"
-          :class="{ on: settingsStore.confirmRemove }"
-          @click="settingsStore.confirmRemove = !settingsStore.confirmRemove"
-        ></button>
-      </div>
-    </div>
+    <SettingsSection title="settings.behavior">
+      <SettingsRow label="settings.confirmRemove">
+        <ToggleSwitch
+          :model-value="settingsStore.confirmRemove"
+          @update:model-value="settingsStore.confirmRemove = $event"
+        />
+      </SettingsRow>
+    </SettingsSection>
 
-    <div class="settings-section">
-      <h3>{{ t("settings.github") }}</h3>
-      <p class="desc">{{ t("settings.githubDesc") }}</p>
+    <SettingsSection title="settings.github" desc="settings.githubDesc">
       <div class="profile-field" style="max-width: 420px">
-        <span>{{ t("settings.githubClientId") }} <em class="muted">（{{ t("settings.githubOptional") }}）</em></span>
+        <span>
+          {{ t("settings.githubClientId") }}
+          <em class="muted">（{{ t("settings.githubOptional") }}）</em>
+        </span>
         <input
           :value="settingsStore.githubClientId"
           :placeholder="t('settings.githubClientIdPh')"
@@ -174,20 +152,26 @@ function updateProfile(patch: { name?: string; gender?: Gender; occupation?: str
         <button class="btn ghost" @click="openUrl('https://github.com/settings/applications/new')">
           {{ t("settings.githubCreateApp") }}
         </button>
-        <button class="btn ghost" @click="openUrl('https://docs.github.com/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps#device-flow')">
+        <button
+          class="btn ghost"
+          @click="
+            openUrl(
+              'https://docs.github.com/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps#device-flow'
+            )
+          "
+        >
           {{ t("settings.githubDoc") }}
         </button>
       </div>
-    </div>
+    </SettingsSection>
 
-    <div class="settings-section">
-      <h3>{{ t("settings.about") }}</h3>
+    <SettingsSection title="settings.about">
       <p class="desc" style="margin-bottom: 0">
         {{ t("settings.aboutText", { version: appVersion }) }}<br />
         {{ t("settings.dataDir") }}<code class="caption">{{ dataDir }}</code><br />
         {{ t("settings.shortcut") }}
       </p>
-    </div>
+    </SettingsSection>
   </div>
 </template>
 
