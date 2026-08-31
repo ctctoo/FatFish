@@ -1,0 +1,4 @@
+*** Begin Patch
+*** Add File: test-patch-file.txt
++hello world
+*** End Patch
