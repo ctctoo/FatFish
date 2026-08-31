@@ -13,6 +13,10 @@ import type {
   Todo,
   TodoInput,
   Activity,
+  GithubAccount,
+  GithubDeviceCode,
+  GithubLoginResult,
+  GithubRepo,
 } from "../types";
 
 export const tauriApi = {
@@ -117,6 +121,23 @@ export const tauriApi = {
   // ---- git ----
   refreshGitInfo(projectId: string): Promise<Project> {
     return invoke("refresh_git_info", { projectId });
+  },
+
+  // ---- github ----
+  githubLoginStart(clientId: string): Promise<GithubDeviceCode> {
+    return invoke("github_login_start", { clientId });
+  },
+  githubLoginPoll(clientId: string, deviceCode: string): Promise<GithubLoginResult> {
+    return invoke("github_login_poll", { clientId, deviceCode });
+  },
+  githubStatus(): Promise<GithubAccount | null> {
+    return invoke("github_status");
+  },
+  githubLogout(): Promise<void> {
+    return invoke("github_logout");
+  },
+  githubListRepos(): Promise<GithubRepo[]> {
+    return invoke("github_list_repos");
   },
 
   // ---- system ----

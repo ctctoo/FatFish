@@ -83,6 +83,13 @@ pub fn init_connection(db_path: &std::path::Path) -> Result<Connection, rusqlite
             FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE SET NULL
         );
 
+        CREATE TABLE IF NOT EXISTS github_account (
+            login TEXT PRIMARY KEY,
+            token TEXT NOT NULL,
+            user_json TEXT NOT NULL,
+            logged_in_at TEXT NOT NULL
+        );
+
         CREATE TABLE IF NOT EXISTS activities (
             id TEXT PRIMARY KEY,
             project_id TEXT NOT NULL,

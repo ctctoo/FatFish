@@ -1,6 +1,7 @@
 pub mod activity;
 pub mod collection;
 pub mod git;
+pub mod github;
 pub mod link;
 pub mod project;
 pub mod scanned;

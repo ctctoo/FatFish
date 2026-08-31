@@ -26,6 +26,7 @@ interface Persisted {
   locale: Locale;
   profile: UserProfile | null;
   onboarded: boolean;
+  githubClientId: string;
 }
 
 function load(): Persisted {
@@ -39,6 +40,7 @@ function load(): Persisted {
     locale: "zh",
     profile: null,
     onboarded: false,
+    githubClientId: "",
   };
   try {
     const raw = localStorage.getItem(KEY) ?? localStorage.getItem(LEGACY_KEY);
@@ -60,9 +62,10 @@ export const useSettingsStore = defineStore("settings", () => {
   const locale = ref<Locale>(initial.locale);
   const profile = ref<UserProfile | null>(initial.profile);
   const onboarded = ref(initial.onboarded);
+  const githubClientId = ref(initial.githubClientId);
 
   watch(
-    [theme, viewMode, sort, defaultFolder, scanDirs, confirmRemove, locale, profile, onboarded],
+    [theme, viewMode, sort, defaultFolder, scanDirs, confirmRemove, locale, profile, onboarded, githubClientId],
     () => {
       localStorage.setItem(
         KEY,
@@ -76,6 +79,7 @@ export const useSettingsStore = defineStore("settings", () => {
           locale: locale.value,
           profile: profile.value,
           onboarded: onboarded.value,
+          githubClientId: githubClientId.value,
         } satisfies Persisted)
       );
     },
@@ -87,5 +91,5 @@ export const useSettingsStore = defineStore("settings", () => {
     scanDirs.value = [dir, ...scanDirs.value].slice(0, 5);
   }
 
-  return { theme, viewMode, sort, defaultFolder, scanDirs, confirmRemove, locale, profile, onboarded, addScanDir };
+  return { theme, viewMode, sort, defaultFolder, scanDirs, confirmRemove, locale, profile, onboarded, githubClientId, addScanDir };
 });

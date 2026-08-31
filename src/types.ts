@@ -114,6 +114,55 @@ export interface CollectionInput {
   name: string;
 }
 
+export interface GithubUser {
+  id: number;
+  login: string;
+  name: string | null;
+  avatarUrl: string | null;
+  htmlUrl: string | null;
+  bio: string | null;
+  publicRepos: number | null;
+}
+
+export interface GithubAccount {
+  token: string;
+  user: GithubUser;
+  loggedInAt: string;
+}
+
+export interface GithubRepo {
+  id: number;
+  name: string;
+  fullName: string;
+  htmlUrl: string;
+  description: string | null;
+  language: string | null;
+  stargazersCount: number | null;
+  forksCount: number | null;
+  updatedAt: string | null;
+  private: boolean;
+  fork: boolean;
+  archived: boolean;
+  ownerAvatarUrl: string | null;
+}
+
+export interface GithubDeviceCode {
+  deviceCode: string;
+  userCode: string;
+  verificationUri: string;
+  interval: number;
+  expiresIn: number;
+}
+
+export type GithubLoginStatus = "success" | "pending" | "slow_down" | "expired" | "denied" | "failed";
+
+export interface GithubLoginResult {
+  status: GithubLoginStatus;
+  account: GithubAccount | null;
+  interval: number | null;
+  message: string | null;
+}
+
 /** 状态枚举值 — UIPlan §3.3：进行中 / 计划中 / 暂停 / 已完成 / 归档 */
 export const STATUS_VALUES = ["IN_PROGRESS", "PLANNED", "PAUSED", "COMPLETED", "ARCHIVED"] as const;
 

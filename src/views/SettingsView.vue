@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { open } from "@tauri-apps/plugin-dialog";
+import { openUrl } from "@tauri-apps/plugin-opener";
 import { appDataDir } from "@tauri-apps/api/path";
 import { getVersion } from "@tauri-apps/api/app";
 import { useSettingsStore, type Gender } from "../stores/settings";
@@ -159,6 +160,27 @@ function updateProfile(patch: { name?: string; gender?: Gender; occupation?: str
     </div>
 
     <div class="settings-section">
+      <h3>{{ t("settings.github") }}</h3>
+      <p class="desc">{{ t("settings.githubDesc") }}</p>
+      <div class="profile-field" style="max-width: 420px">
+        <span>{{ t("settings.githubClientId") }}</span>
+        <input
+          :value="settingsStore.githubClientId"
+          :placeholder="t('settings.githubClientIdPh')"
+          @input="settingsStore.githubClientId = ($event.target as HTMLInputElement).value"
+        />
+      </div>
+      <div class="gh-actions-row">
+        <button class="btn ghost" @click="openUrl('https://github.com/settings/applications/new')">
+          {{ t("settings.githubCreateApp") }}
+        </button>
+        <button class="btn ghost" @click="openUrl('https://docs.github.com/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps#device-flow')">
+          {{ t("settings.githubDoc") }}
+        </button>
+      </div>
+    </div>
+
+    <div class="settings-section">
       <h3>{{ t("settings.about") }}</h3>
       <p class="desc" style="margin-bottom: 0">
         {{ t("settings.aboutText", { version: appVersion }) }}<br />
@@ -168,3 +190,12 @@ function updateProfile(patch: { name?: string; gender?: Gender; occupation?: str
     </div>
   </div>
 </template>
+
+<style scoped>
+.gh-actions-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+</style>

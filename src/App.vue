@@ -7,11 +7,13 @@ import { useUiStore } from "./stores/ui";
 import { useTagStore } from "./stores/tag";
 import { useCollectionStore } from "./stores/collection";
 import { useSettingsStore } from "./stores/settings";
+import { useGithubStore } from "./stores/github";
 
 const uiStore = useUiStore();
 const tagStore = useTagStore();
 const collectionStore = useCollectionStore();
 const settingsStore = useSettingsStore();
+const githubStore = useGithubStore();
 
 const showPalette = ref(false);
 
@@ -27,7 +29,9 @@ onMounted(async () => {
   await Promise.all([
     tagStore.fetchTags(),
     collectionStore.fetchCollections(),
+    githubStore.fetchStatus(),
   ]);
+  if (githubStore.account) await githubStore.fetchRepos();
 });
 
 onUnmounted(() => window.removeEventListener("keydown", onGlobalKeydown));

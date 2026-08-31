@@ -55,6 +55,11 @@ pub fn run() {
             commands::scanner::scan_directory,
             commands::scanner::import_projects,
             commands::git::refresh_git_info,
+            commands::github::github_login_start,
+            commands::github::github_login_poll,
+            commands::github::github_status,
+            commands::github::github_logout,
+            commands::github::github_list_repos,
             commands::system::open_folder,
             commands::system::open_terminal,
         ])

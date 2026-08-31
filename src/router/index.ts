@@ -6,6 +6,7 @@ import TagsView from "../views/TagsView.vue";
 import CollectionView from "../views/CollectionView.vue";
 import TodosView from "../views/TodosView.vue";
 import SettingsView from "../views/SettingsView.vue";
+import GithubView from "../views/GithubView.vue";
 
 export const router = createRouter({
   history: createWebHistory(),
@@ -21,5 +22,6 @@ export const router = createRouter({
     { path: "/tags/:id", name: "tag", component: ProjectsView, props: true, meta: { mode: "tag" } },
     { path: "/todos", name: "todos", component: TodosView },
     { path: "/settings", name: "settings", component: SettingsView },
+    { path: "/github", name: "github", component: GithubView },
   ],
 });

@@ -13,12 +13,16 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   Plus,
+  Github,
 } from "lucide-vue-next";
+import { openUrl } from "@tauri-apps/plugin-opener";
 import { useProjectStore } from "../../stores/project";
 import { useTagStore } from "../../stores/tag";
 import { useCollectionStore } from "../../stores/collection";
 import { useUiStore } from "../../stores/ui";
+import { useGithubStore } from "../../stores/github";
 import { useI18n } from "../../i18n";
+import { githubLangColor } from "../../utils/github";
 
 const emit = defineEmits<{ openSearch: [] }>();
 
@@ -28,6 +32,7 @@ const projectStore = useProjectStore();
 const tagStore = useTagStore();
 const collectionStore = useCollectionStore();
 const uiStore = useUiStore();
+const githubStore = useGithubStore();
 const { t } = useI18n();
 
 const collapsed = ref(false);
@@ -43,6 +48,7 @@ const activeNav = computed(() => {
   if (route.path.startsWith("/tags/")) return `tag:${route.params.id}`;
   if (route.path === "/tags") return "manage-tags";
   if (route.path === "/settings") return "settings";
+  if (route.path === "/github") return "github";
   return "";
 });
 
@@ -103,6 +109,33 @@ async function addCollection() {
         <Star :size="16" :stroke-width="1.8" />
         <span class="label">{{ t("side.favorites") }}</span>
       </button>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">{{ t("side.github") }}</div>
+      <button class="sidebar-item" :class="{ active: activeNav === 'github' }" @click="go('/github')">
+        <img
+          v-if="githubStore.account?.user.avatarUrl"
+          :src="githubStore.account.user.avatarUrl"
+          class="github-avatar"
+          alt=""
+        />
+        <Github v-else :size="16" :stroke-width="1.8" />
+        <span class="label">{{ githubStore.account ? githubStore.account.user.login : t("side.githubLogin") }}</span>
+        <span v-if="githubStore.account" class="count">{{ githubStore.repos.length }}</span>
+      </button>
+      <template v-if="githubStore.account">
+        <button
+          v-for="repo in githubStore.repos.slice(0, 5)"
+          :key="repo.id"
+          class="sidebar-item repo-item"
+          :title="repo.fullName"
+          @click="openUrl(repo.htmlUrl).catch(() => undefined)"
+        >
+          <span class="repo-dot" :style="{ background: githubLangColor(repo.language) }" />
+          <span class="label">{{ repo.name }}</span>
+        </button>
+      </template>
     </div>
 
     <div class="sidebar-section">
@@ -186,5 +219,29 @@ async function addCollection() {
 
 .manage-tags {
   padding-left: 26px;
+}
+
+.github-avatar {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--surface-muted);
+}
+
+.repo-item {
+  padding-left: 30px;
+  font-size: 12.5px;
+}
+
+.repo-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.sidebar.collapsed .repo-item {
+  display: none;
 }
 </style>
