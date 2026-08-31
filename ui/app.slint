@@ -1,6 +1,297 @@
-export component AppWindow inherits Window {
-    title: "Project Hub";
-    width: 1200px;
-    height: 760px;
+import { Button, CheckBox, ListView, ScrollView } from "std-widgets.slint";
+
+struct ProjectRow {
+    id: string,
+    name: string,
+    status: string,
+    description: string,
+    cover-emoji: string,
+    cover-color: brush,
+    favorite: bool,
 }
 
+struct TodoRow {
+    id: string,
+    title: string,
+    done: bool,
+    project-name: string,
+}
+
+component ProjectCard inherits Rectangle {
+    in property <ProjectRow> project;
+    callback toggle-favorite;
+
+    height: 92px;
+    background: #ffffff;
+    border-radius: 12px;
+    border-width: 1px;
+    border-color: #e5e8ee;
+
+    HorizontalLayout {
+        padding: 14px;
+        spacing: 14px;
+        cross-axis-alignment: center;
+
+        Rectangle {
+            width: 58px;
+            height: 58px;
+            border-radius: 12px;
+            background: project.cover-color;
+
+            VerticalLayout {
+                alignment: center;
+                Text {
+                    text: project.cover-emoji;
+                    font-size: 26px;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                }
+            }
+        }
+
+        VerticalLayout {
+            spacing: 4px;
+
+            HorizontalLayout {
+                spacing: 10px;
+
+                Text {
+                    text: project.name;
+                    font-size: 15px;
+                    font-weight: 700;
+                    color: #1b2430;
+                    vertical-alignment: center;
+                }
+
+                VerticalLayout {
+                    alignment: center;
+                    Rectangle {
+                        width: 6px;
+                        height: 6px;
+                        border-radius: 3px;
+                        background: #3a7afe;
+                    }
+                }
+
+                Text {
+                    text: project.status;
+                    font-size: 12px;
+                    color: #6b7684;
+                    vertical-alignment: center;
+                }
+            }
+
+            Text {
+                text: project.description;
+                font-size: 13px;
+                color: #8a94a2;
+                overflow: elide;
+            }
+        }
+
+        Button {
+            width: 34px;
+            height: 34px;
+            text: project.favorite ? "★" : "☆";
+            clicked => {
+                root.toggle-favorite();
+            }
+        }
+    }
+}
+
+component TodoRowView inherits HorizontalLayout {
+    in property <TodoRow> todo;
+    callback toggled(bool);
+
+    checkbox := CheckBox {
+        checked: todo.done;
+        text: todo.title;
+        toggled => {
+            root.toggled(checkbox.checked);
+        }
+    }
+}
+
+export component AppWindow inherits Window {
+    title: "Project Hub";
+    width: 1180px;
+    height: 760px;
+    background: #f3f5f8;
+
+    in property <[ProjectRow]> projects: [];
+    in property <[TodoRow]> todos: [];
+    in property <string> greeting: "你好";
+    in property <bool> has-projects: false;
+
+    callback toggle-todo(string, bool);
+    callback toggle-favorite(string, bool);
+
+    HorizontalLayout {
+        spacing: 0;
+
+        // ---- 侧栏 ----
+        Rectangle {
+            width: 208px;
+            background: #1e2530;
+
+            VerticalLayout {
+                padding: 20px;
+                spacing: 6px;
+
+                Text {
+                    text: "Project Hub";
+                    font-size: 18px;
+                    font-weight: 800;
+                    color: #ffffff;
+                }
+
+                Rectangle {
+                    height: 38px;
+                    border-radius: 8px;
+                    background: #2f6fed;
+
+                    VerticalLayout {
+                        alignment: center;
+                        Text {
+                            text: "首页";
+                            font-size: 14px;
+                            color: #ffffff;
+                            horizontal-alignment: center;
+                            vertical-alignment: center;
+                        }
+                    }
+                }
+
+                HorizontalLayout {
+                    padding-left: 12px;
+                    Text {
+                        text: "项目";
+                        font-size: 14px;
+                        color: #9aa4b2;
+                        height: 38px;
+                        vertical-alignment: center;
+                    }
+                }
+
+                HorizontalLayout {
+                    padding-left: 12px;
+                    Text {
+                        text: "待办";
+                        font-size: 14px;
+                        color: #9aa4b2;
+                        height: 38px;
+                        vertical-alignment: center;
+                    }
+                }
+
+                HorizontalLayout {
+                    padding-left: 12px;
+                    Text {
+                        text: "标签";
+                        font-size: 14px;
+                        color: #9aa4b2;
+                        height: 38px;
+                        vertical-alignment: center;
+                    }
+                }
+
+                HorizontalLayout {
+                    padding-left: 12px;
+                    Text {
+                        text: "集合";
+                        font-size: 14px;
+                        color: #9aa4b2;
+                        height: 38px;
+                        vertical-alignment: center;
+                    }
+                }
+
+                HorizontalLayout {
+                    padding-left: 12px;
+                    Text {
+                        text: "设置";
+                        font-size: 14px;
+                        color: #9aa4b2;
+                        height: 38px;
+                        vertical-alignment: center;
+                    }
+                }
+            }
+        }
+
+        // ---- 主内容 ----
+        VerticalLayout {
+            padding: 24px;
+            spacing: 18px;
+
+            Text {
+                text: root.greeting;
+                font-size: 24px;
+                font-weight: 800;
+                color: #1b2430;
+            }
+
+            Rectangle {
+                height: 260px;
+                border-radius: 14px;
+                background: #ffffff;
+                border-width: 1px;
+                border-color: #e5e8ee;
+
+                VerticalLayout {
+                    padding: 16px;
+                    spacing: 10px;
+
+                    Text {
+                        text: "待办";
+                        font-size: 15px;
+                        font-weight: 700;
+                        color: #1b2430;
+                    }
+
+                    ScrollView {
+                        VerticalLayout {
+                            spacing: 8px;
+
+                            if root.todos.length == 0 : Text {
+                                text: "暂无待办";
+                                font-size: 13px;
+                                color: #8a94a2;
+                            }
+
+                            for t in root.todos: TodoRowView {
+                                todo: t;
+                                toggled(new-done) => {
+                                    root.toggle-todo(t.id, new-done);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            Text {
+                text: "最近项目";
+                font-size: 15px;
+                font-weight: 700;
+                color: #1b2430;
+            }
+
+            if !root.has-projects : Text {
+                text: "还没有项目，稍后在「项目」页创建或扫描。";
+                font-size: 13px;
+                color: #8a94a2;
+            }
+
+            ListView {
+                for p in root.projects: ProjectCard {
+                    project: p;
+                    toggle-favorite => {
+                        root.toggle-favorite(p.id, !p.favorite);
+                    }
+                }
+            }
+        }
+    }
+}
