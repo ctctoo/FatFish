@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { statusLabel } from "../../i18n";
 import { useSettingsStore } from "../../stores/settings";
+import type { ProjectStatus } from "../../types";
 
 const props = defineProps<{
-  status: string;
+  status: ProjectStatus;
 }>();
 
 const settings = useSettingsStore();

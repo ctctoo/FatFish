@@ -40,6 +40,8 @@ const zh: Record<string, string> = {
   "rel.dayAgo": "{n} 天前",
   "rel.today": "今天",
   "rel.tomorrow": "明天",
+  "timeline.dateShort": "{m}月{d}日",
+  "timeline.date": "{y}年{m}月{d}日",
 
   // 侧栏
   "side.search": "搜索",
@@ -91,6 +93,7 @@ const zh: Record<string, string> = {
   "gender.unspecified": "不愿透露",
 
   // Todo
+  "todo.title": "任务",
   "todo.allTasks": "全部任务",
   "todo.addTask": "添加任务",
   "todo.add": "添加任务",
@@ -184,6 +187,7 @@ const zh: Record<string, string> = {
   "confirm.deleteCollectionTitle": "删除集合",
   "confirm.deleteCollectionMsg": "删除集合「{name}」？项目本身不会被删除。",
   "confirm.deleteTagMsg": "删除标签「{name}」？该标签会同时从所有项目上移除。",
+  "confirm.deleteTagTitle": "删除标签",
   "confirm.delete": "删除",
 
   // 项目对话框
@@ -357,6 +361,8 @@ const en: Record<string, string> = {
   "rel.dayAgo": "{n} d ago",
   "rel.today": "Today",
   "rel.tomorrow": "Tomorrow",
+  "timeline.dateShort": "{m}/{d}",
+  "timeline.date": "{y}/{m}/{d}",
 
   "side.search": "Search",
   "side.home": "Home",
@@ -404,6 +410,7 @@ const en: Record<string, string> = {
   "gender.female": "Female",
   "gender.unspecified": "Prefer not to say",
 
+  "todo.title": "Todos",
   "todo.allTasks": "All Tasks",
   "todo.addTask": "Add Task",
   "todo.add": "Add Task",
@@ -493,6 +500,7 @@ const en: Record<string, string> = {
   "confirm.deleteCollectionTitle": "Delete Collection",
   "confirm.deleteCollectionMsg": "Delete collection \"{name}\"? Projects themselves are kept.",
   "confirm.deleteTagMsg": "Delete tag \"{name}\"? It will be removed from all projects.",
+  "confirm.deleteTagTitle": "Delete Tag",
   "confirm.delete": "Delete",
 
   "dialog.project.new": "New Project",

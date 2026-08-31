@@ -3,7 +3,6 @@ import { computed, onMounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import ProjectGrid from "../components/project/ProjectGrid.vue";
 import ProjectListTable from "../components/project/ProjectListTable.vue";
-import ProjectDialog from "../components/dialog/ProjectDialog.vue";
 import CollectionAddDialog from "../components/dialog/CollectionAddDialog.vue";
 import ConfirmDialog from "../components/common/ConfirmDialog.vue";
 import EmptyState from "../components/common/EmptyState.vue";
@@ -12,6 +11,7 @@ import { useProjectStore } from "../stores/project";
 import { useCollectionStore } from "../stores/collection";
 import { useUiStore } from "../stores/ui";
 import { useSettingsStore } from "../stores/settings";
+import { useProjectActions } from "../composables/useProjectActions";
 import { useI18n } from "../i18n";
 import type { Project } from "../types";
 
@@ -24,7 +24,6 @@ const uiStore = useUiStore();
 const { t } = useI18n();
 
 const loading = ref(true);
-const showForm = ref(false);
 const showAdd = ref(false);
 const editing = ref(false);
 const editName = ref("");
@@ -40,9 +39,7 @@ const projects = ref<Project[]>([]);
 async function load() {
   loading.value = true;
   try {
-    projects.value = await projectStore.fetchAll().then((all) =>
-      all.filter((p) => p.collections.some((c) => c.id === collectionId.value))
-    );
+    projects.value = await projectStore.fetchByCollection(collectionId.value);
   } finally {
     loading.value = false;
   }
@@ -51,20 +48,13 @@ async function load() {
 onMounted(load);
 watch(collectionId, load);
 
-async function handleGridAction(action: string, project: Project) {
-  if (action.startsWith("status:")) {
-    try {
-      const updated = await projectStore.changeStatus(project, action.slice("status:".length));
-      const idx = projects.value.findIndex((p) => p.id === project.id);
-      if (idx !== -1) projects.value[idx] = updated;
-      uiStore.showToast(t("toast.statusChanged"), "success");
-    } catch (e) {
-      uiStore.showToast(String(e), "error");
-    }
-    return;
-  }
-  router.push(`/projects/${project.id}`);
-}
+// 动作统一分发（打开/终端/复制路径/状态切换/刷新 Git 等）
+const { handleAction } = useProjectActions({
+  onStatusChanged: (updated) => {
+    const idx = projects.value.findIndex((p) => p.id === updated.id);
+    if (idx !== -1) projects.value[idx] = updated;
+  },
+});
 
 async function rename() {
   if (!collection.value || !editName.value.trim()) {
@@ -100,7 +90,7 @@ async function removeCollection() {
         <input
           v-model="editName"
           type="text"
-          style="background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 6px 12px; font-size: 18px; outline: none"
+          class="text-input rename-input"
           @keyup.enter="rename"
           @blur="rename"
         />
@@ -127,9 +117,9 @@ async function removeCollection() {
         v-if="settingsStore.viewMode === 'grid'"
         :projects="projects"
         @open="(p) => router.push(`/projects/${p.id}`)"
-        @open-folder="projectStore.openInFolder($event)"
+        @open-folder="handleAction('open-folder', $event)"
         @toggle-favorite="projectStore.toggleFavorite($event)"
-        @action="handleGridAction"
+        @action="handleAction"
       />
       <ProjectListTable v-else :projects="projects" @open="(p) => router.push(`/projects/${p.id}`)" />
     </template>
@@ -144,7 +134,6 @@ async function removeCollection() {
       @close="showAdd = false"
       @added="load()"
     />
-    <ProjectDialog v-if="showForm" @close="showForm = false" @saved="load()" />
     <ConfirmDialog
       v-if="deleteTarget"
       :title="t('confirm.deleteCollectionTitle')"

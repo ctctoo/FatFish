@@ -11,6 +11,7 @@ import EmptyState from "../components/common/EmptyState.vue";
 import Skeleton from "../components/common/Skeleton.vue";
 import { useProjectStore } from "../stores/project";
 import { useSettingsStore } from "../stores/settings";
+import { useProjectActions } from "../composables/useProjectActions";
 import { useI18n } from "../i18n";
 import type { Project } from "../types";
 
@@ -50,34 +51,24 @@ async function load() {
   }
 }
 
-async function openInFolder(project: Project) {
-  await projectStore.openInFolder(project);
-}
-
-async function handleAction(action: string, project: Project) {
-  if (action === "open-folder" || action === "open") {
-    await openInFolder(project);
-    return;
-  }
-  if (action.startsWith("status:")) {
-    const updated = await projectStore.changeStatus(project, action.slice("status:".length));
-    const idx = recentProjects.value.findIndex((p) => p.id === project.id);
+// 动作统一分发（打开/终端/复制路径/状态切换/刷新 Git 等）
+const { handleAction } = useProjectActions({
+  onStatusChanged: (updated) => {
+    const idx = recentProjects.value.findIndex((p) => p.id === updated.id);
     if (idx !== -1) recentProjects.value[idx] = updated;
-    return;
-  }
-  router.push(`/projects/${project.id}`);
-}
+  },
+});
 </script>
 
 <template>
   <div class="page">
-    <div class="home-hero" style="display: flex; align-items: flex-start">
+    <div class="home-hero">
       <div>
         <h1>{{ greeting }} <span style="font-weight: 400">👋</span></h1>
         <p>{{ t("home.subline") }}</p>
       </div>
-      <span style="flex: 1"></span>
-      <div class="view-toggle" style="margin-top: 8px">
+      <span class="spacer"></span>
+      <div class="view-toggle">
         <button
           :class="{ active: settingsStore.viewMode === 'grid' }"
           :title="t('home.gridView')"
@@ -95,7 +86,7 @@ async function handleAction(action: string, project: Project) {
       </div>
     </div>
 
-    <div class="home-section" style="margin-top: 14px">
+    <div class="home-section first">
       <TodoWidget mode="compact" />
     </div>
 
@@ -107,7 +98,7 @@ async function handleAction(action: string, project: Project) {
           v-if="settingsStore.viewMode === 'grid'"
           :projects="recentProjects"
           @open="(p) => router.push(`/projects/${p.id}`)"
-          @open-folder="openInFolder"
+          @open-folder="handleAction('open-folder', $event)"
           @toggle-favorite="projectStore.toggleFavorite($event)"
           @action="handleAction"
         />

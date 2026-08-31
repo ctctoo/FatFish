@@ -81,7 +81,7 @@ async function addCollection() {
     </button>
 
     <div class="sidebar-section">
-      <div class="sidebar-label">Home</div>
+      <div class="sidebar-label">{{ t("side.home") }}</div>
       <button class="sidebar-item" :class="{ active: activeNav === 'home' }" @click="go('/home')">
         <House :size="16" :stroke-width="1.8" />
         <span class="label">{{ t("side.home") }}</span>
@@ -89,7 +89,7 @@ async function addCollection() {
     </div>
 
     <div class="sidebar-section">
-      <div class="sidebar-label">Projects</div>
+      <div class="sidebar-label">{{ t("side.allProjects") }}</div>
       <button class="sidebar-item" :class="{ active: activeNav === 'projects' }" @click="go('/projects')">
         <LayoutGrid :size="16" :stroke-width="1.8" />
         <span class="label">{{ t("side.allProjects") }}</span>
@@ -150,7 +150,7 @@ async function addCollection() {
         <span class="label">{{ tag.name }}</span>
       </button>
       <button class="sidebar-item" :class="{ active: activeNav === 'manage-tags' }" @click="go('/tags')">
-        <span class="label" style="padding-left: 26px">{{ t("side.manageTags") }}</span>
+        <span class="label manage-tags">{{ t("side.manageTags") }}</span>
       </button>
     </div>
 
@@ -182,5 +182,9 @@ async function addCollection() {
 
 .sidebar.collapsed .collection-input {
   display: none;
+}
+
+.manage-tags {
+  padding-left: 26px;
 }
 </style>

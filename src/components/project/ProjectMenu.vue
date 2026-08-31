@@ -3,11 +3,12 @@ import { ref } from "vue";
 import { FolderOpen, TerminalSquare, Link2, Copy, Pencil, RefreshCw, Trash2, ExternalLink, Check } from "lucide-vue-next";
 import { useI18n, statusLabel } from "../../i18n";
 import { STATUS_VALUES } from "../../types";
+import type { ProjectStatus } from "../../types";
 import { useSettingsStore } from "../../stores/settings";
 
 const props = defineProps<{
   hasGitHubLink: boolean;
-  status: string;
+  status: ProjectStatus;
 }>();
 
 const emit = defineEmits<{

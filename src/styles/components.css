@@ -960,6 +960,7 @@
 
 .detail-hero .chip-row {
   justify-content: center;
+  margin-top: 10px;
 }
 
 .detail-section {
@@ -1424,6 +1425,8 @@ input[type="color"] {
 
 /* Home */
 .home-hero {
+  display: flex;
+  align-items: flex-start;
   padding: 26px 0 6px;
 }
 
@@ -1436,8 +1439,20 @@ input[type="color"] {
   margin-top: 4px;
 }
 
+.home-hero .spacer {
+  flex: 1;
+}
+
+.home-hero .view-toggle {
+  margin-top: 8px;
+}
+
 .home-section {
   margin-top: 26px;
+}
+
+.home-section.first {
+  margin-top: 14px;
 }
 
 .home-section > h2 {
@@ -1570,4 +1585,50 @@ input[type="color"] {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+
+/* ---------- 通用工具类 ---------- */
+.spacer {
+  flex: 1;
+}
+
+/* 需要绝对定位弹层的包装元素 */
+.popover-anchor {
+  position: relative;
+}
+
+.popover.narrow {
+  width: 160px;
+}
+
+/* 通用文本输入（集合重命名 / 标签新建等场景） */
+.text-input {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 13.5px;
+  color: var(--text-primary);
+  outline: none;
+}
+
+.text-input:focus {
+  border-color: var(--border-strong);
+}
+
+.rename-input.text-input {
+  font-size: 18px;
+}
+
+.error-text {
+  color: var(--danger);
+  font-size: 13px;
+}
+
+.tag-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 640px;
 }

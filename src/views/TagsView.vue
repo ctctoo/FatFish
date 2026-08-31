@@ -4,12 +4,13 @@ import { useRouter } from "vue-router";
 import { Plus } from "lucide-vue-next";
 import { useTagStore } from "../stores/tag";
 import { useUiStore } from "../stores/ui";
+import { useProjectStore } from "../stores/project";
+import ConfirmDialog from "../components/common/ConfirmDialog.vue";
 import { useI18n } from "../i18n";
-import { tauriApi } from "../services/tauri";
-import type { Project } from "../types";
 
 const router = useRouter();
 const tagStore = useTagStore();
+const projectStore = useProjectStore();
 const uiStore = useUiStore();
 const { t } = useI18n();
 
@@ -19,6 +20,7 @@ const editingId = ref<string | null>(null);
 const editName = ref("");
 const editColor = ref("");
 const counts = ref<Record<string, number>>({});
+const deleteTarget = ref<{ id: string; name: string } | null>(null);
 
 onMounted(async () => {
   await Promise.all([tagStore.fetchTags(), countProjects()]);
@@ -26,7 +28,7 @@ onMounted(async () => {
 
 async function countProjects() {
   try {
-    const projects: Project[] = await tauriApi.listProjects({});
+    const projects = await projectStore.fetchAll();
     const map: Record<string, number> = {};
     for (const p of projects) {
       for (const item of p.tags) map[item.id] = (map[item.id] ?? 0) + 1;
@@ -66,13 +68,15 @@ async function saveEdit() {
   }
 }
 
-async function remove(id: string, name: string) {
-  if (!confirm(t("confirm.deleteTagMsg", { name }))) return;
+async function remove() {
+  if (!deleteTarget.value) return;
   try {
-    await tagStore.deleteTag(id);
+    await tagStore.deleteTag(deleteTarget.value.id);
     uiStore.showToast(t("toast.tagDeleted"), "success");
   } catch (e) {
     uiStore.showToast(String(e), "error");
+  } finally {
+    deleteTarget.value = null;
   }
 }
 </script>
@@ -90,7 +94,8 @@ async function remove(id: string, name: string) {
           v-model="newName"
           type="text"
           :placeholder="t('tags.newNamePh')"
-          style="flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; font-size: 13.5px; outline: none"
+          class="text-input"
+          style="flex: 1"
           @keyup.enter="create"
         />
         <input v-model="newColor" type="color" title="color" />
@@ -98,7 +103,7 @@ async function remove(id: string, name: string) {
       </div>
     </div>
 
-    <div style="display: flex; flex-direction: column; gap: 8px; max-width: 640px">
+    <div class="tag-list">
       <div v-for="tag in tagStore.tags" :key="tag.id" class="entity-row">
         <template v-if="editingId === tag.id">
           <input v-model="editName" type="text" @keyup.enter="saveEdit" />
@@ -117,12 +122,22 @@ async function remove(id: string, name: string) {
           <span class="spacer"></span>
           <button class="btn small ghost" @click="startEdit(tag.id, tag.name, tag.color)">{{ t("common.edit") }}</button>
           <button class="btn small ghost" @click="router.push(`/tags/${tag.id}`)">{{ t("tags.viewProjects") }}</button>
-          <button class="btn small ghost danger" @click="remove(tag.id, tag.name)">{{ t("common.delete") }}</button>
+          <button class="btn small ghost danger" @click="deleteTarget = { id: tag.id, name: tag.name }">{{ t("common.delete") }}</button>
         </template>
       </div>
       <p v-if="!tagStore.tags.length" class="text-secondary" style="font-size: 13px">
         {{ t("tags.empty") }}
       </p>
     </div>
+
+    <ConfirmDialog
+      v-if="deleteTarget"
+      :title="t('confirm.deleteTagTitle')"
+      :message="t('confirm.deleteTagMsg', { name: deleteTarget.name })"
+      :confirm-text="t('confirm.delete')"
+      danger
+      @confirm="remove()"
+      @cancel="deleteTarget = null"
+    />
   </div>
 </template>

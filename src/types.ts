@@ -63,7 +63,7 @@ export interface Project {
   name: string;
   path: string;
   description: string | null;
-  status: string;
+  status: ProjectStatus;
   favorite: boolean;
   tags: Tag[];
   collections: Collection[];
@@ -82,7 +82,7 @@ export interface ProjectInput {
   name: string;
   path: string;
   description: string | null;
-  status: string;
+  status: ProjectStatus;
   coverEmoji: string | null;
   coverColor: string | null;
   notes: string | null;
@@ -90,12 +90,12 @@ export interface ProjectInput {
 
 export interface ProjectFilter {
   query?: string;
-  status?: string;
+  status?: ProjectStatus;
   favorite?: boolean;
   tagId?: string;
   collectionId?: string;
   recent?: boolean;
-  sort?: string;
+  sort?: SortKey;
 }
 
 export interface ScannedProject {
@@ -116,6 +116,11 @@ export interface CollectionInput {
 
 /** 状态枚举值 — UIPlan §3.3：进行中 / 计划中 / 暂停 / 已完成 / 归档 */
 export const STATUS_VALUES = ["IN_PROGRESS", "PLANNED", "PAUSED", "COMPLETED", "ARCHIVED"] as const;
+
+export type ProjectStatus = (typeof STATUS_VALUES)[number];
+
+/** 项目列表排序键（与 settings.sort 一致） */
+export type SortKey = "updated" | "name" | "opened";
 
 export const LINK_TYPE_VALUES = [
   "github",

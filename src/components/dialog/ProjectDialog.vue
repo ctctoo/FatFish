@@ -7,7 +7,7 @@ import { useSettingsStore } from "../../stores/settings";
 import { useUiStore } from "../../stores/ui";
 import { STATUS_VALUES } from "../../types";
 import { statusLabel, useI18n } from "../../i18n";
-import type { Project, ProjectInput } from "../../types";
+import type { Project, ProjectInput, ProjectStatus } from "../../types";
 import ProjectOrgSelector from "../common/ProjectOrgSelector.vue";
 
 const props = defineProps<{
@@ -28,7 +28,7 @@ const name = ref("");
 const path = ref("");
 const description = ref("");
 const notes = ref("");
-const status = ref("IN_PROGRESS");
+const status = ref<ProjectStatus>("IN_PROGRESS");
 const coverEmoji = ref("");
 const selectedTagIds = ref<string[]>([]);
 const selectedCollectionIds = ref<string[]>([]);
@@ -92,11 +92,11 @@ async function save() {
   };
   saving.value = true;
   try {
-    const saved = isEdit.value
+    let saved = isEdit.value
       ? await projectStore.updateProject(props.project!.id, input)
       : await projectStore.createProject(input);
-    await projectStore.setProjectTags(saved.id, selectedTagIds.value);
-    await projectStore.setProjectCollections(saved.id, selectedCollectionIds.value);
+    saved = await projectStore.setProjectTags(saved.id, selectedTagIds.value);
+    saved = await projectStore.setProjectCollections(saved.id, selectedCollectionIds.value);
     uiStore.showToast(isEdit.value ? t("dialog.project.savedAsEdit") : t("dialog.project.savedAsNew"), "success");
     emit("saved", saved);
     emit("close");

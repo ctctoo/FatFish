@@ -50,7 +50,7 @@ const menuX = ref(0);
 const menuY = ref(0);
 
 const renderedDescription = computed(() =>
-  project.value?.description ? marked.parse(project.value.description) : ""
+  project.value?.description ? (marked.parse(project.value.description) as string) : ""
 );
 
 const githubLink = computed(() => project.value?.links.find((l) => l.linkType === "github"));
@@ -60,7 +60,7 @@ watch(() => props.id, load);
 
 async function load() {
   try {
-    project.value = await tauriApi.getProject(props.id);
+    project.value = await projectStore.getProject(props.id);
     activities.value = await tauriApi.listActivities(props.id);
   } catch (e) {
     uiStore.showToast(String(e), "error");
@@ -70,13 +70,12 @@ async function load() {
 
 async function toggleFavorite() {
   if (!project.value) return;
-  await tauriApi.setFavorite(project.value.id, !project.value.favorite);
-  await load();
+  project.value = await projectStore.toggleFavorite(project.value);
 }
 
 async function refreshGit() {
   if (!project.value) return;
-  project.value = await tauriApi.refreshGitInfo(project.value.id);
+  project.value = await projectStore.refreshGit(project.value.id);
   uiStore.showToast(t("toast.gitRefreshed"), "success");
 }
 
@@ -92,7 +91,7 @@ async function openFolder() {
 async function openTerminal() {
   if (!project.value) return;
   try {
-    await tauriApi.openTerminal(project.value.path);
+    await projectStore.openTerminal(project.value);
   } catch (e) {
     uiStore.showToast(String(e), "error");
   }
@@ -124,15 +123,11 @@ function onNotesInput() {
   if (notesTimer) clearTimeout(notesTimer);
   notesTimer = setTimeout(async () => {
     if (!project.value) return;
-    await tauriApi.updateProject(project.value.id, {
-      name: project.value.name,
-      path: project.value.path,
-      description: project.value.description,
-      status: project.value.status,
-      coverEmoji: project.value.coverEmoji,
-      coverColor: project.value.coverColor,
-      notes: project.value.notes,
-    });
+    try {
+      await projectStore.updateProjectNotes(project.value, project.value.notes);
+    } catch (e) {
+      uiStore.showToast(String(e), "error");
+    }
   }, 600);
 }
 
@@ -192,7 +187,7 @@ function shortHash(hash: string | null): string {
         <ChevronLeft :size="15" :stroke-width="1.8" /> {{ t("detail.back") }}
       </button>
 
-      <div style="display: flex; justify-content: flex-end; gap: 6px; margin-bottom: -34px; position: relative">
+      <div class="detail-actions">
         <button class="btn ghost small" :title="project.favorite ? t('menu.unfavorite') : t('menu.favorite')" @click="toggleFavorite">
           <Star
             :size="16"
@@ -209,12 +204,12 @@ function shortHash(hash: string | null): string {
         <ProjectCover :name="project.name" :emoji="project.coverEmoji" :color="project.coverColor" size="detail" />
         <h1>{{ project.name }}</h1>
         <div class="subtitle">{{ project.description?.split("\n")[0] || t("card.noDesc") }}</div>
-        <div class="status-chip" style="justify-content: center">
+        <div class="status-chip">
           <span class="status-dot" :class="`status-${project.status}`"></span>
           {{ statusLabel(settingsStore.locale, project.status) }}
           <template v-if="project.language"> · {{ project.language }}</template>
         </div>
-        <div class="chip-row" style="justify-content: center; margin-top: 10px">
+        <div class="chip-row">
           <span v-for="c in project.collections" :key="c.id" class="collection-badge">{{ c.name }}</span>
           <span v-for="item in project.tags" :key="item.id" class="tag-badge">{{ item.name }}</span>
         </div>
@@ -232,11 +227,10 @@ function shortHash(hash: string | null): string {
       </div>
 
       <div class="detail-section">
-        <h3 style="display: flex; align-items: center">
+        <h3>
           {{ t("detail.links") }}
           <button
-            class="link-btn"
-            style="margin-left: auto; text-transform: none; letter-spacing: 0"
+            class="link-btn section-action"
             @click="linkDialogMode = 'add'; editingLink = null; showLinkDialog = true"
           >
             <Plus :size="13" :stroke-width="1.8" /> {{ t("detail.linksAdd") }}
@@ -248,7 +242,7 @@ function shortHash(hash: string | null): string {
             <span class="link-title">{{ link.title }}</span>
             <span class="caption">{{ linkTypeLabel(settingsStore.locale, link.linkType) }}</span>
             <span class="link-url">{{ link.url }}</span>
-            <span class="spacer" style="flex: 1"></span>
+            <span class="spacer"></span>
             <button class="link-btn" @click="openLink(link.url)">
               <ExternalLink :size="13" :stroke-width="1.8" />
             </button>
@@ -287,9 +281,9 @@ function shortHash(hash: string | null): string {
       </div>
 
       <div class="detail-section">
-        <h3 style="display: flex; align-items: center">
+        <h3>
           {{ t("detail.devSection") }}
-          <button class="link-btn" style="margin-left: auto; text-transform: none; letter-spacing: 0" @click="refreshGit">
+          <button class="link-btn section-action" @click="refreshGit">
             <RefreshCw :size="12" :stroke-width="1.8" /> {{ t("common.refresh") }}
           </button>
         </h3>
@@ -353,3 +347,24 @@ function shortHash(hash: string | null): string {
     </div>
   </div>
 </template>
+
+<style scoped>
+.detail-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+  margin-bottom: -34px;
+  position: relative;
+}
+
+.detail-section h3 {
+  display: flex;
+  align-items: center;
+}
+
+.section-action {
+  margin-left: auto;
+  text-transform: none;
+  letter-spacing: 0;
+}
+</style>

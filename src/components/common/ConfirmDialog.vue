@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useI18n } from "../../i18n";
+
 const props = defineProps<{
   title: string;
   message?: string;
@@ -10,6 +12,8 @@ const emit = defineEmits<{
   confirm: [];
   cancel: [];
 }>();
+
+const { t } = useI18n();
 </script>
 
 <template>
@@ -22,9 +26,9 @@ const emit = defineEmits<{
         {{ props.message }}
       </p>
       <div class="modal-actions">
-        <button class="btn" @click="emit('cancel')">取消</button>
+        <button class="btn" @click="emit('cancel')">{{ t("common.cancel") }}</button>
         <button class="btn" :class="props.danger ? 'danger' : 'primary'" @click="emit('confirm')">
-          {{ props.confirmText ?? "确定" }}
+          {{ props.confirmText ?? t("common.confirm") }}
         </button>
       </div>
     </div>

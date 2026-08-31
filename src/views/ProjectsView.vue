@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { openUrl } from "@tauri-apps/plugin-opener";
 import { Search, ListFilter, ArrowUpDown, LayoutGrid, List, Plus, FolderSearch } from "lucide-vue-next";
 import ProjectGrid from "../components/project/ProjectGrid.vue";
 import ProjectListTable from "../components/project/ProjectListTable.vue";
@@ -11,15 +10,15 @@ import LinkDialog from "../components/dialog/LinkDialog.vue";
 import ConfirmDialog from "../components/common/ConfirmDialog.vue";
 import EmptyState from "../components/common/EmptyState.vue";
 import Skeleton from "../components/common/Skeleton.vue";
-import { tauriApi } from "../services/tauri";
 import { useProjectStore } from "../stores/project";
 import { useTagStore } from "../stores/tag";
 import { useCollectionStore } from "../stores/collection";
 import { useSettingsStore } from "../stores/settings";
 import { useUiStore } from "../stores/ui";
+import { useProjectActions } from "../composables/useProjectActions";
 import { STATUS_VALUES } from "../types";
 import { statusLabel, useI18n } from "../i18n";
-import type { Project } from "../types";
+import type { Project, SortKey } from "../types";
 
 const route = useRoute();
 const router = useRouter();
@@ -111,60 +110,26 @@ function editProject(project: Project) {
   showForm.value = true;
 }
 
-function handleAction(action: string, project: Project) {
-  const run = async () => {
-    if (action.startsWith("status:")) {
-      await projectStore.changeStatus(project, action.slice("status:".length));
-      uiStore.showToast(t("toast.statusChanged"), "success");
-      return;
+// 动作统一分发（打开/终端/复制路径/状态切换/刷新 Git 等）
+const { handleAction } = useProjectActions({
+  onEdit: editProject,
+  onAddLink: (project) => (linkTarget.value = project),
+  onDelete: (project) => {
+    if (settingsStore.confirmRemove) {
+      deleteTarget.value = project;
+    } else {
+      return removeProject(project);
     }
-    switch (action) {
-      case "open":
-      case "open-folder":
-        await projectStore.openInFolder(project);
-        break;
-      case "open-terminal":
-        await tauriApi.openTerminal(project.path);
-        break;
-      case "open-github": {
-        const gh = project.links.find((l) => l.linkType === "github");
-        if (gh) await openUrl(gh.url);
-        break;
-      }
-      case "copy-path":
-        await navigator.clipboard.writeText(project.path);
-        uiStore.showToast(t("toast.copied"), "success");
-        break;
-      case "edit":
-        editProject(project);
-        break;
-      case "add-link":
-        linkTarget.value = project;
-        break;
-      case "refresh-git":
-        await tauriApi.refreshGitInfo(project.id);
-        await projectStore.fetchProjects();
-        uiStore.showToast(t("toast.gitRefreshed"), "success");
-        break;
-      case "delete":
-        if (settingsStore.confirmRemove) {
-          deleteTarget.value = project;
-        } else {
-          await removeProject(project);
-        }
-        break;
-    }
-  };
-  run().catch((e) => uiStore.showToast(String(e), "error"));
-}
+  },
+});
 
 async function removeProject(project: Project) {
   await projectStore.deleteProject(project.id);
   uiStore.showToast(t("toast.projectDeleted"), "success");
 }
 
-function setSort(key: string) {
-  settingsStore.sort = key as typeof settingsStore.sort;
+function setSort(key: SortKey) {
+  settingsStore.sort = key;
   showSort.value = false;
 }
 
@@ -196,12 +161,12 @@ const sortLabel = computed(
         <input v-model="projectStore.query" type="text" :placeholder="t('projects.searchPh')" />
       </div>
 
-      <div style="position: relative">
+      <div class="popover-anchor">
         <button class="tool-btn" :class="{ active: showFilter || activeCount > 0 }" @click="showFilter = !showFilter">
           <ListFilter :size="14" :stroke-width="1.8" />
           {{ t("projects.filter") }}{{ activeCount ? ` (${activeCount})` : "" }}
         </button>
-        <div v-if="showFilter" class="popover" style="left: 0">
+        <div v-if="showFilter" class="popover">
           <h4>{{ t("projects.filterStatus") }}</h4>
           <button class="opt-row" :class="{ active: !projectStore.status }" @click="projectStore.status = null">
             {{ t("projects.filterAll") }}
@@ -250,19 +215,19 @@ const sortLabel = computed(
         </div>
       </div>
 
-      <div style="position: relative">
+      <div class="popover-anchor">
         <button class="tool-btn" @click="showSort = !showSort">
           <ArrowUpDown :size="14" :stroke-width="1.8" />
           {{ sortLabel }}
         </button>
-        <div v-if="showSort" class="popover" style="left: 0; width: 160px">
+        <div v-if="showSort" class="popover narrow">
           <button class="opt-row" :class="{ active: settingsStore.sort === 'updated' }" @click="setSort('updated')">{{ t("projects.sortUpdated") }}</button>
           <button class="opt-row" :class="{ active: settingsStore.sort === 'name' }" @click="setSort('name')">{{ t("projects.sortName") }}</button>
           <button class="opt-row" :class="{ active: settingsStore.sort === 'opened' }" @click="setSort('opened')">{{ t("projects.sortOpened") }}</button>
         </div>
       </div>
 
-      <span class="spacer" style="flex: 1"></span>
+      <span class="spacer"></span>
 
       <div class="view-toggle">
         <button :class="{ active: settingsStore.viewMode === 'grid' }" :title="t('projects.grid')" @click="settingsStore.viewMode = 'grid'">
@@ -274,7 +239,7 @@ const sortLabel = computed(
       </div>
     </div>
 
-    <p v-if="projectStore.error" style="color: #c0554f; font-size: 13px">{{ projectStore.error }}</p>
+    <p v-if="projectStore.error" class="error-text">{{ projectStore.error }}</p>
 
     <Skeleton v-if="projectStore.loading && !projectStore.projects.length" :count="6" />
 

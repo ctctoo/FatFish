@@ -102,7 +102,7 @@ function goProject(projectId: string | null) {
 <template>
   <div class="todo-widget">
     <div class="todo-header">
-      <span class="todo-title">Todo</span>
+      <span class="todo-title">{{ t("todo.title") }}</span>
       <span class="todo-count">{{ mode === "all" ? todoStore.todos.length : todoStore.todos.length - doneCount }}</span>
       <button v-if="mode !== 'all'" class="todo-all" @click="router.push('/todos')">
         {{ t("todo.allTasks") }} <ChevronRight :size="14" :stroke-width="1.8" />

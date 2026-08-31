@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { Plus, Pencil, Link2, SquareCheck } from "lucide-vue-next";
+import { useI18n } from "../../i18n";
 import type { Activity } from "../../types";
 
 const props = defineProps<{
   activities: Activity[];
 }>();
+
+const { t } = useI18n();
 
 const groups = computed(() => {
   const map = new Map<string, Activity[]>();
@@ -25,10 +28,11 @@ function dateGroupLabel(iso: string): string {
   const sameDay = (a: Date, b: Date) =>
     a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
   const yesterday = new Date(now.getTime() - 86_400_000);
-  if (sameDay(d, now)) return "今天";
-  if (sameDay(d, yesterday)) return "昨天";
-  const md = `${d.getMonth() + 1}月${d.getDate()}日`;
-  return d.getFullYear() === now.getFullYear() ? md : `${d.getFullYear()}年${md}`;
+  if (sameDay(d, now)) return t("rel.today");
+  if (sameDay(d, yesterday)) return t("rel.yesterday");
+  const sameYear = d.getFullYear() === now.getFullYear();
+  if (sameYear) return t("timeline.dateShort", { m: d.getMonth() + 1, d: d.getDate() });
+  return t("timeline.date", { y: d.getFullYear(), m: d.getMonth() + 1, d: d.getDate() });
 }
 
 function timeOf(iso: string): string {
