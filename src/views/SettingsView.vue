@@ -163,7 +163,7 @@ function updateProfile(patch: { name?: string; gender?: Gender; occupation?: str
       <h3>{{ t("settings.github") }}</h3>
       <p class="desc">{{ t("settings.githubDesc") }}</p>
       <div class="profile-field" style="max-width: 420px">
-        <span>{{ t("settings.githubClientId") }}</span>
+        <span>{{ t("settings.githubClientId") }} <em class="muted">（{{ t("settings.githubOptional") }}）</em></span>
         <input
           :value="settingsStore.githubClientId"
           :placeholder="t('settings.githubClientIdPh')"
@@ -197,5 +197,12 @@ function updateProfile(patch: { name?: string; gender?: Gender; occupation?: str
   gap: 8px;
   margin-top: 10px;
   flex-wrap: wrap;
+}
+
+.muted {
+  font-style: normal;
+  font-weight: 400;
+  color: var(--text-tertiary);
+  font-size: 12px;
 }
 </style>

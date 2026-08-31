@@ -11,7 +11,24 @@ const DEVICE_CODE_URL: &str = "https://github.com/login/device/code";
 const ACCESS_TOKEN_URL: &str = "https://github.com/login/oauth/access_token";
 const USER_AGENT_VALUE: &str = "FatFish";
 
-/// Device Flow 第一步：申请设备码。client_id 来自用户在设置里配置的 OAuth App。
+/// 内置的 GitHub OAuth App Client ID（开发者配置一次即可，用户无需自行创建 OAuth App）。
+/// 留空时可回退到前端设置里的自定义 Client ID。
+const DEFAULT_GITHUB_CLIENT_ID: &str = "";
+
+/// 解析客户端实际使用的 Client ID：优先使用前端传入的自定义值，否则使用内置默认值。
+fn resolve_client_id(candidate: &str) -> Result<String, String> {
+    let candidate = candidate.trim();
+    if !candidate.is_empty() {
+        return Ok(candidate.to_string());
+    }
+    let default = DEFAULT_GITHUB_CLIENT_ID.trim();
+    if !default.is_empty() {
+        return Ok(default.to_string());
+    }
+    Err("未配置 GitHub OAuth App 的 Client ID，请联系应用开发者".to_string())
+}
+
+/// Device Flow 第一步：申请设备码。
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct GithubDeviceCode {
@@ -140,15 +157,12 @@ fn client() -> Client {
 
 /// 发起 Device Flow：POST /login/device/code，返回设备码与验证码。
 pub fn request_device_code(client_id: &str) -> Result<GithubDeviceCode, String> {
-    let client_id = client_id.trim();
-    if client_id.is_empty() {
-        return Err("请先在设置中填写 GitHub OAuth App 的 Client ID".to_string());
-    }
+    let client_id = resolve_client_id(client_id)?;
     let resp = client()
         .post(DEVICE_CODE_URL)
         .header(ACCEPT, "application/json")
         .header(USER_AGENT, USER_AGENT_VALUE)
-        .form(&[("client_id", client_id), ("scope", "repo")])
+        .form(&[("client_id", client_id.as_str()), ("scope", "repo")])
         .send()
         .map_err(|e| format!("无法连接 GitHub：{e}"))?;
     let status = resp.status();
@@ -182,12 +196,13 @@ pub fn request_device_code(client_id: &str) -> Result<GithubDeviceCode, String> 
 
 /// 轮询一次授权状态。前端按 GitHub 返回的 interval 周期性调用本函数。
 pub fn poll_login(client_id: &str, device_code: &str) -> Result<GithubLoginResult, String> {
+    let client_id = resolve_client_id(client_id)?;
     let resp = client()
         .post(ACCESS_TOKEN_URL)
         .header(ACCEPT, "application/json")
         .header(USER_AGENT, USER_AGENT_VALUE)
         .form(&[
-            ("client_id", client_id.trim()),
+            ("client_id", client_id.as_str()),
             ("device_code", device_code),
             ("grant_type", "urn:ietf:params:oauth:grant-type:device_code"),
         ])

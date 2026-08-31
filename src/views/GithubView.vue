@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from "vue";
-import { useRouter } from "vue-router";
 import { openUrl } from "@tauri-apps/plugin-opener";
 import {
   Github,
@@ -21,7 +20,6 @@ import EmptyState from "../components/common/EmptyState.vue";
 import type { GithubDeviceCode, GithubRepo } from "../types";
 import { githubLangColor } from "../utils/github";
 
-const router = useRouter();
 const githubStore = useGithubStore();
 const settingsStore = useSettingsStore();
 const uiStore = useUiStore();
@@ -55,16 +53,10 @@ function stopPolling() {
 }
 
 async function startLogin() {
-  const clientId = settingsStore.githubClientId.trim();
-  if (!clientId) {
-    uiStore.showToast(t("github.needClientId"), "error");
-    router.push("/settings");
-    return;
-  }
   starting.value = true;
   error.value = "";
   try {
-    device.value = await githubStore.startLogin(clientId);
+    device.value = await githubStore.startLogin(settingsStore.githubClientId.trim());
     deadline = Date.now() + device.value.expiresIn * 1000;
     remaining.value = device.value.expiresIn;
     openUrl(device.value.verificationUri).catch(() => undefined);
@@ -175,10 +167,6 @@ function openRepo(repo: GithubRepo) {
       <div class="gh-card-icon"><Github :size="36" :stroke-width="1.5" /></div>
       <h3>{{ t("github.loginTitle") }}</h3>
       <p class="text-secondary">{{ t("github.loginDesc") }}</p>
-      <p v-if="!settingsStore.githubClientId.trim()" class="gh-warn">
-        {{ t("github.needClientId") }}
-        <button class="link-btn" @click="router.push('/settings')">{{ t("github.goSettings") }}</button>
-      </p>
       <div class="gh-actions">
         <button class="btn primary" :disabled="starting" @click="startLogin">
           <LoaderCircle v-if="starting" class="spin" :size="15" />
@@ -287,12 +275,6 @@ function openRepo(repo: GithubRepo) {
   font-size: 17px;
 }
 
-.gh-warn {
-  font-size: 13px;
-  color: var(--danger);
-  margin-top: 4px;
-}
-
 .gh-actions {
   display: flex;
   gap: 10px;
@@ -308,14 +290,6 @@ function openRepo(repo: GithubRepo) {
   border: 1px dashed var(--border-strong);
   border-radius: var(--radius-md);
   margin: 6px 0 2px;
-}
-
-.link-btn {
-  border: none;
-  background: none;
-  color: var(--accent);
-  font-size: 13px;
-  padding: 0 2px;
 }
 
 .gh-account {
