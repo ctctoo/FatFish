@@ -6,13 +6,15 @@ defineProps<{
   title: string;
   /** i18n 键，可选描述 */
   desc?: string;
+  /** 锚点 id，用于左侧导航定位 */
+  id?: string;
 }>();
 
 const { t } = useI18n();
 </script>
 
 <template>
-  <section class="settings-section">
+  <section :id="id" class="settings-section">
     <h3>{{ t(title) }}</h3>
     <p v-if="desc" class="desc">{{ t(desc) }}</p>
     <slot />
