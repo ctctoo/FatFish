@@ -1,7 +1,28 @@
+use std::path::Path;
+
 use rusqlite::{Connection, OptionalExtension};
+
+use crate::error::{AppError, AppResult};
 
 /// 当前 schema 版本。任何结构变化都必须通过 migrations 推进版本。
 pub const LATEST_SCHEMA_VERSION: i64 = 5;
+
+/// 打开（必要时创建）数据库：确保父目录存在、启用 WAL 与外键，
+/// 并执行版本化 migration 到最新版本。
+pub fn open(db_path: &Path) -> AppResult<Connection> {
+    if let Some(parent) = db_path.parent() {
+        std::fs::create_dir_all(parent).map_err(|e| AppError::DataDir(format!(
+            "创建数据库目录失败: {} ({e})",
+            parent.display()
+        )))?;
+    }
+    let mut conn = Connection::open(db_path)?;
+    conn.pragma_update(None, "journal_mode", "WAL")?;
+    conn.pragma_update(None, "foreign_keys", "ON")?;
+    let version = migrate(&mut conn)?;
+    tracing::debug!(schema_version = version, path = %db_path.display(), "database opened");
+    Ok(conn)
+}
 
 /// 打开数据库并迁移到最新版本。
 ///
