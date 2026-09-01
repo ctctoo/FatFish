@@ -8,3 +8,4 @@ pub mod scanner;
 pub mod system;
 pub mod tag;
 pub mod todo;
+pub mod update;

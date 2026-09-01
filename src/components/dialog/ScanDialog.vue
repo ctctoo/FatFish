@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { open } from "@tauri-apps/plugin-dialog";
 import { X } from "lucide-vue-next";
 import { useProjectStore } from "../../stores/project";
@@ -23,6 +23,7 @@ const results = ref<ScannedProject[]>([]);
 const selected = ref<Set<string>>(new Set());
 const scanning = ref(false);
 const importing = ref(false);
+const projectsOnly = ref(false);
 
 onMounted(() => {
   rootDir.value = settingsStore.defaultFolder || settingsStore.scanDirs[0] || "";
@@ -60,6 +61,10 @@ function toggle(path: string) {
   if (selected.value.has(path)) selected.value.delete(path);
   else selected.value.add(path);
 }
+
+const visibleResults = computed(() =>
+  projectsOnly.value ? results.value.filter((r) => r.isProject) : results.value
+);
 
 async function importSelected() {
   const paths = [...selected.value];
@@ -109,10 +114,16 @@ async function importSelected() {
         <div v-if="scanning" class="caption">{{ t("dialog.scan.discovering") }}</div>
 
         <div v-if="results.length" class="field">
-          <label>{{ t("dialog.scan.found", { n: results.length, m: results.filter((r) => r.alreadyImported).length }) }}</label>
+          <label class="scan-toolbar">
+            <span>{{ t("dialog.scan.found", { n: results.length, m: results.filter((r) => r.alreadyImported).length }) }}</span>
+            <label class="scan-filter">
+              <input type="checkbox" v-model="projectsOnly" />
+              {{ t("dialog.scan.projectsOnly") }}
+            </label>
+          </label>
           <div class="scan-list">
             <label
-              v-for="item in results"
+              v-for="item in visibleResults"
               :key="item.path"
               class="scan-item"
               :class="{ dim: item.alreadyImported }"
@@ -128,7 +139,7 @@ async function importSelected() {
                 <div class="caption" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap">{{ item.path }}</div>
               </div>
               <span style="margin-left: auto; flex-shrink: 0" class="caption">
-                {{ item.alreadyImported ? t("dialog.scan.imported") : item.language ?? "" }}
+                {{ item.alreadyImported ? t("dialog.scan.imported") : item.isProject ? item.language ?? "" : t("dialog.scan.folder") }}
               </span>
             </label>
           </div>
@@ -152,3 +163,28 @@ async function importSelected() {
     </div>
   </div>
 </template>
+
+<style scoped>
+.scan-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.scan-filter {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.scan-filter input {
+  accent-color: var(--accent);
+  width: 14px;
+  height: 14px;
+}
+</style>

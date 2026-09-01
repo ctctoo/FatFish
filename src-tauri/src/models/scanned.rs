@@ -6,6 +6,8 @@ use serde::{Deserialize, Serialize};
 pub struct ScannedProject {
     pub name: String,
     pub path: String,
+    /// 检测到项目特征文件（package.json / Cargo.toml 等）
+    pub is_project: bool,
     pub language: Option<String>,
     /// 数据库中已存在同路径项目
     pub already_imported: bool,

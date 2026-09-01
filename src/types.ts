@@ -101,8 +101,18 @@ export interface ProjectFilter {
 export interface ScannedProject {
   name: string;
   path: string;
+  /** 检测到项目特征文件（package.json / Cargo.toml 等） */
+  isProject: boolean;
   language: string | null;
   alreadyImported: boolean;
+}
+
+export interface UpdateInfo {
+  currentVersion: string;
+  latestVersion: string;
+  releaseUrl: string;
+  releaseNotes: string | null;
+  publishedAt: string | null;
 }
 
 export interface TagInput {

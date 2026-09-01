@@ -146,7 +146,8 @@ pub fn scan_directory(conn: &Connection, root: &str) -> Result<Vec<ScannedProjec
     Ok(scanned)
 }
 
-/// 批量导入扫描结果：重复路径跳过，单个失败不影响其它项。
+/// 批量导入扫描结果（不限于代码项目，普通文件夹也可导入）：
+/// 重复路径跳过，单个失败不影响其它项。
 /// 传入 collection_id 时，导入的项目自动加入该集合。
 pub fn import_scanned(
     conn: &Connection,
@@ -178,10 +179,12 @@ pub fn import_scanned(
                     "INSERT OR IGNORE INTO project_collections (project_id, collection_id) VALUES (?1, ?2)",
                     rusqlite::params![project.id, cid],
                 );
+                activity_repository::log(conn, &project.id, "collection", "加入集合");
             }
             imported.push(ScannedProject {
                 name: project.name,
                 path: project.path,
+                is_project: project.language.is_some(),
                 language: project.language,
                 already_imported: true,
             });

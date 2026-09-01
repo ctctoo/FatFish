@@ -13,7 +13,8 @@ const SKIP_DIRS: [&str; 8] = [
     "node_modules", "target", "build", "dist", ".gradle", ".idea", ".vscode", "venv",
 ];
 
-/// 扫描根目录下的一级子目录，依据项目特征文件识别项目。
+/// 扫描根目录下的一级子目录，返回所有文件夹（不限于开发者项目）。
+/// 检测到特征文件的目录会带出语言标记，其余目录视为普通文件夹。
 /// MVP 不做无限递归。
 pub fn scan_directory(root: &str) -> Result<Vec<ScannedProject>, String> {
     let root_path = Path::new(root);
@@ -33,14 +34,14 @@ pub fn scan_directory(root: &str) -> Result<Vec<ScannedProject>, String> {
         if name.starts_with('.') || SKIP_DIRS.contains(&name.to_lowercase().as_str()) {
             continue;
         }
-        if let Some(language) = detect_language(&path) {
-            scanned.push(ScannedProject {
-                name,
-                path: path.to_string_lossy().to_string(),
-                language: Some(language),
-                already_imported: false,
-            });
-        }
+        let language = detect_language(&path);
+        scanned.push(ScannedProject {
+            name,
+            path: path.to_string_lossy().to_string(),
+            is_project: language.is_some(),
+            language,
+            already_imported: false,
+        });
     }
 
     scanned.sort_by(|a, b| a.name.to_lowercase().cmp(&b.name.to_lowercase()));

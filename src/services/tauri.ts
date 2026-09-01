@@ -12,6 +12,7 @@ import type {
   TagInput,
   Todo,
   TodoInput,
+  UpdateInfo,
   Activity,
   GithubAccount,
   GithubDeviceCode,
@@ -138,6 +139,11 @@ export const tauriApi = {
   },
   githubListRepos(): Promise<GithubRepo[]> {
     return invoke("github_list_repos");
+  },
+
+  // ---- update ----
+  checkForUpdate(currentVersion: string): Promise<UpdateInfo | null> {
+    return invoke("check_for_update", { currentVersion });
   },
 
   // ---- system ----

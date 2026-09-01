@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
 import { open } from "@tauri-apps/plugin-dialog";
-import { X, Search, FolderSearch } from "lucide-vue-next";
+import { X, Search, FolderSearch, FolderPlus } from "lucide-vue-next";
 import { tauriApi } from "../../services/tauri";
 import { useSettingsStore } from "../../stores/settings";
 import { useUiStore } from "../../stores/ui";
@@ -116,6 +116,34 @@ async function importScanned() {
   }
 }
 
+// ---- 模式三：直接添加本地文件夹 ----
+const addingFolder = ref(false);
+
+async function addLocalFolder() {
+  const dir = await open({
+    directory: true,
+    multiple: false,
+    defaultPath: settingsStore.defaultFolder || undefined,
+    title: t("dialog.collectionAdd.pickFolder"),
+  });
+  if (typeof dir !== "string" || !dir.trim()) return;
+  addingFolder.value = true;
+  try {
+    const imported = await tauriApi.importProjects([dir], props.collectionId);
+    if (!imported.length) {
+      uiStore.showToast(t("toast.folderExists"), "info");
+      return;
+    }
+    uiStore.showToast(t("toast.importedToCollection", { n: imported.length }), "success");
+    emit("added");
+    emit("close");
+  } catch (e) {
+    uiStore.showToast(String(e), "error");
+  } finally {
+    addingFolder.value = false;
+  }
+}
+
 onMounted(async () => {
   allProjects.value = await tauriApi.listProjects({ sort: "name" });
   rootDir.value = settingsStore.defaultFolder || settingsStore.scanDirs[0] || "";
@@ -132,8 +160,18 @@ onMounted(async () => {
         </button>
       </div>
 
-      <!-- 从现有项目多选 -->
+      <!-- 直接添加本地文件夹 -->
       <div class="add-section">
+        <div class="add-section-title">{{ t("dialog.collectionAdd.folderSection") }}</div>
+        <p class="caption" style="margin: 4px 0 10px">{{ t("dialog.collectionAdd.folderHint") }}</p>
+        <button class="btn primary" :disabled="addingFolder" @click="addLocalFolder">
+          <FolderPlus :size="15" :stroke-width="1.8" />
+          {{ addingFolder ? t("dialog.collectionAdd.adding") : t("dialog.collectionAdd.pickFolder") }}
+        </button>
+      </div>
+
+      <!-- 从现有项目多选 -->
+      <div class="add-section" style="border-top: 1px solid var(--border); padding-top: 14px; margin-top: 16px">
         <div class="add-section-title">{{ t("dialog.collectionAdd.fromExisting") }}</div>
         <div class="add-search">
           <Search :size="14" :stroke-width="1.8" />
@@ -165,7 +203,7 @@ onMounted(async () => {
         </div>
       </div>
 
-      <!-- 扫描导入 -->
+      <!-- 扫描文件夹导入 -->
       <div class="add-section" style="border-top: 1px solid var(--border); padding-top: 14px; margin-top: 16px">
         <div class="add-section-title">{{ t("dialog.collectionAdd.importSection") }}</div>
         <div class="path-row" style="margin: 8px 0">
@@ -192,6 +230,7 @@ onMounted(async () => {
             <span class="add-item-name">{{ item.name }}</span>
             <span class="caption add-item-path">{{ item.path }}</span>
             <span v-if="item.alreadyImported" class="caption" style="flex-shrink: 0">{{ t("dialog.collectionAdd.inLibrary") }}</span>
+            <span v-else-if="!item.isProject" class="caption" style="flex-shrink: 0">{{ t("dialog.scan.folder") }}</span>
           </label>
         </div>
         <div v-if="scanResults.length" style="display: flex; justify-content: flex-end; margin-top: 10px">

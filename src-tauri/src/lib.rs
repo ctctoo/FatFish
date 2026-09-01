@@ -62,6 +62,7 @@ pub fn run() {
             commands::github::github_list_repos,
             commands::system::open_folder,
             commands::system::open_terminal,
+            commands::update::check_for_update,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -36,7 +36,7 @@ const saving = ref(false);
 
 const isEdit = computed(() => !!props.project);
 
-onMounted(() => {
+onMounted(async () => {
   if (props.project) {
     name.value = props.project.name;
     path.value = props.project.path;
@@ -46,8 +46,9 @@ onMounted(() => {
     coverEmoji.value = props.project.coverEmoji ?? "";
     selectedTagIds.value = props.project.tags.map((item) => item.id);
     selectedCollectionIds.value = props.project.collections.map((item) => item.id);
-  } else if (settingsStore.defaultFolder) {
-    path.value = settingsStore.defaultFolder;
+  } else {
+    // 新建模式：进入即弹出系统文件夹选择框，选完自动回填名称
+    if (!path.value) await pickDirectory();
   }
 });
 

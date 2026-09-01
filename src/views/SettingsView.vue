@@ -15,6 +15,8 @@ import {
 } from "lucide-vue-next";
 import { useSettingsStore, type Gender } from "../stores/settings";
 import { useI18n } from "../i18n";
+import { tauriApi } from "../services/tauri";
+import type { UpdateInfo } from "../types";
 import SettingsSection from "../components/settings/SettingsSection.vue";
 import SettingsRow from "../components/settings/SettingsRow.vue";
 import RadioGroup from "../components/settings/RadioGroup.vue";
@@ -32,6 +34,25 @@ appDataDir()
 getVersion()
   .then((v) => (appVersion.value = v))
   .catch(() => (appVersion.value = ""));
+
+// ---- 检查更新 ----
+type UpdateState = "idle" | "checking" | "latest" | "available" | "error";
+const updateState = ref<UpdateState>("idle");
+const updateInfo = ref<UpdateInfo | null>(null);
+const updateError = ref("");
+
+async function checkForUpdate() {
+  if (!appVersion.value || updateState.value === "checking") return;
+  updateState.value = "checking";
+  updateError.value = "";
+  try {
+    updateInfo.value = await tauriApi.checkForUpdate(appVersion.value);
+    updateState.value = updateInfo.value ? "available" : "latest";
+  } catch (e) {
+    updateError.value = String(e);
+    updateState.value = "error";
+  }
+}
 
 async function pickDefaultFolder() {
   const dir = await open({ directory: true, multiple: false, title: t("settings.defaultFolder") });
@@ -245,6 +266,27 @@ onUnmounted(() => {
             {{ t("settings.dataDir") }}<code class="caption">{{ dataDir }}</code><br />
             {{ t("settings.shortcut") }}
           </p>
+          <div class="update-row">
+            <button
+              class="btn small"
+              :disabled="updateState === 'checking' || !appVersion"
+              @click="checkForUpdate"
+            >
+              {{ updateState === "checking" ? t("settings.checkingUpdate") : t("settings.checkUpdate") }}
+            </button>
+            <span v-if="updateState === 'latest'" class="update-hint">
+              {{ t("settings.upToDate") }}
+            </span>
+            <span v-else-if="updateState === 'available' && updateInfo" class="update-hint">
+              {{ t("settings.updateAvailable", { version: updateInfo.latestVersion }) }}
+              <button class="update-link" @click="openUrl(updateInfo.releaseUrl)">
+                {{ t("settings.downloadUpdate") }}
+              </button>
+            </span>
+            <span v-else-if="updateState === 'error'" class="update-hint update-error">
+              {{ t("settings.updateFailed") }}：{{ updateError }}
+            </span>
+          </div>
         </SettingsSection>
       </div>
     </div>
@@ -337,5 +379,32 @@ onUnmounted(() => {
   font-weight: 400;
   color: var(--text-tertiary);
   font-size: 12px;
+}
+
+.update-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.update-hint {
+  font-size: 12.5px;
+  color: var(--text-secondary);
+}
+
+.update-link {
+  border: none;
+  background: none;
+  padding: 0 0 0 4px;
+  color: var(--accent);
+  font-size: 12.5px;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.update-error {
+  color: var(--danger, #d9534f);
 }
 </style>
