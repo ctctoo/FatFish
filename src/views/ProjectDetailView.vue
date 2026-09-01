@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import { openUrl } from "@tauri-apps/plugin-opener";
 import { marked } from "marked";
@@ -118,18 +118,36 @@ async function removeLink(linkId: string) {
 }
 
 let notesTimer: ReturnType<typeof setTimeout> | null = null;
+let notesSaving = false;
 
 function onNotesInput() {
   if (notesTimer) clearTimeout(notesTimer);
-  notesTimer = setTimeout(async () => {
-    if (!project.value) return;
-    try {
-      await projectStore.updateProjectNotes(project.value, project.value.notes);
-    } catch (e) {
-      uiStore.showToast(String(e), "error");
-    }
-  }, 600);
+  notesTimer = setTimeout(saveNotes, 600);
 }
+
+async function saveNotes() {
+  if (notesTimer) {
+    clearTimeout(notesTimer);
+    notesTimer = null;
+  }
+  if (!project.value || notesSaving) return;
+  notesSaving = true;
+  try {
+    await projectStore.updateProjectNotes(project.value, project.value.notes);
+  } catch (e) {
+    uiStore.showToast(String(e), "error");
+  } finally {
+    notesSaving = false;
+  }
+}
+
+// 离开页面时立即落盘未保存的笔记
+onUnmounted(() => {
+  if (notesTimer) {
+    clearTimeout(notesTimer);
+    saveNotes();
+  }
+});
 
 function onMenuAction(action: string) {
   showMenu.value = false;
@@ -162,12 +180,19 @@ async function remove() {
   router.push("/projects");
 }
 
+let menuCloseHandler: (() => void) | null = null;
+
 function openHeaderMenu(e: MouseEvent) {
   menuX.value = Math.min(e.clientX, window.innerWidth - 230);
   menuY.value = Math.min(e.clientY, window.innerHeight - 320);
   showMenu.value = true;
-  setTimeout(() => document.addEventListener("click", () => (showMenu.value = false), { once: true }), 0);
+  menuCloseHandler = () => (showMenu.value = false);
+  setTimeout(() => document.addEventListener("click", menuCloseHandler!, { once: true }), 0);
 }
+
+onUnmounted(() => {
+  if (menuCloseHandler) document.removeEventListener("click", menuCloseHandler);
+});
 
 function formatTime(iso: string | null | undefined): string {
   if (!iso) return "—";
@@ -312,37 +337,45 @@ function shortHash(hash: string | null): string {
         <p v-else class="caption">{{ t("detail.notGit") }}</p>
       </div>
 
-      <ProjectDialog v-if="showForm" :project="project" @close="showForm = false" @saved="load()" />
-      <LinkDialog
-        v-if="showLinkDialog"
-        :project-id="project.id"
-        :link="editingLink"
-        @close="showLinkDialog = false"
-        @saved="load()"
-      />
-      <ConfirmDialog
-        v-if="deleteTarget"
-        :title="t('confirm.deleteProjectTitle')"
-        :message="t('confirm.deleteProjectMsg', { name: project.name })"
-        :confirm-text="t('confirm.delete')"
-        danger
-        @confirm="remove()"
-        @cancel="deleteTarget = false"
-      />
+      <Transition name="overlay-out">
+        <ProjectDialog v-if="showForm" :project="project" @close="showForm = false" @saved="load()" />
+      </Transition>
+      <Transition name="overlay-out">
+        <LinkDialog
+          v-if="showLinkDialog"
+          :project-id="project.id"
+          :link="editingLink"
+          @close="showLinkDialog = false"
+          @saved="load()"
+        />
+      </Transition>
+      <Transition name="overlay-out">
+        <ConfirmDialog
+          v-if="deleteTarget"
+          :title="t('confirm.deleteProjectTitle')"
+          :message="t('confirm.deleteProjectMsg', { name: project.name })"
+          :confirm-text="t('confirm.delete')"
+          danger
+          @confirm="remove()"
+          @cancel="deleteTarget = false"
+        />
+      </Transition>
 
       <Teleport to="body">
-        <div v-if="showMenu" class="menu" :style="{ left: menuX + 'px', top: menuY + 'px' }" @click.stop>
-          <button class="menu-item" @click="onMenuAction('open-folder')"><FolderOpen :size="15" :stroke-width="1.8" /> {{ t("menu.openFolder") }}</button>
-          <button class="menu-item" @click="onMenuAction('open-terminal')"><TerminalSquare :size="15" :stroke-width="1.8" /> {{ t("menu.openTerminal") }}</button>
-          <button class="menu-item" :disabled="!githubLink" @click="onMenuAction('open-github')"><ExternalLink :size="15" :stroke-width="1.8" /> {{ t("menu.openGithub") }}</button>
-          <button class="menu-item" @click="onMenuAction('copy-path')"><Copy :size="15" :stroke-width="1.8" /> {{ t("menu.copyPath") }}</button>
-          <div class="menu-divider"></div>
-          <button class="menu-item" @click="onMenuAction('edit')"><Pencil :size="15" :stroke-width="1.8" /> {{ t("menu.edit") }}</button>
-          <button class="menu-item" @click="onMenuAction('add-link')"><Link2 :size="15" :stroke-width="1.8" /> {{ t("menu.addLink") }}</button>
-          <button class="menu-item" @click="onMenuAction('refresh-git')"><RefreshCw :size="15" :stroke-width="1.8" /> {{ t("menu.refreshGit") }}</button>
-          <div class="menu-divider"></div>
-          <button class="menu-item danger" @click="onMenuAction('delete')"><Trash2 :size="15" :stroke-width="1.8" /> {{ t("menu.delete") }}</button>
-        </div>
+        <Transition name="overlay-out">
+          <div v-if="showMenu" class="menu" :style="{ left: menuX + 'px', top: menuY + 'px' }" @click.stop>
+            <button class="menu-item" @click="onMenuAction('open-folder')"><FolderOpen :size="15" :stroke-width="1.8" /> {{ t("menu.openFolder") }}</button>
+            <button class="menu-item" @click="onMenuAction('open-terminal')"><TerminalSquare :size="15" :stroke-width="1.8" /> {{ t("menu.openTerminal") }}</button>
+            <button class="menu-item" :disabled="!githubLink" @click="onMenuAction('open-github')"><ExternalLink :size="15" :stroke-width="1.8" /> {{ t("menu.openGithub") }}</button>
+            <button class="menu-item" @click="onMenuAction('copy-path')"><Copy :size="15" :stroke-width="1.8" /> {{ t("menu.copyPath") }}</button>
+            <div class="menu-divider"></div>
+            <button class="menu-item" @click="onMenuAction('edit')"><Pencil :size="15" :stroke-width="1.8" /> {{ t("menu.edit") }}</button>
+            <button class="menu-item" @click="onMenuAction('add-link')"><Link2 :size="15" :stroke-width="1.8" /> {{ t("menu.addLink") }}</button>
+            <button class="menu-item" @click="onMenuAction('refresh-git')"><RefreshCw :size="15" :stroke-width="1.8" /> {{ t("menu.refreshGit") }}</button>
+            <div class="menu-divider"></div>
+            <button class="menu-item danger" @click="onMenuAction('delete')"><Trash2 :size="15" :stroke-width="1.8" /> {{ t("menu.delete") }}</button>
+          </div>
+        </Transition>
       </Teleport>
     </div>
   </div>

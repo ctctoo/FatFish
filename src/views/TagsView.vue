@@ -130,14 +130,16 @@ async function remove() {
       </p>
     </div>
 
-    <ConfirmDialog
-      v-if="deleteTarget"
-      :title="t('confirm.deleteTagTitle')"
-      :message="t('confirm.deleteTagMsg', { name: deleteTarget.name })"
-      :confirm-text="t('confirm.delete')"
-      danger
-      @confirm="remove()"
-      @cancel="deleteTarget = null"
-    />
+    <Transition name="overlay-out">
+      <ConfirmDialog
+        v-if="deleteTarget"
+        :title="t('confirm.deleteTagTitle')"
+        :message="t('confirm.deleteTagMsg', { name: deleteTarget.name })"
+        :confirm-text="t('confirm.delete')"
+        danger
+        @confirm="remove()"
+        @cancel="deleteTarget = null"
+      />
+    </Transition>
   </div>
 </template>

@@ -358,7 +358,9 @@ function goProject(projectId: string | null) {
   transition: opacity 0.15s;
 }
 
-.todo-row:hover .todo-del {
+.todo-row:hover .todo-del,
+/* 键盘 Tab 聚焦到行内控件时也显示删除按钮（可发现性） */
+.todo-row:focus-within .todo-del {
   opacity: 1;
 }
 

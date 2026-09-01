@@ -9,6 +9,7 @@ import { useTagStore } from "./stores/tag";
 import { useCollectionStore } from "./stores/collection";
 import { useSettingsStore } from "./stores/settings";
 import { useGithubStore } from "./stores/github";
+import { useProjectStore } from "./stores/project";
 
 const router = useRouter();
 const uiStore = useUiStore();
@@ -16,6 +17,7 @@ const tagStore = useTagStore();
 const collectionStore = useCollectionStore();
 const settingsStore = useSettingsStore();
 const githubStore = useGithubStore();
+const projectStore = useProjectStore();
 
 const showPalette = ref(false);
 
@@ -23,9 +25,20 @@ const showPalette = ref(false);
 // 名称对应 motion.css 里的 .page-fwd-* / .page-back-*。
 const transitionName = ref("page");
 
-router.afterEach((to, from) => {
+// 同一视图组件间跳转（如 /projects → /projects/:id → /projects）时，
+// 用 fullPath 作 key 强制重建组件，保证路由过渡每次都触发。
+router.beforeEach((to, from) => {
   const depth = (r: typeof to) => (r.meta?.depth as number) ?? 0;
-  transitionName.value = depth(to) > depth(from) ? "page-fwd" : "page-back";
+  // 深入 → 前进（右推）；返回 → 后退（左回）；平级切换 → 柔和上浮，避免方向错乱。
+  transitionName.value =
+    depth(to) > depth(from) ? "page-fwd" : depth(to) < depth(from) ? "page-back" : "page";
+  if (to.path === from.path) return false;
+});
+
+router.afterEach(() => {
+  // 旧页面退场后新页面入场：归零滚动，避免新页面从旧偏移处出现
+  const el = document.querySelector(".app-content");
+  if (el) el.scrollTop = 0;
 });
 
 function onGlobalKeydown(e: KeyboardEvent) {
@@ -41,17 +54,12 @@ onMounted(async () => {
     tagStore.fetchTags(),
     collectionStore.fetchCollections(),
     githubStore.fetchStatus(),
+    projectStore.refreshStats(),
   ]);
   if (githubStore.account) await githubStore.fetchRepos();
 });
 
 onUnmounted(() => window.removeEventListener("keydown", onGlobalKeydown));
-
-// 新页面开始入场时把滚动容器归零，避免新页面从旧页面的滚动偏移处进入
-function onPageEnter() {
-  const el = document.querySelector(".app-content");
-  if (el) el.scrollTop = 0;
-}
 </script>
 
 <template>
@@ -61,27 +69,31 @@ function onPageEnter() {
     <div class="app-main">
       <div class="app-content">
         <router-view v-slot="{ Component }">
-          <Transition :name="transitionName" mode="out-in" @enter="onPageEnter">
-            <component :is="Component" />
+          <Transition :name="transitionName" mode="out-in">
+            <component :is="Component" :key="$route.fullPath" />
           </Transition>
         </router-view>
       </div>
     </div>
 
-    <CommandPalette v-if="showPalette" @close="showPalette = false" />
+    <Transition name="overlay-out">
+      <CommandPalette v-if="showPalette" @close="showPalette = false" />
+    </Transition>
 
     <Onboarding v-if="!settingsStore.onboarded" />
 
     <div class="toast-wrap">
-      <div
-        v-for="toast in uiStore.toasts"
-        :key="toast.id"
-        class="toast"
-        :class="toast.type"
-        @click="uiStore.dismissToast(toast.id)"
-      >
-        {{ toast.message }}
-      </div>
+      <TransitionGroup name="toast">
+        <div
+          v-for="toast in uiStore.toasts"
+          :key="toast.id"
+          class="toast"
+          :class="toast.type"
+          @click="uiStore.dismissToast(toast.id)"
+        >
+          {{ toast.message }}
+        </div>
+      </TransitionGroup>
     </div>
   </div>
 </template>

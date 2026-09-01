@@ -110,7 +110,11 @@ const { handleAction } = useProjectActions({
       </EmptyState>
     </div>
 
-    <ProjectDialog v-if="showForm" @close="showForm = false" @saved="load()" />
-    <ScanDialog v-if="showScan" @close="showScan = false" @imported="load()" />
+    <Transition name="overlay-out">
+      <ProjectDialog v-if="showForm" @close="showForm = false" @saved="load()" />
+    </Transition>
+    <Transition name="overlay-out">
+      <ScanDialog v-if="showScan" @close="showScan = false" @imported="load()" />
+    </Transition>
   </div>
 </template>

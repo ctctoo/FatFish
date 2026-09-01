@@ -263,6 +263,8 @@ onUnmounted(() => {
         <SettingsSection :id="targetId('about')" title="settings.about">
           <p class="desc" style="margin-bottom: 0">
             {{ t("settings.aboutText", { version: appVersion }) }}<br />
+            {{ t("settings.author") }}<button class="update-link" @click="openUrl('https://github.com/ctctoo')">Chan7</button><br />
+            {{ t("settings.website") }}<button class="update-link" @click="openUrl('https://fatfish.cc.cd/')">fatfish.cc.cd</button><br />
             {{ t("settings.dataDir") }}<code class="caption">{{ dataDir }}</code><br />
             {{ t("settings.shortcut") }}
           </p>

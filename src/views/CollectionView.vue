@@ -127,21 +127,25 @@ async function removeCollection() {
       <button class="btn primary" @click="showAdd = true">{{ t("collection.addProject") }}</button>
     </EmptyState>
 
-    <CollectionAddDialog
-      v-if="showAdd && collection"
-      :collection-id="collection.id"
-      :collection-name="collection.name"
-      @close="showAdd = false"
-      @added="load()"
-    />
-    <ConfirmDialog
-      v-if="deleteTarget"
-      :title="t('confirm.deleteCollectionTitle')"
-      :message="t('confirm.deleteCollectionMsg', { name: collection?.name ?? '' })"
-      :confirm-text="t('confirm.delete')"
-      danger
-      @confirm="removeCollection()"
-      @cancel="deleteTarget = false"
-    />
+    <Transition name="overlay-out">
+      <CollectionAddDialog
+        v-if="showAdd && collection"
+        :collection-id="collection.id"
+        :collection-name="collection.name"
+        @close="showAdd = false"
+        @added="load()"
+      />
+    </Transition>
+    <Transition name="overlay-out">
+      <ConfirmDialog
+        v-if="deleteTarget"
+        :title="t('confirm.deleteCollectionTitle')"
+        :message="t('confirm.deleteCollectionMsg', { name: collection?.name ?? '' })"
+        :confirm-text="t('confirm.delete')"
+        danger
+        @confirm="removeCollection()"
+        @cancel="deleteTarget = false"
+      />
+    </Transition>
   </div>
 </template>

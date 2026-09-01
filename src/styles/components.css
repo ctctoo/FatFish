@@ -313,12 +313,12 @@
 }
 
 .btn.danger {
-  color: #c0554f;
+  color: var(--danger);
 }
 
 .btn.danger:hover {
-  border-color: #c0554f;
-  background: rgba(192, 85, 79, 0.06);
+  border-color: var(--danger);
+  background: color-mix(in srgb, var(--danger) 8%, transparent);
 }
 
 .btn.icon-only {
@@ -392,7 +392,6 @@
 .project-card:hover {
   border-color: var(--border-strong);
   background: var(--surface-muted);
-  transform: translateY(-2px);
   box-shadow: var(--shadow-menu);
 }
 
@@ -452,6 +451,10 @@
 
 .card-star.on {
   color: #d9a92f;
+}
+
+.card-star.on:hover {
+  background: color-mix(in srgb, #d9a92f 12%, transparent);
 }
 
 .card-desc {
@@ -615,15 +618,15 @@
 }
 
 .menu-item.danger {
-  color: #c0554f;
+  color: var(--danger);
 }
 
 .menu-item.danger svg {
-  color: #c0554f;
+  color: var(--danger);
 }
 
 .menu-item.danger:hover {
-  background: rgba(192, 85, 79, 0.08);
+  background: color-mix(in srgb, var(--danger) 9%, transparent);
 }
 
 .menu-divider {
@@ -1259,7 +1262,7 @@
 }
 
 .toast.success { border-color: var(--status-in-progress); }
-.toast.error { border-color: #c0554f; }
+.toast.error { border-color: var(--danger); }
 
 /* ---------- Tag / Collection rows ---------- */
 .entity-row {
@@ -1485,6 +1488,10 @@ input[type="color"] {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    /* 必须同时清零延迟：stagger 类动画靠 delay 排队，
+       只缩时长会导致内容先隐形（opacity:0 起始态）再延迟闪现 */
+    animation-delay: 0ms !important;
+    transition-delay: 0ms !important;
   }
 }
 

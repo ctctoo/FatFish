@@ -32,17 +32,23 @@ onMounted(async () => {
 });
 
 let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+let searchSeq = 0;
 
 function onInput() {
   if (debounceTimer) clearTimeout(debounceTimer);
   debounceTimer = setTimeout(async () => {
     const q = query.value.trim();
     if (!q) {
+      searchSeq++;
       results.value = [];
       activeIndex.value = 0;
       return;
     }
-    results.value = await tauriApi.listProjects({ query: q });
+    // 竞态保护：只接受最后一次请求，防止快速输入时旧结果覆盖新结果
+    const seq = ++searchSeq;
+    const list = await tauriApi.listProjects({ query: q });
+    if (seq !== searchSeq) return;
+    results.value = list;
     activeIndex.value = 0;
   }, 200);
 }
@@ -59,12 +65,15 @@ function onKeydown(e: KeyboardEvent) {
   }
   if (e.key === "ArrowDown") {
     e.preventDefault();
-    activeIndex.value = Math.min(activeIndex.value + 1, items.value.length - 1);
+    if (!items.value.length) return;
+    activeIndex.value = (activeIndex.value + 1) % items.value.length;
   } else if (e.key === "ArrowUp") {
     e.preventDefault();
-    activeIndex.value = Math.max(activeIndex.value - 1, 0);
+    if (!items.value.length) return;
+    activeIndex.value = (activeIndex.value - 1 + items.value.length) % items.value.length;
   } else if (e.key === "Enter") {
-    const item = items.value[activeIndex.value];
+    // 防止过滤后索引越界选中错误项
+    const item = items.value[Math.min(activeIndex.value, items.value.length - 1)];
     if (item) open(item);
   }
 }

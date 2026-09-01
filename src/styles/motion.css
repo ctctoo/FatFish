@@ -1,164 +1,150 @@
 /* Motion & Micro-interactions — 独立动画层
- * 设计取向：克制、顺滑、克制的弹性曲线。
- * 统一使用 --ease-out / --ease-spring 两个缓动，避免各组件各自为政。
+ * 设计取向：克制、顺滑。
+ * 原则：入场动画只动 opacity / transform（合成器友好，不触发 layout/paint），
+ *       不用全页 blur / 布局属性做过渡，避免大页面切换掉帧。
  * 所有动画均在 prefers-reduced-motion 下被全局停用（见 components.css 末尾）。
  */
 
 /* ---------- 全局缓动 token ---------- */
 :root {
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  /* 弹性曲线：overshoot 收敛到 ~1.4，弹而不晃 */
+  --ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
 }
 
-/* ---------- 页面切换（App.vue router-view）----------
+/* ---------- 页面切换（App.vue router-view，mode=out-in）----------
  * 方向感知：进入详情（depth 变深）向右推进，返回（depth 变浅）向左退回。
- * 进场淡入 + 位移 + 轻微模糊形成景深；退场快速、干净、不拖沓。
+ * 退场快（0.1s）+ 进场干净（0.22s），总时长压到 ~0.32s，利落不拖沓。
  */
 .page-fwd-enter-active,
 .page-back-enter-active {
   transition:
-    opacity 0.26s var(--ease-out),
-    transform 0.3s var(--ease-out),
-    filter 0.3s var(--ease-out);
-  will-change: opacity, transform, filter;
+    opacity 0.22s var(--ease-out),
+    transform 0.26s var(--ease-out);
 }
 .page-fwd-leave-active,
 .page-back-leave-active {
   transition:
-    opacity 0.13s ease,
-    transform 0.15s ease;
+    opacity 0.1s ease,
+    transform 0.12s ease;
 }
 .page-fwd-enter-from {
   opacity: 0;
-  transform: translateX(26px);
-  filter: blur(5px);
+  transform: translateX(16px);
 }
 .page-back-enter-from {
   opacity: 0;
-  transform: translateX(-26px);
-  filter: blur(5px);
+  transform: translateX(-16px);
 }
 .page-fwd-leave-to {
   opacity: 0;
-  transform: translateX(-10px);
+  transform: translateX(-8px);
 }
 .page-back-leave-to {
   opacity: 0;
-  transform: translateX(10px);
+  transform: translateX(8px);
 }
 
 /* 首屏（无方向，如直接刷新）回退到柔和上浮 */
 .page-enter-active {
   transition:
-    opacity 0.26s var(--ease-out),
-    transform 0.3s var(--ease-out),
-    filter 0.3s var(--ease-out);
+    opacity 0.22s var(--ease-out),
+    transform 0.26s var(--ease-out);
 }
 .page-enter-from {
   opacity: 0;
-  transform: translateY(12px);
-  filter: blur(5px);
+  transform: translateY(10px);
 }
 
 /* ---------- 页面内部元素的分段显现 ----------
- * 页面根元素直接子级的 hero / 区块按顺序淡入上浮。
- * 入场由 Vue 的 onPageEnter 触发，避免和路由过渡打架。
+ * 用 animation-fill-mode: backwards 填充起始态（delay 期间隐藏），
+ * 动画结束回归自然态——不依赖 forwards，也不会把元素钉在中间态。
  */
-.page-stagger > * {
-  opacity: 0;
-  transform: translateY(14px);
-  animation: stagger-in 0.5s var(--ease-out) forwards;
-}
-.page-stagger > *:nth-child(1) { animation-delay: 0.02s; }
-.page-stagger > *:nth-child(2) { animation-delay: 0.06s; }
-.page-stagger > *:nth-child(3) { animation-delay: 0.1s; }
-.page-stagger > *:nth-child(4) { animation-delay: 0.14s; }
-.page-stagger > *:nth-child(5) { animation-delay: 0.18s; }
-.page-stagger > *:nth-child(n + 6) { animation-delay: 0.22s; }
-
 @keyframes stagger-in {
-  to {
-    opacity: 1;
-    transform: translateY(0);
+  from {
+    opacity: 0;
+    transform: translateY(12px);
   }
 }
 
+.page-stagger > * {
+  animation: stagger-in 0.4s var(--ease-out) backwards;
+}
+.page-stagger > *:nth-child(1) { animation-delay: 0.02s; }
+.page-stagger > *:nth-child(2) { animation-delay: 0.05s; }
+.page-stagger > *:nth-child(3) { animation-delay: 0.08s; }
+.page-stagger > *:nth-child(4) { animation-delay: 0.11s; }
+.page-stagger > *:nth-child(5) { animation-delay: 0.14s; }
+.page-stagger > *:nth-child(n + 6) { animation-delay: 0.16s; }
+
+/* 固定定位弹层不是版式内容：不参与 stagger，
+ * 入场交还给 .modal-mask 自己的 modal-fade（若无此豁免会延迟闪现）。
+ */
+.page-stagger > .modal-mask {
+  animation: modal-fade 0.18s ease;
+  animation-delay: 0s;
+}
+
 /* ---------- 项目卡片入场交错（网格）----------
- * 按 3 列节奏分列交错，比原来的按索引延迟更均匀；
- * hover 用弹簧曲线，抬升更自然。
+ * 按 3 列节奏分列交错；延迟上限收敛，长列表不至于"排队等入场"。
  */
 @keyframes card-in {
   from {
     opacity: 0;
-    transform: translateY(16px);
+    transform: translateY(14px);
   }
 }
 
 .project-grid .project-card {
-  animation: card-in 0.42s var(--ease-out) backwards;
+  animation: card-in 0.32s var(--ease-out) backwards;
 }
-/* 每 3 张一个节奏，配合 auto-fill 列宽 */
 .project-grid .project-card:nth-child(3n + 1) { animation-delay: 0.02s; }
-.project-grid .project-card:nth-child(3n + 2) { animation-delay: 0.07s; }
-.project-grid .project-card:nth-child(3n + 3) { animation-delay: 0.12s; }
-.project-grid .project-card:nth-child(n + 10) { animation-delay: 0.18s; }
+.project-grid .project-card:nth-child(3n + 2) { animation-delay: 0.05s; }
+.project-grid .project-card:nth-child(3n + 3) { animation-delay: 0.08s; }
+.project-grid .project-card:nth-child(n + 10) { animation-delay: 0.12s; }
 
-/* 卡片 hover：弹簧抬升 + 阴影强化 */
+/* 卡片 hover：弹簧抬升 + 阴影强化。
+ * 入场是 animation、hover 是 transition，两者都作用于 transform；
+ * animation 优先级更高，但入场只有 0.32s 且带 delay，结束后自然交还。
+ */
 .project-card {
   transition:
-    border-color 0.18s ease,
-    background 0.18s ease,
+    border-color 0.16s ease,
+    background 0.16s ease,
     transform 0.22s var(--ease-spring),
-    box-shadow 0.22s var(--ease-out);
+    box-shadow 0.2s var(--ease-out);
 }
 .project-card:hover {
-  transform: translateY(-4px);
-}
-
-/* 卡片内容块依次点亮（用于重置筛选后的重排） */
-.project-card .card-tile,
-.project-card .card-content,
-.project-card .card-footer {
-  animation: chip-in 0.3s var(--ease-out) backwards;
-}
-.project-card .card-content { animation-delay: 0.03s; }
-.project-card .card-footer { animation-delay: 0.06s; }
-
-@keyframes chip-in {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-  }
+  transform: translateY(-3px);
 }
 
 /* ---------- 列表行入场 ---------- */
 .project-table tbody tr {
-  animation: row-in 0.3s var(--ease-out) backwards;
+  animation: row-in 0.26s var(--ease-out) backwards;
 }
-.project-table tbody tr:nth-child(2n) { animation-delay: 0.04s; }
-.project-table tbody tr:nth-child(2n + 1) { animation-delay: 0.09s; }
-.project-table tbody tr:nth-child(n + 10) { animation-delay: 0.14s; }
+.project-table tbody tr:nth-child(2n) { animation-delay: 0.03s; }
+.project-table tbody tr:nth-child(2n + 1) { animation-delay: 0.06s; }
+.project-table tbody tr:nth-child(n + 10) { animation-delay: 0.1s; }
 
 @keyframes row-in {
   from {
     opacity: 0;
-    transform: translateX(-8px);
+    transform: translateY(5px);
   }
 }
 
 /* ---------- 悬浮层 / 弹窗 / 命令面板 ----------
- * 统一到一处，并补全退场缓动（原来是单向 ease）。
- * 面板/弹窗用轻微弹性缩放进入。
+ * 面板/弹窗用轻微弹性缩放进入，时长收敛在 0.2s 级别。
  */
 .menu-backdrop {
   animation: fade-in 0.15s ease;
 }
 .menu {
-  animation: pop-in 0.18s var(--ease-spring);
+  animation: pop-in 0.16s var(--ease-spring);
 }
 .popover {
-  animation: pop-in 0.18s var(--ease-spring);
+  animation: pop-in 0.16s var(--ease-spring);
 }
 
 @keyframes fade-in {
@@ -176,12 +162,12 @@
   animation: fade-in 0.15s ease;
 }
 .palette {
-  animation: palette-in 0.26s var(--ease-spring);
+  animation: palette-in 0.22s var(--ease-spring);
 }
 @keyframes palette-in {
   from {
     opacity: 0;
-    transform: translateY(-10px) scale(0.98);
+    transform: translateY(-8px) scale(0.98);
   }
 }
 
@@ -190,7 +176,7 @@
   animation: modal-fade 0.18s ease;
 }
 .modal {
-  animation: modal-in 0.24s var(--ease-spring);
+  animation: modal-in 0.22s var(--ease-spring);
 }
 @keyframes modal-fade {
   from { opacity: 0; }
@@ -204,35 +190,87 @@
 
 /* ---------- 首次引导（Onboarding）----------
  * 遮罩淡入 + 卡片柔和上浮；步骤切换时内容轻微淡入，节奏明快。
+ * （.ob-card 的入场动画在 Onboarding.vue scoped 样式内定义，此处不重复声明）
  */
 .ob-mask {
   animation: fade-in 0.2s ease;
-}
-.ob-card {
-  animation: modal-in 0.3s var(--ease-spring);
 }
 .ob-title,
 .ob-sub,
 .ob-input,
 .ob-genders,
 .ob-footer {
-  animation: stagger-in 0.32s var(--ease-out) backwards;
+  animation: stagger-in 0.3s var(--ease-out) backwards;
 }
 .ob-title { animation-delay: 0.04s; }
-.ob-sub { animation-delay: 0.09s; }
+.ob-sub { animation-delay: 0.08s; }
 .ob-input,
-.ob-genders { animation-delay: 0.13s; }
-.ob-footer { animation-delay: 0.17s; }
+.ob-genders { animation-delay: 0.11s; }
+.ob-footer { animation-delay: 0.14s; }
 
-/* ---------- Toast：从右滑入，弹簧缓动 ---------- */
-.toast {
-  animation: toast-in 0.26s var(--ease-spring);
+/* ---------- Toast：TransitionGroup 驱动的进 / 退 / 位移 ----------
+ * 进入从右滑入（弹簧），退场向右滑出并让位，剩余 toast 平滑上移补位。
+ */
+.toast-enter-active {
+  transition:
+    opacity 0.22s var(--ease-out),
+    transform 0.22s var(--ease-spring);
 }
-@keyframes toast-in {
-  from {
-    opacity: 0;
-    transform: translateX(18px);
-  }
+.toast-leave-active {
+  /* absolute 让出文档流，配合 .toast-move 让下方 toast 平滑补位 */
+  position: absolute;
+  right: 0;
+  transition:
+    opacity 0.16s ease,
+    transform 0.16s ease;
+}
+.toast-enter-from {
+  opacity: 0;
+  transform: translateX(18px);
+}
+.toast-leave-to {
+  opacity: 0;
+  transform: translateX(14px);
+}
+.toast-move {
+  transition: transform 0.2s var(--ease-out);
+}
+
+/* ---------- 弹层退场（leave-only Transition：overlay-out）----------
+ * 入场仍走上方各元素的 CSS animation；退场统一用这组 transition 类。
+ * 用法：把 modal / palette 的 .mask 根元素，或独立的 .menu / .popover
+ * 用 <Transition name="overlay-out"> 包裹。
+ */
+.overlay-out-leave-active {
+  transition: opacity 0.16s ease;
+}
+.overlay-out-leave-to {
+  opacity: 0;
+}
+/* 面板跟随遮罩一同退场（遮罩为 Transition 根时面板是其子元素） */
+.overlay-out-leave-active .modal,
+.overlay-out-leave-active .palette,
+.overlay-out-leave-active .menu,
+/* 面板自身就是 Transition 根时（独立 menu / popover） */
+.overlay-out-leave-active.menu,
+.overlay-out-leave-active.popover {
+  transition:
+    opacity 0.16s ease,
+    transform 0.18s var(--ease-out);
+}
+.overlay-out-leave-to .modal {
+  opacity: 0;
+  transform: translateY(6px) scale(0.98);
+}
+.overlay-out-leave-to .palette {
+  opacity: 0;
+  transform: translateY(-8px) scale(0.98);
+}
+.overlay-out-leave-to .menu,
+.overlay-out-leave-to.menu,
+.overlay-out-leave-to.popover {
+  opacity: 0;
+  transform: translateY(3px) scale(0.97);
 }
 
 /* ---------- 侧栏微交互 ---------- */
@@ -248,14 +286,17 @@
 
 /* 侧栏集合/标签列表项依次浮现 */
 .sidebar-section .sidebar-item {
-  animation: stagger-in 0.3s var(--ease-out) backwards;
+  animation: stagger-in 0.26s var(--ease-out) backwards;
 }
 .sidebar-section:nth-of-type(3) .sidebar-item:nth-child(n + 2) { animation-delay: 0.03s; }
-.sidebar-section:nth-of-type(3) .sidebar-item:nth-child(n + 4) { animation-delay: 0.06s; }
+.sidebar-section:nth-of-type(3) .sidebar-item:nth-child(n + 4) { animation-delay: 0.05s; }
 .sidebar-section:nth-of-type(4) .sidebar-item:nth-child(n + 2) { animation-delay: 0.03s; }
-.sidebar-section:nth-of-type(4) .sidebar-item:nth-child(n + 3) { animation-delay: 0.06s; }
+.sidebar-section:nth-of-type(4) .sidebar-item:nth-child(n + 3) { animation-delay: 0.05s; }
 
-/* ---------- 按钮按下反馈 ---------- */
+/* ---------- 按钮按下反馈 ----------
+ * 注意：这里不要往"主题切换过渡"列表里塞 .btn 等元素——
+ * 相同特异性下后声明的 transition 会整组覆盖，导致按下反馈丢失。
+ */
 .btn:not(:disabled),
 .tool-btn:not(:disabled),
 .card-star,
@@ -275,6 +316,22 @@
   transform: scale(0.96);
 }
 
+/* 收藏点亮的星星：弹一下，强化切换反馈 */
+.card-star.on svg {
+  animation: star-pop 0.28s var(--ease-spring);
+}
+@keyframes star-pop {
+  from {
+    transform: scale(0.4);
+  }
+  60% {
+    transform: scale(1.18);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
 /* ---------- 开关 / 单选滑块平滑 ---------- */
 .toggle,
 .toggle::after,
@@ -283,13 +340,13 @@
   transition-timing-function: var(--ease-out);
 }
 
-/* ---------- 主题切换时整体柔和过渡 ---------- */
+/* ---------- 主题切换时整体柔和过渡 ----------
+ * 只列没有自身 background transition 的元素，避免整组覆盖组件自己的过渡。
+ * （.btn / .tool-btn / .sidebar-item 已各自带 0.15s background 过渡）
+ */
 body,
 .sidebar,
-.sidebar-item,
 .sidebar-logo,
-.btn,
-.tool-btn,
 .card-tile,
 .status-dot {
   transition:

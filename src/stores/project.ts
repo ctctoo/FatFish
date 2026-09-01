@@ -10,6 +10,7 @@ export const useProjectStore = defineStore("project", () => {
   const projects = ref<Project[]>([]);
   const loading = ref(false);
   const error = ref<string | null>(null);
+  let fetchSeq = 0;
 
   const query = ref("");
   const status = ref<ProjectStatus | null>(null);
@@ -31,15 +32,20 @@ export const useProjectStore = defineStore("project", () => {
   }
 
   async function fetchProjects() {
+    // 竞态保护：只接受最新一次请求的结果，避免快速输入时旧响应覆盖新结果
+    const seq = ++fetchSeq;
     loading.value = true;
     error.value = null;
     try {
-      projects.value = await tauriApi.listProjects(currentFilter());
+      const result = await tauriApi.listProjects(currentFilter());
+      if (seq === fetchSeq) projects.value = result;
     } catch (e) {
-      error.value = String(e);
+      if (seq === fetchSeq) error.value = String(e);
     } finally {
-      loading.value = false;
+      if (seq === fetchSeq) loading.value = false;
     }
+    // 列表刷新顺带静默同步一次计数（后端调用很轻，且保证侧栏数字与数据一致）
+    refreshStats();
   }
 
   function resetFilter() {
@@ -96,11 +102,13 @@ export const useProjectStore = defineStore("project", () => {
     await tauriApi.setFavorite(project.id, !project.favorite);
     const updated = await tauriApi.getProject(project.id);
     upsertProject(updated);
+    refreshStats();
     return updated;
   }
 
   async function markOpened(id: string) {
     await tauriApi.markOpened(id);
+    refreshStats();
   }
 
   async function openInFolder(project: Project) {
@@ -164,14 +172,28 @@ export const useProjectStore = defineStore("project", () => {
     if (idx !== -1) projects.value[idx] = updated;
   }
 
-  // ---- 侧栏计数：派生自本地缓存，无需额外后端调用 ----
-  const totalCount = computed(() => projects.value.length);
-  const recentCount = computed(
-    () => projects.value.filter((p) => p.lastOpenedAt).length
-  );
-  const favoriteCount = computed(
-    () => projects.value.filter((p) => p.favorite).length
-  );
+  // ---- 侧栏计数：派生自独立的全量快照，不受当前页过滤影响 ----
+  // projects 是当前视图的过滤结果（如"最近"页只有打开过的项目），
+  // 若直接从它派生计数，切页后"全部"旁边的数字会跟着变。
+  const stats = ref({ total: 0, recent: 0, favorite: 0 });
+
+  /** 后台静默刷新计数快照（不触发 loading，避免侧栏闪烁） */
+  async function refreshStats() {
+    try {
+      const all = await tauriApi.listProjects({ sort: "updated" });
+      stats.value = {
+        total: all.length,
+        recent: all.filter((p) => p.lastOpenedAt).length,
+        favorite: all.filter((p) => p.favorite).length,
+      };
+    } catch {
+      /* 计数刷新失败时保留旧值 */
+    }
+  }
+
+  const totalCount = computed(() => stats.value.total);
+  const recentCount = computed(() => stats.value.recent);
+  const favoriteCount = computed(() => stats.value.favorite);
 
   return {
     projects,
@@ -184,6 +206,7 @@ export const useProjectStore = defineStore("project", () => {
     collectionId,
     recent,
     fetchProjects,
+    refreshStats,
     resetFilter,
     createProject,
     updateProject,

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { Search, ListFilter, ArrowUpDown, LayoutGrid, List, Plus, FolderSearch } from "lucide-vue-next";
 import ProjectGrid from "../components/project/ProjectGrid.vue";
@@ -82,9 +82,15 @@ watch(
   () => projectStore.query,
   () => {
     if (debounceTimer) clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(() => projectStore.fetchProjects(), 250);
+    debounceTimer = setTimeout(() => {
+      debounceTimer = null;
+      projectStore.fetchProjects();
+    }, 250);
   }
 );
+onUnmounted(() => {
+  if (debounceTimer) clearTimeout(debounceTimer);
+});
 
 watch(
   () => [projectStore.status, projectStore.favorite, projectStore.tagId, projectStore.collectionId],
@@ -166,53 +172,55 @@ const sortLabel = computed(
           <ListFilter :size="14" :stroke-width="1.8" />
           {{ t("projects.filter") }}{{ activeCount ? ` (${activeCount})` : "" }}
         </button>
-        <div v-if="showFilter" class="popover">
-          <h4>{{ t("projects.filterStatus") }}</h4>
-          <button class="opt-row" :class="{ active: !projectStore.status }" @click="projectStore.status = null">
-            {{ t("projects.filterAll") }}
-          </button>
-          <button
-            v-for="value in STATUS_VALUES"
-            :key="value"
-            class="opt-row"
-            :class="{ active: projectStore.status === value }"
-            @click="projectStore.status = value"
-          >
-            <span class="status-dot" :class="`status-${value}`"></span>
-            {{ statusLabel(settingsStore.locale, value) }}
-          </button>
+        <Transition name="overlay-out">
+          <div v-if="showFilter" class="popover">
+            <h4>{{ t("projects.filterStatus") }}</h4>
+            <button class="opt-row" :class="{ active: !projectStore.status }" @click="projectStore.status = null">
+              {{ t("projects.filterAll") }}
+            </button>
+            <button
+              v-for="value in STATUS_VALUES"
+              :key="value"
+              class="opt-row"
+              :class="{ active: projectStore.status === value }"
+              @click="projectStore.status = value"
+            >
+              <span class="status-dot" :class="`status-${value}`"></span>
+              {{ statusLabel(settingsStore.locale, value) }}
+            </button>
 
-          <h4>{{ t("projects.filterCollections") }}</h4>
-          <button
-            v-for="c in collectionStore.collections"
-            :key="c.id"
-            class="opt-row"
-            :class="{ active: projectStore.collectionId === c.id }"
-            @click="projectStore.collectionId = projectStore.collectionId === c.id ? null : c.id"
-          >
-            {{ c.name }}
-          </button>
+            <h4>{{ t("projects.filterCollections") }}</h4>
+            <button
+              v-for="c in collectionStore.collections"
+              :key="c.id"
+              class="opt-row"
+              :class="{ active: projectStore.collectionId === c.id }"
+              @click="projectStore.collectionId = projectStore.collectionId === c.id ? null : c.id"
+            >
+              {{ c.name }}
+            </button>
 
-          <h4>{{ t("projects.filterTags") }}</h4>
-          <button
-            v-for="item in tagStore.tags"
-            :key="item.id"
-            class="opt-row"
-            :class="{ active: projectStore.tagId === item.id }"
-            @click="projectStore.tagId = projectStore.tagId === item.id ? null : item.id"
-          >
-            {{ item.name }}
-          </button>
+            <h4>{{ t("projects.filterTags") }}</h4>
+            <button
+              v-for="item in tagStore.tags"
+              :key="item.id"
+              class="opt-row"
+              :class="{ active: projectStore.tagId === item.id }"
+              @click="projectStore.tagId = projectStore.tagId === item.id ? null : item.id"
+            >
+              {{ item.name }}
+            </button>
 
-          <h4>{{ t("projects.filterOther") }}</h4>
-          <button
-            class="opt-row"
-            :class="{ active: projectStore.favorite }"
-            @click="projectStore.favorite = !projectStore.favorite"
-          >
-            {{ t("projects.favOnly") }}
-          </button>
-        </div>
+            <h4>{{ t("projects.filterOther") }}</h4>
+            <button
+              class="opt-row"
+              :class="{ active: projectStore.favorite }"
+              @click="projectStore.favorite = !projectStore.favorite"
+            >
+              {{ t("projects.favOnly") }}
+            </button>
+          </div>
+        </Transition>
       </div>
 
       <div class="popover-anchor">
@@ -220,11 +228,13 @@ const sortLabel = computed(
           <ArrowUpDown :size="14" :stroke-width="1.8" />
           {{ sortLabel }}
         </button>
-        <div v-if="showSort" class="popover narrow">
-          <button class="opt-row" :class="{ active: settingsStore.sort === 'updated' }" @click="setSort('updated')">{{ t("projects.sortUpdated") }}</button>
-          <button class="opt-row" :class="{ active: settingsStore.sort === 'name' }" @click="setSort('name')">{{ t("projects.sortName") }}</button>
-          <button class="opt-row" :class="{ active: settingsStore.sort === 'opened' }" @click="setSort('opened')">{{ t("projects.sortOpened") }}</button>
-        </div>
+        <Transition name="overlay-out">
+          <div v-if="showSort" class="popover narrow">
+            <button class="opt-row" :class="{ active: settingsStore.sort === 'updated' }" @click="setSort('updated')">{{ t("projects.sortUpdated") }}</button>
+            <button class="opt-row" :class="{ active: settingsStore.sort === 'name' }" @click="setSort('name')">{{ t("projects.sortName") }}</button>
+            <button class="opt-row" :class="{ active: settingsStore.sort === 'opened' }" @click="setSort('opened')">{{ t("projects.sortOpened") }}</button>
+          </div>
+        </Transition>
       </div>
 
       <span class="spacer"></span>
@@ -266,17 +276,25 @@ const sortLabel = computed(
       </template>
     </EmptyState>
 
-    <ProjectDialog v-if="showForm" :project="editingProject" @close="showForm = false" @saved="projectStore.fetchProjects()" />
-    <ScanDialog v-if="showScan" @close="showScan = false" @imported="projectStore.fetchProjects()" />
-    <LinkDialog v-if="linkTarget" :project-id="linkTarget.id" @close="linkTarget = null" @saved="projectStore.fetchProjects()" />
-    <ConfirmDialog
-      v-if="deleteTarget"
-      :title="t('confirm.deleteProjectTitle')"
-      :message="t('confirm.deleteProjectMsg', { name: deleteTarget.name })"
-      :confirm-text="t('confirm.delete')"
-      danger
-      @confirm="removeProject(deleteTarget!); deleteTarget = null"
-      @cancel="deleteTarget = null"
-    />
+    <Transition name="overlay-out">
+      <ProjectDialog v-if="showForm" :project="editingProject" @close="showForm = false" @saved="projectStore.fetchProjects()" />
+    </Transition>
+    <Transition name="overlay-out">
+      <ScanDialog v-if="showScan" @close="showScan = false" @imported="projectStore.fetchProjects()" />
+    </Transition>
+    <Transition name="overlay-out">
+      <LinkDialog v-if="linkTarget" :project-id="linkTarget.id" @close="linkTarget = null" @saved="projectStore.fetchProjects()" />
+    </Transition>
+    <Transition name="overlay-out">
+      <ConfirmDialog
+        v-if="deleteTarget"
+        :title="t('confirm.deleteProjectTitle')"
+        :message="t('confirm.deleteProjectMsg', { name: deleteTarget.name })"
+        :confirm-text="t('confirm.delete')"
+        danger
+        @confirm="removeProject(deleteTarget!); deleteTarget = null"
+        @cancel="deleteTarget = null"
+      />
+    </Transition>
   </div>
 </template>
