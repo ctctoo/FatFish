@@ -182,7 +182,7 @@ function shortHash(hash: string | null): string {
 
 <template>
   <div class="page">
-    <div class="detail" v-if="project">
+    <div class="detail page-stagger" v-if="project">
       <button class="back-link" @click="router.push('/projects')">
         <ChevronLeft :size="15" :stroke-width="1.8" /> {{ t("detail.back") }}
       </button>

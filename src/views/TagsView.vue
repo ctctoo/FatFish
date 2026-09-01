@@ -82,7 +82,7 @@ async function remove() {
 </script>
 
 <template>
-  <div class="page">
+  <div class="page page-stagger">
     <div class="page-header">
       <h1>{{ t("tags.title") }}</h1>
       <span class="count">{{ t("tags.total", { n: tagStore.tags.length }) }}</span>

@@ -6,7 +6,7 @@ const { t } = useI18n();
 </script>
 
 <template>
-  <div class="page" style="max-width: 860px">
+  <div class="page page-stagger" style="max-width: 860px">
     <div class="page-header">
       <h1>{{ t("todo.allTasks") }}</h1>
       <span class="count">{{ t("todo.includingDone") }}</span>

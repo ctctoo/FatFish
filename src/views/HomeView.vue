@@ -61,7 +61,7 @@ const { handleAction } = useProjectActions({
 </script>
 
 <template>
-  <div class="page">
+  <div class="page page-stagger">
     <div class="home-hero">
       <div>
         <h1>{{ greeting }} <span style="font-weight: 400">👋</span></h1>

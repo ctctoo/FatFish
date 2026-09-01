@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { tauriApi } from "../services/tauri";
 import type { Collection, Project, ProjectFilter, ProjectInput, ProjectStatus, ScannedProject } from "../types";
 import { useSettingsStore } from "./settings";
@@ -164,6 +164,15 @@ export const useProjectStore = defineStore("project", () => {
     if (idx !== -1) projects.value[idx] = updated;
   }
 
+  // ---- 侧栏计数：派生自本地缓存，无需额外后端调用 ----
+  const totalCount = computed(() => projects.value.length);
+  const recentCount = computed(
+    () => projects.value.filter((p) => p.lastOpenedAt).length
+  );
+  const favoriteCount = computed(
+    () => projects.value.filter((p) => p.favorite).length
+  );
+
   return {
     projects,
     loading,
@@ -193,6 +202,9 @@ export const useProjectStore = defineStore("project", () => {
     importProjects,
     fetchAll,
     fetchByCollection,
+    totalCount,
+    recentCount,
+    favoriteCount,
   };
 });
 

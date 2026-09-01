@@ -151,7 +151,7 @@ function openRepo(repo: GithubRepo) {
 </script>
 
 <template>
-  <div class="page">
+  <div class="page page-stagger">
     <div class="page-header">
       <h1>{{ t("github.title") }}</h1>
       <span v-if="githubStore.account" class="count">{{ githubStore.repos.length }} {{ t("github.repos") }}</span>

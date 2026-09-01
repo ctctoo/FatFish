@@ -140,7 +140,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="page settings-page">
+  <div class="page settings-page page-stagger">
     <div class="page-header">
       <h1>{{ t("settings.title") }}</h1>
     </div>

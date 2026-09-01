@@ -5,6 +5,7 @@ import { router } from "./router";
 import { useTheme } from "./composables/useTheme";
 import "./styles/tokens.css";
 import "./styles/global.css";
+import "./styles/motion.css";
 import "./styles/components.css";
 
 const app = createApp(App);

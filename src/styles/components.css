@@ -139,7 +139,12 @@
 .sidebar-item.active {
   background: var(--accent-soft);
   color: var(--accent);
-  font-weight: 600;
+}
+
+/* 激活态下 count 也用 accent 色，去掉字重切换，避免 active 切换时
+ * label 宽度变化导致 count 位置整体跳动（视觉上的“抽搐”）。 */
+.sidebar-item.active .count {
+  color: var(--accent);
 }
 
 .sidebar-item svg {
@@ -380,7 +385,6 @@
   border-radius: var(--radius-lg);
   overflow: hidden;
   cursor: pointer;
-  transition: border-color 0.15s, background 0.15s, transform 0.18s ease, box-shadow 0.18s ease;
   display: flex;
   flex-direction: column;
 }
@@ -686,7 +690,6 @@
   display: grid;
   place-items: center;
   z-index: 200;
-  animation: modal-fade 0.18s ease;
 }
 
 .modal {
@@ -698,22 +701,10 @@
   border-radius: 16px;
   padding: 24px;
   box-shadow: var(--shadow-modal);
-  animation: modal-in 0.18s ease;
 }
 
 .modal.wide {
   width: min(600px, 94vw);
-}
-
-@keyframes modal-fade {
-  from { opacity: 0; }
-}
-
-@keyframes modal-in {
-  from {
-    opacity: 0;
-    transform: translateY(4px);
-  }
 }
 
 .modal-header {
@@ -1105,7 +1096,6 @@
   justify-content: center;
   padding-top: 12vh;
   z-index: 300;
-  animation: modal-fade 0.15s ease;
 }
 
 .palette {
@@ -1118,7 +1108,6 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  animation: modal-in 0.15s ease;
 }
 
 .palette-input-row {
@@ -1224,15 +1213,9 @@
 }
 
 /* ---------- Skeleton ---------- */
-@keyframes skeleton-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.55; }
-}
-
 .skeleton {
   background: var(--surface-muted);
   border-radius: 6px;
-  animation: skeleton-pulse 1.4s ease infinite;
 }
 
 .skeleton-card {
@@ -1273,18 +1256,10 @@
   border: 1px solid var(--border);
   box-shadow: var(--shadow-menu);
   max-width: 360px;
-  animation: toast-in 0.18s ease;
 }
 
 .toast.success { border-color: var(--status-in-progress); }
 .toast.error { border-color: #c0554f; }
-
-@keyframes toast-in {
-  from {
-    opacity: 0;
-    transform: translateY(4px);
-  }
-}
 
 /* ---------- Tag / Collection rows ---------- */
 .entity-row {
@@ -1500,80 +1475,6 @@ input[type="color"] {
   font-size: 12px;
   color: var(--text-tertiary);
   flex-shrink: 0;
-}
-
-/* ---------- 页面切换过渡（App.vue router-view Transition） ---------- */
-.page-enter-active {
-  transition: opacity 0.22s ease, transform 0.24s ease;
-}
-.page-leave-active {
-  transition: opacity 0.13s ease;
-}
-.page-enter-from {
-  opacity: 0;
-  transform: translateY(10px);
-}
-.page-leave-to {
-  opacity: 0;
-}
-
-/* ---------- 浮层入场（菜单 / 弹层 / 命令面板） ---------- */
-.menu {
-  animation: pop-in 0.15s ease;
-}
-.menu-backdrop {
-  animation: fade-in 0.15s ease;
-}
-.popover {
-  animation: pop-in 0.16s ease;
-}
-.palette-mask {
-  animation: fade-in 0.15s ease;
-}
-.palette {
-  animation: palette-in 0.22s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-@keyframes fade-in {
-  from {
-    opacity: 0;
-  }
-}
-
-@keyframes pop-in {
-  from {
-    opacity: 0;
-    transform: translateY(4px) scale(0.97);
-  }
-}
-
-@keyframes palette-in {
-  from {
-    opacity: 0;
-    transform: translateY(-8px) scale(0.98);
-  }
-}
-
-/* ---------- 卡片入场交错 ---------- */
-.project-card {
-  animation: card-in 0.3s ease backwards;
-}
-.project-grid .project-card:nth-child(1) { animation-delay: 0.02s; }
-.project-grid .project-card:nth-child(2) { animation-delay: 0.05s; }
-.project-grid .project-card:nth-child(3) { animation-delay: 0.08s; }
-.project-grid .project-card:nth-child(4) { animation-delay: 0.11s; }
-.project-grid .project-card:nth-child(5) { animation-delay: 0.14s; }
-.project-grid .project-card:nth-child(6) { animation-delay: 0.17s; }
-.project-grid .project-card:nth-child(7) { animation-delay: 0.2s; }
-.project-grid .project-card:nth-child(8) { animation-delay: 0.23s; }
-.project-grid .project-card:nth-child(9) { animation-delay: 0.26s; }
-.project-grid .project-card:nth-child(n + 10) { animation-delay: 0.29s; }
-
-@keyframes card-in {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
 }
 
 /* ---------- 无障碍：跟随系统减弱动态效果 ---------- */

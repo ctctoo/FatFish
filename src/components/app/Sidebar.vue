@@ -99,15 +99,17 @@ async function addCollection() {
       <button class="sidebar-item" :class="{ active: activeNav === 'projects' }" @click="go('/projects')">
         <LayoutGrid :size="16" :stroke-width="1.8" />
         <span class="label">{{ t("side.allProjects") }}</span>
-        <span class="count">{{ projectStore.projects.length }}</span>
+        <span class="count">{{ projectStore.totalCount }}</span>
       </button>
       <button class="sidebar-item" :class="{ active: activeNav === 'recent' }" @click="go('/recent')">
         <Clock :size="16" :stroke-width="1.8" />
         <span class="label">{{ t("side.recent") }}</span>
+        <span class="count">{{ projectStore.recentCount }}</span>
       </button>
       <button class="sidebar-item" :class="{ active: activeNav === 'favorites' }" @click="go('/favorites')">
         <Star :size="16" :stroke-width="1.8" />
         <span class="label">{{ t("side.favorites") }}</span>
+        <span class="count">{{ projectStore.favoriteCount }}</span>
       </button>
     </div>
 
