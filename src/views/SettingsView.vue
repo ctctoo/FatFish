@@ -11,12 +11,13 @@ import {
   FolderOpen,
   Settings2,
   Github,
+  Bot,
   Info,
 } from "lucide-vue-next";
 import { useSettingsStore, type Gender } from "../stores/settings";
 import { useI18n } from "../i18n";
 import { tauriApi } from "../services/tauri";
-import type { UpdateInfo } from "../types";
+import type { UpdateInfo, McpStatus } from "../types";
 import SettingsSection from "../components/settings/SettingsSection.vue";
 import SettingsRow from "../components/settings/SettingsRow.vue";
 import RadioGroup from "../components/settings/RadioGroup.vue";
@@ -88,6 +89,48 @@ const genderOptions = computed(() =>
   GENDERS.map((g) => ({ value: g, label: t(`gender.${g}`) }))
 );
 
+// ---- MCP / Agent 集成 ----
+const mcpStatus = ref<McpStatus | null>(null);
+const mcpBusy = ref(false);
+const mcpError = ref("");
+
+async function loadMcpStatus() {
+  try {
+    mcpStatus.value = await tauriApi.mcpStatus();
+  } catch (e) {
+    mcpError.value = String(e);
+  }
+}
+
+async function setMcp(enable: boolean) {
+  if (mcpBusy.value) return;
+  mcpBusy.value = true;
+  mcpError.value = "";
+  try {
+    mcpStatus.value = await tauriApi.setMcpEnabled(enable);
+  } catch (e) {
+    mcpError.value = String(e);
+    await loadMcpStatus();
+  } finally {
+    mcpBusy.value = false;
+  }
+}
+
+async function toggleAgent(agentId: string, enable: boolean) {
+  if (mcpBusy.value) return;
+  mcpBusy.value = true;
+  mcpError.value = "";
+  try {
+    mcpStatus.value = await tauriApi.configureMcpAgent(agentId, enable);
+  } catch (e) {
+    mcpError.value = String(e);
+  } finally {
+    mcpBusy.value = false;
+  }
+}
+
+loadMcpStatus();
+
 // ---- 左侧分类导航 ----
 const sections = [
   { id: "profile", title: "settings.profile", icon: User },
@@ -95,6 +138,7 @@ const sections = [
   { id: "language", title: "settings.language", icon: Languages },
   { id: "library", title: "settings.library", icon: FolderOpen },
   { id: "behavior", title: "settings.behavior", icon: Settings2 },
+  { id: "mcp", title: "settings.mcp", icon: Bot },
   { id: "github", title: "settings.github", icon: Github },
   { id: "about", title: "settings.about", icon: Info },
 ] as const;
@@ -229,6 +273,50 @@ onUnmounted(() => {
               @update:model-value="settingsStore.confirmRemove = $event"
             />
           </SettingsRow>
+        </SettingsSection>
+
+        <SettingsSection :id="targetId('mcp')" title="settings.mcp" desc="settings.mcpDesc">
+          <SettingsRow label="settings.mcpEnable">
+            <ToggleSwitch
+              :model-value="mcpStatus?.enabled ?? false"
+              :disabled="mcpBusy"
+              @update:model-value="setMcp($event)"
+            />
+          </SettingsRow>
+          <p class="desc mcp-hint">{{ t("settings.mcpEnableHint") }}</p>
+
+          <template v-if="mcpStatus">
+            <p v-if="mcpStatus.agents.length" class="mcp-agents-title">
+              {{ t("settings.mcpAgents") }}
+            </p>
+            <ul v-if="mcpStatus.agents.length" class="mcp-agents">
+              <li v-for="agent in mcpStatus.agents" :key="agent.id" class="mcp-agent">
+                <span class="mcp-agent-name">{{ agent.name }}</span>
+                <span
+                  class="mcp-agent-badge"
+                  :class="agent.configured ? 'ok' : agent.configFound ? 'warn' : 'muted'"
+                >
+                  {{
+                    agent.configured
+                      ? t("settings.mcpConfigured")
+                      : agent.configFound
+                        ? t("settings.mcpNotConfigured")
+                        : t("settings.mcpNoConfigFile")
+                  }}
+                </span>
+                <button
+                  v-if="agent.configFound"
+                  class="btn small"
+                  :disabled="mcpBusy"
+                  @click="toggleAgent(agent.id, !agent.configured)"
+                >
+                  {{ agent.configured ? t("settings.mcpDisconnect") : t("settings.mcpConnect") }}
+                </button>
+              </li>
+            </ul>
+            <p v-else class="desc">{{ t("settings.mcpNoneDetected") }}</p>
+          </template>
+          <p v-if="mcpError" class="mcp-error">{{ mcpError }}</p>
         </SettingsSection>
 
         <SettingsSection :id="targetId('github')" title="settings.github" desc="settings.githubDesc">
@@ -374,6 +462,72 @@ onUnmounted(() => {
   gap: 8px;
   margin-top: 10px;
   flex-wrap: wrap;
+}
+
+.mcp-hint {
+  margin-top: 8px;
+  margin-bottom: 0;
+}
+
+.mcp-agents-title {
+  margin: 16px 0 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.mcp-agents {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.mcp-agent {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border: 1px solid var(--border, rgba(128, 128, 128, 0.2));
+  border-radius: var(--radius-md);
+  font-size: 13.5px;
+}
+
+.mcp-agent-name {
+  font-weight: 500;
+}
+
+.mcp-agent .btn {
+  margin-left: auto;
+}
+
+.mcp-agent-badge {
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.mcp-agent-badge.ok {
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.mcp-agent-badge.warn {
+  color: var(--text-secondary);
+  background: var(--hover);
+}
+
+.mcp-agent-badge.muted {
+  color: var(--text-tertiary);
+  background: var(--hover);
+}
+
+.mcp-error {
+  margin-top: 10px;
+  font-size: 12.5px;
+  color: var(--danger, #d9534f);
 }
 
 .muted {

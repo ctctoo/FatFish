@@ -2,6 +2,15 @@
 
 所有显著变更都会记录在本文件中。
 
+## v0.3.0 — 2026-09-01
+
+### 新增
+
+- **Agent / MCP 集成**：FatFish 内置 MCP（Model Context Protocol）服务器，AI Agent 可以直接读取和操作你的项目数据。在「设置 → Agent / MCP」中一键开启，自动检测本机的 Claude Desktop、Cursor、Windsurf、Claude Code、Codex CLI、opencode、VS Code 并写入/移除配置
+- **MCP 暴露 5 个工具**：项目概览（名称/描述/地址）、修改项目描述与添加计划、创建 Todo、读取 Git 提交记录、读取最近与收藏项目
+- **`--mcp` 启动模式**：`fatfish.exe --mcp` 以无界面 stdio 模式运行 MCP 服务器，供 Agent 作为子进程拉起；仅当设置中开启 MCP 时生效
+- **应用级设置表**（`app_settings`）：MCP 开关持久化到数据库，随数据目录迁移
+
 ## v0.2.1 — 2026-09-01
 
 ### 修复

@@ -16,6 +16,7 @@ pub fn init_connection(db_path: &std::path::Path) -> Result<Connection, rusqlite
             description TEXT,
             status TEXT NOT NULL DEFAULT 'IN_PROGRESS',
             favorite INTEGER NOT NULL DEFAULT 0,
+            github_url TEXT,
             cover_emoji TEXT,
             cover_color TEXT,
             notes TEXT,
@@ -90,6 +91,11 @@ pub fn init_connection(db_path: &std::path::Path) -> Result<Connection, rusqlite
             logged_in_at TEXT NOT NULL
         );
 
+        CREATE TABLE IF NOT EXISTS app_settings (
+            key TEXT PRIMARY KEY,
+            value TEXT NOT NULL
+        );
+
         CREATE TABLE IF NOT EXISTS activities (
             id TEXT PRIMARY KEY,
             project_id TEXT NOT NULL,
@@ -114,6 +120,7 @@ fn migrate(conn: &Connection) -> Result<(), rusqlite::Error> {
     add_column_if_missing(conn, "projects", "cover_emoji", "TEXT")?;
     add_column_if_missing(conn, "projects", "cover_color", "TEXT")?;
     add_column_if_missing(conn, "projects", "notes", "TEXT")?;
+    add_column_if_missing(conn, "projects", "github_url", "TEXT")?;
 
     // 状态枚举统一到 UIPlan：进行中 / 计划中 / 暂停 / 已完成 / 归档
     conn.execute(
@@ -158,4 +165,45 @@ fn add_column_if_missing(
 
 pub fn now() -> String {
     chrono::Local::now().to_rfc3339()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// 全新空库必须能正常初始化（migrate 不再因缺少 github_url 列而失败）。
+    #[test]
+    fn init_connection_succeeds_on_fresh_db() {
+        let dir = std::env::temp_dir().join(format!("fatfish-fresh-{}", uuid::Uuid::new_v4()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let db = dir.join("fatfish.db");
+
+        let conn = init_connection(&db)
+            .expect("init_connection 应在全新数据库上成功");
+
+        let projects: i64 = conn
+            .query_row("SELECT count(*) FROM projects", [], |r| r.get(0))
+            .unwrap();
+        assert_eq!(projects, 0);
+
+        // migrate 引用了 p.github_url，因此该列必须存在。
+        let has_github_url: bool = conn
+            .prepare("PRAGMA table_info(projects)")
+            .unwrap()
+            .query_map([], |row| {
+                let name: String = row.get(1)?;
+                Ok(name)
+            })
+            .unwrap()
+            .filter_map(Result::ok)
+            .any(|name| name == "github_url");
+        assert!(has_github_url, "projects.github_url 应在初始化后存在");
+
+        // 重复初始化应幂等。
+        drop(conn);
+        let conn2 = init_connection(&db).expect("再次初始化应幂等成功");
+        drop(conn2);
+
+        let _ = std::fs::remove_dir_all(&dir);
+    }
 }

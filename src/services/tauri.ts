@@ -13,6 +13,7 @@ import type {
   Todo,
   TodoInput,
   UpdateInfo,
+  McpStatus,
   Activity,
   GithubAccount,
   GithubDeviceCode,
@@ -122,6 +123,17 @@ export const tauriApi = {
   // ---- git ----
   refreshGitInfo(projectId: string): Promise<Project> {
     return invoke("refresh_git_info", { projectId });
+  },
+
+  // ---- mcp ----
+  mcpStatus(): Promise<McpStatus> {
+    return invoke("mcp_status");
+  },
+  setMcpEnabled(enable: boolean): Promise<McpStatus> {
+    return invoke("set_mcp_enabled", { enable });
+  },
+  configureMcpAgent(agentId: string, enable: boolean): Promise<McpStatus> {
+    return invoke("configure_mcp_agent", { agentId, enable });
   },
 
   // ---- github ----

@@ -1,6 +1,6 @@
 [package]
 name = "fatfish"
-version = "0.2.1"
+version = "0.3.0"
 description = "FatFish - Local-first project management tool for developers"
 authors = ["you"]
 edition = "2021"
@@ -21,7 +21,10 @@ serde_json = "1"
 rusqlite = { version = "0.32", features = ["bundled"] }
 uuid = { version = "1", features = ["v4"] }
 chrono = { version = "0.4", features = ["serde"] }
+directories = "6"
 reqwest = { version = "0.12", default-features = false, features = ["blocking", "json", "rustls-tls"] }
+rmcp = { version = "0.8", features = ["server", "transport-io", "macros"] }
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "io-std", "io-util", "sync", "time"] }
 
 [profile.dev]
 incremental = true

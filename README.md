@@ -62,6 +62,17 @@ FatFish 不管理你的代码，只管理**项目的入口与上下文**。它�
 - **明暗主题**：浅色 / 深色 / 跟随系统
 - **中英双语**：设置内一键切换
 
+### Agent / MCP 集成
+
+- **内置 MCP 服务器**：FatFish 可作为 MCP（Model Context Protocol）服务器，让 Claude Desktop、Cursor、Windsurf、Claude Code、Codex CLI、opencode、VS Code 等 AI Agent 读写你的项目数据
+- **设置页一键开启**：在「设置 → Agent / MCP」打开开关，自动检测本机已安装的客户端并写入配置（关闭时自动移除），无需手动编辑任何 JSON
+- **暴露 5 个工具**：
+  - `project_overview` — 项目概览：名称、描述、本地路径、Git 远程地址
+  - `update_project` — 修改项目描述 / 追加计划到项目备注
+  - `add_todo` — 创建 Todo，可关联项目与截止日期
+  - `git_log` — 读取项目 Git 提交记录、分支与最新提交摘要
+  - `recent_and_favorite_projects` — 最近打开与收藏的项目
+
 ---
 
 ## 技术栈
@@ -72,6 +83,7 @@ FatFish 不管理你的代码，只管理**项目的入口与上下文**。它�
 | 前端 | Vue 3 + TypeScript + Vite + Pinia + Vue Router |
 | 后端 | Rust，Command → Service → Repository → SQLite 分层 |
 | 存储 | SQLite（rusqlite bundled，随应用分发） |
+| Agent 集成 | MCP 服务器（rmcp，stdio 传输，`--mcp` 模式运行） |
 | 国际化 | 自研轻量 i18n（字典 + `useI18n()`，locale 持久化） |
 
 ---

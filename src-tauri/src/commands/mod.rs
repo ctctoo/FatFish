@@ -3,6 +3,7 @@ pub mod collection;
 pub mod git;
 pub mod github;
 pub mod link;
+pub mod mcp;
 pub mod project;
 pub mod scanner;
 pub mod system;

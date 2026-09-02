@@ -56,12 +56,21 @@ pub struct ProjectFilter {
     pub sort: Option<String>,
 }
 
+/// 允许未使用的状态常量：作为对外契约保留（状态字符串在
+/// repository / 前端 / 文档中引用），不应因当前未被 Rust 代码
+/// 直接引用而删除。
+#[allow(dead_code)]
 pub const STATUS_IN_PROGRESS: &str = "IN_PROGRESS";
+#[allow(dead_code)]
 pub const STATUS_PLANNED: &str = "PLANNED";
+#[allow(dead_code)]
 pub const STATUS_PAUSED: &str = "PAUSED";
+#[allow(dead_code)]
 pub const STATUS_COMPLETED: &str = "COMPLETED";
+#[allow(dead_code)]
 pub const STATUS_ARCHIVED: &str = "ARCHIVED";
 
+#[allow(dead_code)]
 pub const ALL_STATUSES: [&str; 5] = [
     STATUS_IN_PROGRESS,
     STATUS_PLANNED,
@@ -70,6 +79,7 @@ pub const ALL_STATUSES: [&str; 5] = [
     STATUS_ARCHIVED,
 ];
 
+#[allow(dead_code)]
 pub fn is_valid_status(s: &str) -> bool {
     ALL_STATUSES.contains(&s)
 }

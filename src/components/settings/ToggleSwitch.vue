@@ -1,5 +1,7 @@
 <script setup lang="ts">
-defineProps<{ modelValue: boolean }>();
+withDefaults(defineProps<{ modelValue: boolean; disabled?: boolean }>(), {
+  disabled: false,
+});
 
 const emit = defineEmits<{ "update:modelValue": [value: boolean] }>();
 </script>
@@ -10,6 +12,7 @@ const emit = defineEmits<{ "update:modelValue": [value: boolean] }>();
     :class="{ on: modelValue }"
     role="switch"
     :aria-checked="modelValue"
+    :disabled="disabled"
     @click="emit('update:modelValue', !modelValue)"
   />
 </template>

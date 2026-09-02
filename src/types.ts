@@ -115,6 +115,20 @@ export interface UpdateInfo {
   publishedAt: string | null;
 }
 
+export interface McpAgentStatus {
+  id: string;
+  name: string;
+  /** 配置文件是否存在 */
+  configFound: boolean;
+  /** MCP 条目是否已配置 */
+  configured: boolean;
+}
+
+export interface McpStatus {
+  enabled: boolean;
+  agents: McpAgentStatus[];
+}
+
 export interface TagInput {
   name: string;
   color: string | null;
