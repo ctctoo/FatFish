@@ -152,7 +152,11 @@ impl From<RawRepo> for GithubRepo {
 }
 
 fn client() -> Client {
-    Client::new()
+    // 登录轮询是高频请求：必须带超时，网络异常时快速失败，避免请求挂起
+    Client::builder()
+        .timeout(std::time::Duration::from_secs(15))
+        .build()
+        .unwrap_or_else(|_| Client::new())
 }
 
 /// 发起 Device Flow：POST /login/device/code，返回设备码与验证码。
