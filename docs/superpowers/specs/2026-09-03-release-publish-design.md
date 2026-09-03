@@ -23,7 +23,7 @@
 | 发布记录 | `src-tauri/src/repository/release_repository.rs` | `releases` 表读写 |
 
 - GitHub REST 调用复用已有 `reqwest`（0.12, rustls）；assets 上传改走 `uploads.github.com`
-- 上传为长耗时操作：唯一引入 async 之处，用 `tauri::async_runtime::spawn` 后台执行，通过 Tauri Event `release://progress` 向前端推送进度
+- 执行编排（步骤 4 全流程、AI 润色）为长耗时操作：通过 `tauri::async_runtime::spawn` 在后台执行（async 仅用于此，现有命令保持同步），通过 Tauri Event `release://progress` 向前端推送进度
 - tag / push 沿用 `git_service.rs` 的子进程模式
 - 版本号写入不做正则全局替换，按文件结构精准定位 version 字段，支持 `package.json`、`Cargo.toml`、`pyproject.toml`、`pom.xml`
 
@@ -64,7 +64,7 @@ CREATE INDEX IF NOT EXISTS idx_releases_project ON releases(project_id, created_
 
 ### 4.2 向导步骤
 
-1. **版本确认**：建议版本号 = 上一个 tag + 1（用户可改）；可选勾选「同步版本号到项目文件」→ 写入后自动 `git commit`（仅包含被改动的版本文件）
+1. **版本确认**：建议版本号 = 上一个 tag 版本的 patch 位 +1（如 v1.2.3 → 建议 1.2.4；无历史 tag 时默认 0.1.0），用户可改；可选勾选「同步版本号到项目文件」→ 写入后自动 `git commit`（仅包含被改动的版本文件）
 2. **Changelog**：`git log <上个tag>..HEAD --pretty=format:%H%x1f%s%x1f%b`，按 conventional commits 分组：✨ Features / 🐛 Fixes / ⚡ Performance / ♻ Refactor / 📝 Docs / 🔧 Others；含 `BREAKING CHANGE` 时置顶标注。生成可编辑 Markdown；「AI 润色」为可选按钮（需配置 API Key）
 3. **产物选择**：文件选择器（dialog plugin）多选本地文件作为 assets，显示文件大小
 4. **执行**：`git tag <tag>` → `git push origin <tag>` → `POST /repos/{o}/{r}/releases` → 逐个上传 assets（带进度）→ 结果页展示 Release 链接。任一步失败记 `failed` 并保留已完成进度，支持重试
