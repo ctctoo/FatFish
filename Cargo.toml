@@ -1,6 +1,6 @@
 [package]
 name = "project-hub"
-version = "0.3.0"
+version = "0.3.3"
 description = "A native, local-first personal project workspace"
 edition = "2024"
 license = "MIT"
@@ -37,4 +37,3 @@ tempfile = "3"
 [profile.release]
 lto = "thin"
 strip = true
-
