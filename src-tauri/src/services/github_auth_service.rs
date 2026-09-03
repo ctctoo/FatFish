@@ -38,23 +38,25 @@ pub struct ResolvedToken {
     pub source: TokenSource,
 }
 
-/// 按优先级解析 GitHub 凭证：已登录账号 -> 设置页 PAT -> gh CLI。
+/// 按优先级解析 GitHub 凭证：设置页 PAT -> 已登录账号 -> gh CLI。
+/// PAT 优先：应用内登录走的是 GitHub App Token，其 API 权限由 App 配置决定
+/// （可能缺少 Contents 写权限），而 PAT 是用户为发布显式提供的凭证。
 pub fn resolve_token(conn: &Connection) -> Option<ResolvedToken> {
-    // 1. 应用内已登录账号
-    if let Ok(Some(account)) = crate::services::github_service::load_account(conn) {
-        if !account.token.is_empty() {
-            return Some(ResolvedToken {
-                token: account.token,
-                source: TokenSource::Account,
-            });
-        }
-    }
-    // 2. 设置页 PAT
+    // 1. 设置页 PAT（发布专用，权限最明确）
     if let Ok(Some(pat)) = crate::repository::settings_repository::get(conn, settings::KEY_GITHUB_PAT) {
         if !pat.trim().is_empty() {
             return Some(ResolvedToken {
                 token: pat.trim().to_string(),
                 source: TokenSource::PersonalAccessToken,
+            });
+        }
+    }
+    // 2. 应用内已登录账号
+    if let Ok(Some(account)) = crate::services::github_service::load_account(conn) {
+        if !account.token.is_empty() {
+            return Some(ResolvedToken {
+                token: account.token,
+                source: TokenSource::Account,
             });
         }
     }

@@ -73,9 +73,13 @@ CREATE INDEX IF NOT EXISTS idx_releases_project ON releases(project_id, created_
 
 ## 5. 鉴权设计
 
-优先级：**设置页 PAT → gh CLI → 未配置**
+优先级：**设置页 PAT → 应用内已登录账号 → gh CLI → 未配置**
 
-- PAT（`repo` scope）存 `app_settings` 表，key=`github_pat`，与现有明文存储惯例一致（keyring 加密留作后续独立事项）
+> 实现修订：应用已有 Device Flow 登录体系，其 Token 来自 GitHub App，API 权限由 App 侧配置决定，
+> 可能缺少 Contents: Read & write（创建 Release 必需，缺失时 GitHub 返回
+> 403 "Resource not accessible by integration"）。因此用户为发布显式配置的 PAT 优先于登录账号。
+
+- PAT（classic `repo` scope 或 Fine-grained `Contents: Read and write`）存 `app_settings` 表，key=`github_pat`，与现有明文存储惯例一致（keyring 加密留作后续独立事项）
 - gh CLI 检测：`gh auth token` 成功输出即视为可用；设置页与向导中显示「检测到 gh CLI 已登录，可直接使用」
 - Token 验证：`GET /user`，显示 login；无效时明确报错
 - AI Key 存 `app_settings`，key=`ai_api_key`；OpenAI 兼容 base URL 可配，key=`ai_base_url`（默认 `https://api.openai.com/v1`）

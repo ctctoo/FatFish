@@ -182,11 +182,21 @@ fn run_release_flow(app: &AppHandle, params: &ReleaseParams, release_id: &str) -
     if !(200..300).contains(&status) {
         let hint = match status {
             401 => "Token 无效或已过期".to_string(),
-            403 => "没有创建 Release 的权限".to_string(),
+            403 => {
+                if text.contains("not accessible by integration") {
+                    // 典型场景：应用内登录的 GitHub App Token 未配置 Contents 写权限
+                    "当前凭证没有内容写权限（GitHub App Token 的权限由 App 配置决定）。\
+                     请在「设置 -> 发布」填入一个 PAT（classic 勾选 repo，或 Fine-grained 授予 Contents: Read and write），\
+                     PAT 会优先生效"
+                        .to_string()
+                } else {
+                    "没有创建 Release 的权限".to_string()
+                }
+            }
             422 => "GitHub 拒绝了请求：tag 已存在或字段非法".to_string(),
             s => format!("HTTP {s}"),
         };
-        return fail("release", format!("创建 Release 失败（{hint}）：{text}"));
+        return fail("release", format!("创建 Release 失败（{hint}）"));
     }
     let created: serde_json::Value = match serde_json::from_str(&text) {
         Ok(v) => v,
@@ -261,6 +271,12 @@ fn run_release_flow(app: &AppHandle, params: &ReleaseParams, release_id: &str) -
             Ok(r) => {
                 let s = r.status();
                 let t = r.text().unwrap_or_default();
+                if s.as_u16() == 403 && t.contains("not accessible by integration") {
+                    return fail(
+                        "assets",
+                        format!("上传 {file_name} 失败：当前凭证没有内容写权限，请在「设置 -> 发布」配置 PAT（Contents: Read and write）"),
+                    );
+                }
                 return fail("assets", format!("上传 {file_name} 失败（HTTP {s}）：{t}"));
             }
             Err(e) => return fail("assets", format!("上传 {file_name} 失败：{e}")),
