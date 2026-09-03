@@ -4,6 +4,7 @@ pub mod git;
 pub mod github;
 pub mod link;
 pub mod project;
+pub mod release;
 pub mod scanned;
 pub mod tag;
 pub mod todo;

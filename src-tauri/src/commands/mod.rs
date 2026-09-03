@@ -5,6 +5,7 @@ pub mod github;
 pub mod link;
 pub mod mcp;
 pub mod project;
+pub mod release;
 pub mod scanner;
 pub mod system;
 pub mod tag;

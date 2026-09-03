@@ -13,11 +13,12 @@ import {
   Github,
   Bot,
   Info,
+  Rocket,
 } from "lucide-vue-next";
 import { useSettingsStore, type Gender } from "../stores/settings";
 import { useI18n } from "../i18n";
 import { tauriApi } from "../services/tauri";
-import type { UpdateInfo, McpStatus } from "../types";
+import type { UpdateInfo, McpStatus, PublishSettings } from "../types";
 import SettingsSection from "../components/settings/SettingsSection.vue";
 import SettingsRow from "../components/settings/SettingsRow.vue";
 import RadioGroup from "../components/settings/RadioGroup.vue";
@@ -131,6 +132,72 @@ async function toggleAgent(agentId: string, enable: boolean) {
 
 loadMcpStatus();
 
+// ---- 发布（Release）设置 ----
+const publishSettings = ref<PublishSettings | null>(null);
+const patInput = ref("");
+const aiKeyInput = ref("");
+const aiBaseUrlInput = ref("");
+const aiModelInput = ref("");
+const publishBusy = ref(false);
+const publishMsg = ref("");
+const publishError = ref("");
+
+async function loadPublishSettings() {
+  try {
+    publishSettings.value = await tauriApi.getPublishSettings();
+    aiBaseUrlInput.value = publishSettings.value.aiBaseUrl;
+    aiModelInput.value = publishSettings.value.aiModel;
+  } catch (e) {
+    publishError.value = String(e);
+  }
+}
+
+async function savePat() {
+  if (publishBusy.value) return;
+  publishBusy.value = true;
+  publishMsg.value = "";
+  publishError.value = "";
+  try {
+    if (patInput.value.trim()) {
+      const login = await tauriApi.verifyGithubPat(patInput.value.trim());
+      await tauriApi.setPublishSettings({ githubPat: patInput.value.trim() });
+      publishMsg.value = t("settings.publishPatSaved", { login });
+    } else if (publishSettings.value?.hasPat) {
+      await tauriApi.setPublishSettings({ githubPat: "" });
+      publishMsg.value = t("settings.publishPatCleared");
+    }
+    patInput.value = "";
+    await loadPublishSettings();
+  } catch (e) {
+    publishError.value = String(e);
+  } finally {
+    publishBusy.value = false;
+  }
+}
+
+async function saveAi() {
+  if (publishBusy.value) return;
+  publishBusy.value = true;
+  publishMsg.value = "";
+  publishError.value = "";
+  try {
+    await tauriApi.setPublishSettings({
+      aiApiKey: aiKeyInput.value.trim() || undefined,
+      aiBaseUrl: aiBaseUrlInput.value.trim() || undefined,
+      aiModel: aiModelInput.value.trim() || undefined,
+    });
+    aiKeyInput.value = "";
+    await loadPublishSettings();
+    publishMsg.value = t("settings.publishAiSaved");
+  } catch (e) {
+    publishError.value = String(e);
+  } finally {
+    publishBusy.value = false;
+  }
+}
+
+loadPublishSettings();
+
 // ---- 左侧分类导航 ----
 const sections = [
   { id: "profile", title: "settings.profile", icon: User },
@@ -140,6 +207,7 @@ const sections = [
   { id: "behavior", title: "settings.behavior", icon: Settings2 },
   { id: "mcp", title: "settings.mcp", icon: Bot },
   { id: "github", title: "settings.github", icon: Github },
+  { id: "publish", title: "settings.publishSection", icon: Rocket },
   { id: "about", title: "settings.about", icon: Info },
 ] as const;
 
@@ -346,6 +414,69 @@ onUnmounted(() => {
               {{ t("settings.githubDoc") }}
             </button>
           </div>
+        </SettingsSection>
+
+        <SettingsSection :id="targetId('publish')" title="settings.publishSection" desc="settings.publishDesc">
+          <SettingsRow label="settings.publishGithubAccount">
+            <span
+              class="mcp-agent-badge"
+              :class="publishSettings?.hasLoggedInAccount ? 'ok' : 'muted'"
+            >
+              {{ publishSettings?.hasLoggedInAccount ? t("settings.publishLoggedIn") : t("settings.publishNotLoggedIn") }}
+            </span>
+          </SettingsRow>
+          <SettingsRow label="settings.publishGhCli">
+            <span
+              class="mcp-agent-badge"
+              :class="publishSettings?.ghCliAvailable ? 'ok' : 'muted'"
+            >
+              {{ publishSettings?.ghCliAvailable ? t("settings.publishGhOk") : t("settings.publishGhMissing") }}
+            </span>
+          </SettingsRow>
+
+          <div class="profile-field" style="max-width: 420px; margin-top: 12px">
+            <span>
+              {{ t("settings.publishPat") }}
+              <em class="muted" v-if="publishSettings?.hasPat">
+                {{ t("settings.publishPatSet", { mask: publishSettings.patMasked ?? "" }) }}
+              </em>
+            </span>
+            <input
+              v-model="patInput"
+              type="password"
+              autocomplete="off"
+              :placeholder="t('settings.publishPatPh')"
+            />
+          </div>
+
+          <div class="profile-field" style="max-width: 420px">
+            <span>{{ t("settings.publishAiKey") }}</span>
+            <input
+              v-model="aiKeyInput"
+              type="password"
+              autocomplete="off"
+              :placeholder="t('settings.publishAiKeyPh')"
+            />
+          </div>
+          <div class="profile-field" style="max-width: 420px">
+            <span>{{ t("settings.publishAiBaseUrl") }}</span>
+            <input v-model="aiBaseUrlInput" type="text" placeholder="https://api.openai.com/v1" />
+          </div>
+          <div class="profile-field" style="max-width: 420px">
+            <span>{{ t("settings.publishAiModel") }}</span>
+            <input v-model="aiModelInput" type="text" placeholder="gpt-4o-mini" />
+          </div>
+
+          <div class="gh-actions-row">
+            <button class="btn small" :disabled="publishBusy" @click="savePat">
+              {{ t("settings.publishPatSave") }}
+            </button>
+            <button class="btn small" :disabled="publishBusy" @click="saveAi">
+              {{ t("common.save") }}
+            </button>
+          </div>
+          <p v-if="publishMsg" class="mcp-hint caption" style="color: var(--accent)">{{ publishMsg }}</p>
+          <p v-if="publishError" class="mcp-error">{{ publishError }}</p>
         </SettingsSection>
 
         <SettingsSection :id="targetId('about')" title="settings.about">

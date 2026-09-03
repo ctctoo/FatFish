@@ -187,6 +187,86 @@ export interface GithubLoginResult {
   message: string | null;
 }
 
+// ---- 发布（Release）----
+
+export interface Release {
+  id: string;
+  projectId: string;
+  version: string;
+  tagName: string;
+  /** preparing | tag_pushed | published | failed */
+  status: string;
+  changelog: string | null;
+  releaseUrl: string | null;
+  errorMessage: string | null;
+  releasedAt: string | null;
+  createdAt: string;
+}
+
+export interface ReleaseCheck {
+  key: string;
+  passed: boolean;
+  message: string;
+}
+
+export interface CommitSummary {
+  hash: string;
+  subject: string;
+}
+
+export interface ReleaseContext {
+  checks: ReleaseCheck[];
+  latestTag: string | null;
+  suggestedVersion: string;
+  suggestedTag: string;
+  commits: CommitSummary[];
+  draftChangelog: string;
+  login: string | null;
+  /** account / pat / gh_cli / none */
+  tokenSource: string;
+  hasVersionFiles: boolean;
+  isDirty: boolean;
+}
+
+export interface ReleaseStartArgs {
+  projectId: string;
+  version: string;
+  tagName: string;
+  changelog: string;
+  assets: string[];
+  draft: boolean;
+  prerelease: boolean;
+  syncVersion: boolean;
+}
+
+export interface ReleaseProgress {
+  releaseId: string;
+  /** prepare | version | tag | release | assets | done */
+  step: string;
+  currentFile: string | null;
+  uploadedBytes: number | null;
+  totalBytes: number | null;
+  message: string | null;
+}
+
+export interface ReleaseOutcome {
+  releaseId: string;
+  success: boolean;
+  releaseUrl: string | null;
+  error: string | null;
+  step: string;
+}
+
+export interface PublishSettings {
+  hasLoggedInAccount: boolean;
+  ghCliAvailable: boolean;
+  hasPat: boolean;
+  patMasked: string | null;
+  aiBaseUrl: string;
+  aiModel: string;
+  hasAiKey: boolean;
+}
+
 /** 状态枚举值 — UIPlan §3.3：进行中 / 计划中 / 暂停 / 已完成 / 归档 */
 export const STATUS_VALUES = ["IN_PROGRESS", "PLANNED", "PAUSED", "COMPLETED", "ARCHIVED"] as const;
 

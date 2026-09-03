@@ -107,6 +107,23 @@ pub fn init_connection(db_path: &std::path::Path) -> Result<Connection, rusqlite
 
         CREATE INDEX IF NOT EXISTS idx_activities_project
             ON activities(project_id, created_at DESC);
+
+        CREATE TABLE IF NOT EXISTS releases (
+            id TEXT PRIMARY KEY,
+            project_id TEXT NOT NULL,
+            version TEXT NOT NULL,
+            tag_name TEXT NOT NULL,
+            status TEXT NOT NULL DEFAULT 'preparing',
+            changelog TEXT,
+            release_url TEXT,
+            error_message TEXT,
+            released_at TEXT,
+            created_at TEXT NOT NULL,
+            FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE CASCADE
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_releases_project
+            ON releases(project_id, created_at DESC);
         "#,
     )?;
 

@@ -1,7 +1,12 @@
+pub mod ai_service;
+pub mod changelog_service;
 pub mod git_service;
+pub mod github_auth_service;
 pub mod github_service;
 pub mod mcp_config_service;
 pub mod project_service;
+pub mod release_service;
 pub mod scanner_service;
 pub mod search_service;
 pub mod update_service;
+pub mod version_file_service;

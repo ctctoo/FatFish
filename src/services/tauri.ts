@@ -19,6 +19,10 @@ import type {
   GithubDeviceCode,
   GithubLoginResult,
   GithubRepo,
+  PublishSettings,
+  Release,
+  ReleaseContext,
+  ReleaseStartArgs,
 } from "../types";
 
 export const tauriApi = {
@@ -151,6 +155,34 @@ export const tauriApi = {
   },
   githubListRepos(): Promise<GithubRepo[]> {
     return invoke("github_list_repos");
+  },
+
+  // ---- release ----
+  getReleaseContext(projectId: string): Promise<ReleaseContext> {
+    return invoke("get_release_context", { projectId });
+  },
+  polishChangelog(markdown: string): Promise<string> {
+    return invoke("polish_changelog", { markdown });
+  },
+  startRelease(args: ReleaseStartArgs): Promise<string> {
+    return invoke("start_release", { args });
+  },
+  listReleases(projectId: string, limit?: number): Promise<Release[]> {
+    return invoke("list_releases", { projectId, limit: limit ?? null });
+  },
+  getPublishSettings(): Promise<PublishSettings> {
+    return invoke("get_publish_settings");
+  },
+  setPublishSettings(args: {
+    githubPat?: string;
+    aiApiKey?: string;
+    aiBaseUrl?: string;
+    aiModel?: string;
+  }): Promise<void> {
+    return invoke("set_publish_settings", { args });
+  },
+  verifyGithubPat(token: string): Promise<string> {
+    return invoke("verify_github_pat", { token });
   },
 
   // ---- update ----

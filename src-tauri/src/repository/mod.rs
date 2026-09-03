@@ -4,6 +4,7 @@ pub mod git_repository;
 pub mod github_repository;
 pub mod link_repository;
 pub mod project_repository;
+pub mod release_repository;
 pub mod settings_repository;
 pub mod tag_repository;
 pub mod todo_repository;

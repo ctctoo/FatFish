@@ -17,18 +17,20 @@ import {
   Plus,
   Link2,
   Globe,
+  Rocket,
 } from "lucide-vue-next";
 import ProjectCover from "../components/project/ProjectCover.vue";
 import ProjectTimeline from "../components/project/ProjectTimeline.vue";
 import ProjectDialog from "../components/dialog/ProjectDialog.vue";
 import LinkDialog from "../components/dialog/LinkDialog.vue";
 import ConfirmDialog from "../components/common/ConfirmDialog.vue";
+import ReleaseWizard from "../components/project/ReleaseWizard.vue";
 import { tauriApi } from "../services/tauri";
 import { useProjectStore } from "../stores/project";
 import { useSettingsStore } from "../stores/settings";
 import { useUiStore } from "../stores/ui";
 import { statusLabel, linkTypeLabel, relativeTime, useI18n } from "../i18n";
-import type { Activity, Link, Project } from "../types";
+import type { Activity, Link, Project, Release } from "../types";
 
 const props = defineProps<{ id: string }>();
 
@@ -40,6 +42,8 @@ const { t } = useI18n();
 
 const project = ref<Project | null>(null);
 const activities = ref<Activity[]>([]);
+const showReleaseWizard = ref(false);
+const releaseHistory = ref<Release[]>([]);
 const showForm = ref(false);
 const linkDialogMode = ref<"add" | "edit">("add");
 const editingLink = ref<Link | null>(null);
@@ -62,10 +66,15 @@ async function load() {
   try {
     project.value = await projectStore.getProject(props.id);
     activities.value = await tauriApi.listActivities(props.id);
+    releaseHistory.value = await tauriApi.listReleases(props.id).catch(() => []);
   } catch (e) {
     uiStore.showToast(String(e), "error");
     router.push("/projects");
   }
+}
+
+async function openReleaseWizard() {
+  showReleaseWizard.value = true;
 }
 
 async function toggleFavorite() {
@@ -333,12 +342,37 @@ function shortHash(hash: string | null): string {
             <span class="k">{{ t("detail.commitTime") }}</span>
             <span class="v">{{ formatTime(project.gitInfo.commitTime) }} · {{ t("card.updated") }} {{ relativeTime(settingsStore.locale, project.updatedAt) }}</span>
           </div>
+          <div class="release-actions">
+            <button class="btn small primary" @click="openReleaseWizard">
+              <Rocket :size="13" :stroke-width="1.8" /> {{ t("release.publishBtn") }}
+            </button>
+          </div>
         </template>
         <p v-else class="caption">{{ t("detail.notGit") }}</p>
+
+        <template v-if="releaseHistory.length">
+          <h3 class="release-history-title">{{ t("release.historyTitle") }}</h3>
+          <div v-for="rel in releaseHistory" :key="rel.id" class="release-history-row">
+            <span class="release-status-dot" :class="rel.status"></span>
+            <code>{{ rel.tagName }}</code>
+            <span class="caption">{{ formatTime(rel.createdAt) }}</span>
+            <button v-if="rel.releaseUrl" class="link-btn" @click="openLink(rel.releaseUrl)">
+              <ExternalLink :size="12" :stroke-width="1.8" />
+            </button>
+          </div>
+        </template>
       </div>
 
       <Transition name="overlay-out">
         <ProjectDialog v-if="showForm" :project="project" @close="showForm = false" @saved="load()" />
+      </Transition>
+      <Transition name="overlay-out">
+        <ReleaseWizard
+          v-if="showReleaseWizard"
+          :project-id="project.id"
+          @close="showReleaseWizard = false"
+          @published="load()"
+        />
       </Transition>
       <Transition name="overlay-out">
         <LinkDialog
@@ -399,5 +433,46 @@ function shortHash(hash: string | null): string {
   margin-left: auto;
   text-transform: none;
   letter-spacing: 0;
+}
+
+.release-actions {
+  display: flex;
+  margin-top: 12px;
+}
+
+.release-history-title {
+  margin-top: 18px !important;
+}
+
+.release-history-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  padding: 6px 0;
+}
+
+.release-history-row .caption {
+  margin-left: auto;
+}
+
+.release-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.release-status-dot.published {
+  background: var(--status-in-progress, #3d8b5f);
+}
+
+.release-status-dot.failed {
+  background: var(--status-paused, #d9534f);
+}
+
+.release-status-dot.preparing,
+.release-status-dot.tag_pushed {
+  background: var(--text-tertiary);
 }
 </style>
